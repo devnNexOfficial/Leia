@@ -65,7 +65,7 @@ export const isValidName = (value: string): boolean => {
  * Deterministically generates an internal Supabase Auth email from a normalized phone number.
  */
 export const authEmailForPhone = (value: string): string =>
-  `phone-${normalizePakistaniPhone(value)}@leia-store.local`;
+  `phone-${normalizePakistaniPhone(value)}@leiacosmetics.com`;
 
 /**
  * Formats a numeric price into Pakistani Rupee string (e.g. "PKR 2,500").

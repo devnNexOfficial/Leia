@@ -32,6 +32,8 @@ type ShopSearch = {
   search?: string;
 };
 
+const ITEMS_PER_PAGE = 24;
+
 export const Route = createFileRoute("/shop")({
   validateSearch: (search: Record<string, unknown>): ShopSearch => {
     return {
@@ -67,10 +69,21 @@ function ShopContent() {
   const { products, categories } = useStorefrontCatalog();
   const searchParams = Route.useSearch();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [maxPrice, setMaxPrice] = useState<number>(10000);
+
+  // Dynamically compute the catalog's maximum price with a small buffer
+  const catalogMaxPrice = useMemo(() => {
+    if (!products || products.length === 0) return 10000;
+    const maxProductPrice = Math.max(...products.map((p) => p.price));
+    return Math.max(10000, Math.ceil(maxProductPrice / 1000) * 1000);
+  }, [products]);
+
+  const [userMaxPrice, setUserMaxPrice] = useState<number | null>(null);
+  const activeMaxPrice = userMaxPrice ?? catalogMaxPrice;
+
   const [sortBy, setSortBy] = useState<SortOption>("bestsellers");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
 
   const sortOptions = [
     { value: "bestsellers", label: "Bestsellers", icon: Flame, color: "text-[#D6336C]" },
@@ -104,6 +117,11 @@ function ShopContent() {
     }
   }, [categories, searchParams.category, searchParams.search]);
 
+  // Reset pagination to first batch whenever active filters or search change
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [selectedCategory, activeMaxPrice, searchQuery, sortBy]);
+
   // Filter & Sort logic
   const filteredProducts = useMemo(() => {
     return products
@@ -113,7 +131,7 @@ function ShopContent() {
           return false;
         }
         // Price filter
-        if (p.price > maxPrice) {
+        if (p.price > activeMaxPrice) {
           return false;
         }
         // Search query
@@ -134,13 +152,18 @@ function ShopContent() {
         if (a.isBestseller !== b.isBestseller) return a.isBestseller ? -1 : 1;
         return b.reviewCount - a.reviewCount;
       });
-  }, [products, selectedCategory, maxPrice, sortBy, searchQuery]);
+  }, [products, selectedCategory, activeMaxPrice, sortBy, searchQuery]);
+
+  const visibleProducts = useMemo(() => {
+    return filteredProducts.slice(0, visibleCount);
+  }, [filteredProducts, visibleCount]);
 
   const resetFilters = () => {
     setSelectedCategory("All");
-    setMaxPrice(10000);
+    setUserMaxPrice(null);
     setSearchQuery("");
     setSortBy("bestsellers");
+    setVisibleCount(ITEMS_PER_PAGE);
   };
 
   return (
@@ -312,13 +335,50 @@ function ShopContent() {
             </BounceButton>
           </motion.div>
         ) : (
-          <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            <AnimatePresence mode="popLayout">
-              {filteredProducts.map((p, i) => (
-                <ShopProductCard key={p.id} product={p} index={i} />
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <>
+            <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              <AnimatePresence mode="popLayout">
+                {visibleProducts.map((p, i) => (
+                  <ShopProductCard key={p.id} product={p} index={i} />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* ── Pagination / Load More Controls ── */}
+            <div className="mt-12 flex flex-col items-center justify-center space-y-4">
+              <div className="flex flex-col items-center gap-2 w-full max-w-xs text-center">
+                <span className="text-xs font-bold text-gray-500">
+                  Showing <span className="text-[#D6336C] font-black">{visibleProducts.length}</span> of{" "}
+                  <span className="text-gray-900 font-black">{filteredProducts.length}</span> products
+                </span>
+                <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden border border-gray-200/50">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-[#FF80AA] to-[#D6336C] rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${Math.min(100, (visibleProducts.length / filteredProducts.length) * 100)}%`,
+                    }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  />
+                </div>
+              </div>
+
+              {visibleCount < filteredProducts.length ? (
+                <BounceButton
+                  onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
+                  variant="secondary"
+                  className="w-full sm:w-auto px-8 py-3 rounded-2xl bg-white border border-[#F5C6D5] text-[#D6336C] font-extrabold text-xs uppercase tracking-wider hover:bg-[#FFF0F5] hover:border-[#D6336C] transition-all shadow-xs"
+                >
+                  Load More Products ({filteredProducts.length - visibleProducts.length} remaining)
+                </BounceButton>
+              ) : (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFF5F8] border border-[#F5C6D5]/60 text-xs font-bold text-gray-500">
+                  <Sparkles className="size-3.5 text-[#D6336C]" />
+                  <span>You've viewed all {filteredProducts.length} items</span>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </section>
     </main>

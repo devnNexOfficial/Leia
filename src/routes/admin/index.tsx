@@ -40,6 +40,7 @@ function Dashboard() {
     const channel = client
       .channel("admin-dashboard")
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
       .subscribe();
 
     return () => {

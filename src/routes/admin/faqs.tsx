@@ -7,8 +7,6 @@ import {
   Search,
   Eye,
   EyeOff,
-  MoveUp,
-  MoveDown,
   Layers,
 } from "lucide-react";
 import { useEffect, useState } from "react";

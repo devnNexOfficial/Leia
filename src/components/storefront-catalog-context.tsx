@@ -30,7 +30,7 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
     const client = supabase; if (!client) { setError("Store data is unavailable."); setLoading(false); return; }
     const load = async () => {
       const [productsResult, categoriesResult] = await Promise.all([
-        client.from("products").select("id,name,description,price,compare_at_price,stock_count,image_url,image_urls,ingredients,directions,created_at,is_featured,is_new_arrival,new_arrival_order,categories(name),product_variants(id,name,stock_count,price_override,image_url)").eq("status", "Active").eq("is_active", true).order("new_arrival_order", { ascending: true, nullsFirst: false }).order("created_at", { ascending: false }),
+        client.from("products").select("id,name,description,price,compare_at_price,stock_count,image_url,image_urls,ingredients,directions,created_at,is_featured,is_new_arrival,new_arrival_order,categories(name),product_variants(id,name,stock_count,price_override,image_url)").eq("is_active", true).order("new_arrival_order", { ascending: true, nullsFirst: false }).order("created_at", { ascending: false }),
         client.from("categories").select("id,name,image_url,description,display_order,created_at").order("display_order", { ascending: true, nullsFirst: false }).order("created_at", { ascending: true }),
       ]);
       if (productsResult.error || categoriesResult.error) { setError(productsResult.error?.message ?? categoriesResult.error?.message ?? "Could not load store data."); setLoading(false); return; }

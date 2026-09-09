@@ -24,7 +24,7 @@ const notEligible = [
 ];
 
 const steps = [
-  { step: "01", title: "Contact Support", desc: "WhatsApp us at 0300-0000000 with your Order ID and clear photos of the product within 7 days of delivery.", icon: Package },
+  { step: "01", title: "Contact Support", desc: "WhatsApp us at 0341-7813558 with your Order ID and clear photos of the product within 7 days of delivery.", icon: Package },
   { step: "02", title: "Get Approval", desc: "Our team will review your request within 24 hours and send you a return approval with pickup details.", icon: CheckCircle2 },
   { step: "03", title: "Schedule Pickup", desc: "Once approved, we'll schedule a free pickup from your address via our courier partner.", icon: RefreshCw },
   { step: "04", title: "Receive Refund", desc: "After inspection, your refund is processed within 5–7 business days via original payment method or store credit.", icon: Clock },

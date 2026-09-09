@@ -1,6 +1,7 @@
 import type { CartItem } from "@/components/cart-context";
 import { supabase } from "@/lib/supabase";
 import { sendOrderNotifications } from "@/lib/order-emails";
+import { normalizePakistaniPhone } from "@/lib/utils";
 
 export type StorefrontOrder = { order_id: string; order_number: string; total: number; shipping_fee: number };
 
@@ -10,11 +11,12 @@ export async function submitStorefrontOrder(input: {
   phone: string;
   address: string;
   city: string;
-  paymentMethod: "Cash on Delivery" | "JazzCash" | "Easypaisa";
+  paymentMethod: string;
   items: CartItem[];
 }): Promise<StorefrontOrder> {
   if (!supabase) throw new Error("Checkout is currently unavailable (Database connection not configured).");
 
+  const standardPhone = normalizePakistaniPhone(input.phone);
   const paymentMethod = input.paymentMethod === "Cash on Delivery" ? "COD" : input.paymentMethod;
   let finalOrder: StorefrontOrder | null = null;
 
@@ -23,7 +25,7 @@ export async function submitStorefrontOrder(input: {
     const { data, error } = await supabase.rpc("place_storefront_order", {
       p_customer_name: input.customerName.trim(),
       p_customer_email: input.email.trim() || null,
-      p_customer_phone: input.phone.trim() || null,
+      p_customer_phone: standardPhone || null,
       p_shipping_address: input.address.trim(),
       p_city: input.city.trim(),
       p_payment_method: paymentMethod,
@@ -66,7 +68,7 @@ export async function submitStorefrontOrder(input: {
         order_number: orderNumber,
         customer_name: input.customerName.trim(),
         customer_email: input.email.trim() || null,
-        customer_phone: input.phone.trim() || null,
+        customer_phone: standardPhone || null,
         shipping_address: input.address.trim(),
         city: input.city.trim(),
         total,

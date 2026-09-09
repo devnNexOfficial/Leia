@@ -22,7 +22,7 @@ export function FloatingWhatsApp() {
 
       {/* Floating Button */}
       <motion.a
-        href="https://wa.me/923001234567?text=Hi%20LEIA%2C%20I%20need%20help%20with%20my%20order."
+        href="https://wa.me/923417813558?text=Hi!%20I%20have%20a%20question%20about%20LEIA%20products."
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"

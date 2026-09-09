@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdminError, AdminLoading, EmptyState } from "@/components/admin/AdminStates";
 import { adminButton, adminCard, adminInput } from "@/components/admin/AdminLayout";
@@ -146,7 +146,31 @@ function CategoryForm({
   const [image, setImage] = useState(category?.image_url ?? "");
   const [description, setDescription] = useState(category?.description ?? "");
   const [displayOrder, setDisplayOrder] = useState(category?.display_order?.toString() ?? "");
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleImageUpload = async (file: File) => {
+    if (!supabase) return;
+    setUploading(true);
+    setError("");
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `category-${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { contentType: file.type });
+      if (uploadError) {
+        setError(uploadError.message);
+      } else {
+        const publicUrl = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+        setImage(publicUrl);
+      }
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,14 +231,39 @@ function CategoryForm({
           />
         </label>
 
-        <label className="mt-4 block text-sm font-medium">
-          Image URL <span className="font-normal text-slate-400">(optional)</span>
-          <input
-            className={`${adminInput} mt-1`}
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-        </label>
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-1">
+            Image URL or Upload{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              className={`${adminInput} flex-1`}
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              placeholder="https://... or click Upload →"
+            />
+            <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-slate-300 bg-slate-50 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors shrink-0">
+              <Upload className="size-3.5" />
+              {uploading ? "Uploading…" : "Upload"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file);
+                }}
+              />
+            </label>
+          </div>
+          {image && (
+            <div className="mt-2 relative w-full h-24 rounded-lg overflow-hidden border border-slate-200">
+              <img src={image} alt="Category preview" className="w-full h-full object-cover" />
+            </div>
+          )}
+        </div>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 

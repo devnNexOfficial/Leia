@@ -103,7 +103,7 @@ function ContactPage() {
             </div>
 
             {[
-              { icon: Phone, label: "WhatsApp / Call", value: "+92 300 0000000", href: "tel:+923000000000", color: "bg-emerald-50 text-emerald-600" },
+              { icon: Phone, label: "WhatsApp / Call", value: "0341 7813558", href: "https://wa.me/923417813558?text=Hi!%20I%20have%20a%20question%20about%20LEIA%20products.", color: "bg-emerald-50 text-emerald-600" },
               { icon: Mail, label: "Email Us", value: "hello@leia.pk", href: "mailto:hello@leia.pk", color: "bg-[#FFF0F5] text-[#D6336C]" },
               { icon: Instagram, label: "Instagram", value: "@leia.pk", href: "https://instagram.com", color: "bg-purple-50 text-purple-600" },
               { icon: MapPin, label: "Head Office", value: "Lahore, Punjab, Pakistan", href: "#", color: "bg-amber-50 text-amber-600" },

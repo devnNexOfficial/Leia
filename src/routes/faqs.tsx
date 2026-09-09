@@ -294,7 +294,7 @@ function FAQsPage() {
             </p>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://wa.me/923000000000"
+                href="https://wa.me/923417813558?text=Hi!%20I%20have%20a%20question%20about%20LEIA%20products."
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-[#D6336C] hover:bg-pink-50 font-bold text-xs px-6 py-3 rounded-full transition-all shadow-md active:scale-95"

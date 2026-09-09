@@ -16,8 +16,9 @@ const columns = [
   {
     title: "SUPPORT",
     links: [
-      { name: "FAQs", to: "/faq" },
+      { name: "FAQs", to: "/faqs" },
       { name: "Contact Us", to: "/contact" },
+      { name: "Call / WhatsApp: 0341-7813558", href: "https://wa.me/923417813558?text=Hi!%20I%20have%20a%20question%20about%20LEIA%20products." },
     ],
   },
 ];
@@ -69,12 +70,23 @@ export function Footer() {
               <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link.name}>
-                    <Link
-                      to={link.to}
-                      className="text-xs text-white/70 hover:text-white transition-colors"
-                    >
-                      {link.name}
-                    </Link>
+                    {"href" in link && link.href ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-white/70 hover:text-white transition-colors"
+                      >
+                        {link.name}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.to!}
+                        className="text-xs text-white/70 hover:text-white transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

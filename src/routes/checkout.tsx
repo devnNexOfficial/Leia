@@ -60,10 +60,13 @@ function CheckoutContent() {
   const [saveInfo, setSaveInfo] = useState(false);
 
   // Payment
-  const [paymentMethod, setPaymentMethod] = useState<"Cash on Delivery" | "JazzCash" | "Easypaisa">("Cash on Delivery");
+  const [paymentMethod, setPaymentMethod] = useState<"Cash on Delivery">("Cash on Delivery");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+
 
   const shippingFee = 350;
   const total = subtotal + shippingFee;
@@ -318,7 +321,7 @@ function CheckoutContent() {
                 </div>
                 <input
                   type="tel"
-                  placeholder="300 1234567"
+                  placeholder="341 7813558"
                   maxLength={11}
                   value={phone}
                   onChange={(e) => {

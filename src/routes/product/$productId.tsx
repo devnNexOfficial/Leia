@@ -50,7 +50,75 @@ function ProductDetailContent() {
   const { products, loading } = useStorefrontCatalog();
   const product = useMemo(() => products.find((item) => item.id === productId), [products, productId]);
   const { addItem } = useCart();
-  if (loading || !product) return <main className="mx-auto max-w-7xl px-6 py-8 md:py-12" />;
+
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-7xl px-6 py-16 flex flex-col items-center justify-center min-h-[50vh]">
+        <div className="flex size-14 items-center justify-center rounded-full bg-[#FFF0F5] text-[#D6336C] animate-pulse border border-[#F5C6D5]">
+          <Sparkles className="size-7" />
+        </div>
+        <p className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-400">Loading Product Details...</p>
+      </main>
+    );
+  }
+
+  if (!product) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-12 md:py-20 min-h-[60vh] flex flex-col justify-center">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-gray-400">
+          <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
+          <ChevronRight className="size-3" />
+          <Link to="/shop" className="hover:text-gray-900 transition-colors">Shop</Link>
+          <ChevronRight className="size-3" />
+          <span className="font-semibold text-gray-700">Product Not Found</span>
+        </nav>
+
+        {/* Friendly Error Container */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="relative overflow-hidden rounded-3xl border border-[#F5C6D5]/80 bg-gradient-to-br from-[#FFE8F0]/60 via-[#FFF6F9] to-[#FFF0F5] p-8 sm:p-14 text-center shadow-xs"
+        >
+          {/* Ambient Glow Orbs */}
+          <div className="pointer-events-none absolute -top-12 -left-12 size-64 rounded-full bg-[#FF80AA]/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-12 -right-12 size-64 rounded-full bg-[#D6336C]/15 blur-3xl" />
+
+          <div className="relative z-10 mx-auto max-w-md space-y-4">
+            <div className="mx-auto flex size-20 items-center justify-center rounded-2xl bg-white border border-[#F5C6D5] text-[#D6336C] shadow-sm">
+              <ShoppingBag className="size-10 stroke-[1.5]" />
+            </div>
+
+            <span className="inline-block rounded-full bg-[#FFF0F5] border border-[#F5C6D5] px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-widest text-[#D6336C]">
+              404 • Item Unavailable
+            </span>
+
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-[#1A0A10] tracking-tight">
+              Product Not Found
+            </h1>
+
+            <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed">
+              We couldn't locate the product you were looking for. It may have been renamed, removed, or is temporarily out of stock.
+            </p>
+
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link to="/shop" className="w-full sm:w-auto">
+                <BounceButton variant="primary" className="w-full sm:w-auto px-6 py-3 text-xs font-extrabold uppercase tracking-wider">
+                  Explore Shop Catalog
+                </BounceButton>
+              </Link>
+              <Link to="/" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-200 bg-white font-bold text-xs text-gray-700 hover:border-[#D6336C] hover:text-[#D6336C] transition-all shadow-2xs">
+                  Return to Home
+                </button>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+      </main>
+    );
+  }
 
   const galleryImages = product.gallery || [product.image];
   const [activeImageIndex, setActiveImageIndex] = useState(0);

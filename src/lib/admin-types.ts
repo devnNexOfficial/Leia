@@ -13,4 +13,4 @@ export type AdminOrder = {
   order_items?: AdminOrderItem[]; customers?: AdminCustomer | null;
 };
 export type AdminOrderItem = { id: string; order_id: string; product_name: string; variant_name: string | null; unit_price: number; quantity: number; image_url: string | null };
-export type AdminCustomer = { id: string; name: string; email: string | null; phone: string | null; created_at: string };
+export type AdminCustomer = { id: string; name: string; full_name?: string | null; email: string | null; phone: string | null; auth_user_id?: string | null; created_at: string };

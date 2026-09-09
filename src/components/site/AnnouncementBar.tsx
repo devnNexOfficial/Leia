@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 const announcements = [
   { icon: Truck, text: "FREE EXPRESS DELIVERY ON ORDERS OVER PKR 2,500" },
-  { icon: CreditCard, text: "CASH ON DELIVERY, JAZZCASH & EASYPAISA ACCEPTED" },
+  { icon: CreditCard, text: "CASH ON DELIVERY ACCEPTED NATIONWIDE" },
   { icon: Gift, text: "FLAT 15% OFF YOUR FIRST ORDER — CODE: HELLO15" },
 ];
 

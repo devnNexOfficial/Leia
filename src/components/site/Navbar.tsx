@@ -1,14 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Search, User, UserCheck, ShoppingBag, Menu, X, Heart } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/components/cart-context";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { useWishlist } from "@/components/wishlist-context";
 import { SearchModal } from "@/components/site/SearchModal";
 import { WishlistDrawer } from "@/components/site/WishlistDrawer";
-import { AccountModal } from "@/components/site/AccountModal";
 import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
-import { supabase } from "@/lib/supabase";
 
 export function Navbar() {
   const { count, openDrawer } = useCart();
@@ -16,27 +14,13 @@ export function Navbar() {
   const { categories } = useStorefrontCatalog();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
-
   const [scrolled, setScrolled] = useState(false);
-
-
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-    void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(Boolean(session)));
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
-
 
   return (
     <>
@@ -98,7 +82,7 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-0.5">
-            {/* 1. Search Action */}
+            {/* Search */}
             <button
               aria-label="Search"
               onClick={() => setSearchOpen(true)}
@@ -108,7 +92,7 @@ export function Navbar() {
               <Search className="size-5" />
             </button>
 
-            {/* 2. Wishlist Action */}
+            {/* Wishlist */}
             <button
               aria-label={`Wishlist — ${wishlistCount} saved item(s)`}
               onClick={openWishlist}
@@ -123,17 +107,7 @@ export function Navbar() {
               )}
             </button>
 
-            {/* 3. Account Action */}
-            <button
-              aria-label="Account"
-              onClick={() => setAccountOpen(true)}
-              className="p-2 text-gray-600 hover:text-[#D6336C] transition-colors rounded-full hover:bg-[#FFF0F4]"
-              title="Account"
-            >
-              {signedIn ? <UserCheck className="size-5 text-[#D6336C]" /> : <User className="size-5" />}
-            </button>
-
-            {/* 4. Cart Action */}
+            {/* Cart */}
             <button
               aria-label={`Cart — ${count} item(s)`}
               onClick={openDrawer}
@@ -152,7 +126,7 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-[#F5C6D5] bg-white px-5 py-4 space-y-1">
+          <div className="md:hidden border-t border-[#F5C6D5] bg-white px-5 py-4 space-y-1 shadow-lg">
             <Link
               to="/"
               onClick={() => setMobileOpen(false)}
@@ -160,17 +134,53 @@ export function Navbar() {
             >
               Home
             </Link>
-            {categories.map((category) => (
-              <Link
-                key={category.slug}
-                to="/shop"
-                search={{ category: category.name }}
-                onClick={() => setMobileOpen(false)}
-                className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-              >
-                {category.name}
-              </Link>
-            ))}
+            <Link
+              to="/shop"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+            >
+              Shop All Products
+            </Link>
+
+            {/* Categories */}
+            {categories.length > 0 && (
+              <div className="py-1 border-y border-gray-100 my-1.5 space-y-0.5">
+                <p className="px-4 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#D6336C]">Categories</p>
+                {categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    to="/shop"
+                    search={{ category: category.name }}
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-6 py-2 rounded-xl text-xs font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <Link
+              to="/blog"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+            >
+              Beauty Journal (Blog)
+            </Link>
+            <Link
+              to="/faqs"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+            >
+              FAQs & Help
+            </Link>
+            <Link
+              to="/contact"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+            >
+              Contact Us
+            </Link>
           </div>
         )}
       </header>
@@ -178,7 +188,6 @@ export function Navbar() {
       {/* Action Modals & Drawers */}
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       <WishlistDrawer />
-      <AccountModal isOpen={accountOpen} onClose={() => setAccountOpen(false)} />
       <CartDrawer />
     </>
   );
