@@ -213,24 +213,6 @@
   font-family: "Bodoni Moda", Georgia, serif;
 }
 
-@keyframes waveContinuous1 {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes waveContinuous2 {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -240,20 +222,17 @@
   }
 }
 
-@utility animate-wave-slow {
-  animation: waveContinuous1 20s linear infinite;
-  will-change: transform;
-}
-
-@utility animate-wave-fast {
-  animation: waveContinuous2 12s linear infinite;
-  will-change: transform;
-}
-
 @utility animate-marquee {
   display: flex;
   width: max-content;
   animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+@utility animate-marquee-slow {
+  display: flex;
+  width: max-content;
+  animation: marquee 50s linear infinite;
   will-change: transform;
 }
 

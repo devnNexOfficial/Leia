@@ -101,7 +101,7 @@ export function VideoShowcaseSection() {
   if (liveReels.length === 0) return null;
 
   return (
-    <section className="py-20 px-5 md:px-8 bg-gradient-to-b from-white via-[#FFF5F8] to-white relative overflow-hidden">
+    <section className="py-12 md:py-20 px-4 sm:px-6 md:px-8 bg-gradient-to-b from-white via-[#FFF5F8] to-white relative overflow-hidden">
       {/* Background ambient animated orb */}
       <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.07, 0.14, 0.07] }}
@@ -155,7 +155,7 @@ export function VideoShowcaseSection() {
                 setActiveVideo(reel);
                 setIsPlaying(true);
               }}
-              className="group relative rounded-3xl overflow-hidden bg-gray-900 border-2 border-[#F5C6D5] hover:border-[#D6336C] shadow-lg hover:shadow-2xl hover:shadow-[#D6336C]/20 transition-colors duration-300 cursor-pointer h-[380px] md:h-[440px] flex flex-col justify-between"
+              className="group relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gray-900 border-2 border-[#F5C6D5] hover:border-[#D6336C] shadow-lg hover:shadow-2xl hover:shadow-[#D6336C]/20 transition-colors duration-300 cursor-pointer h-[260px] sm:h-[340px] md:h-[440px] flex flex-col justify-between"
             >
               {/* Thumbnail Image / Fallback */}
               {reel.thumbnail ? (

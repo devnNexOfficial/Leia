@@ -389,11 +389,16 @@ function ProductForm({
           />
         </div>
 
-        <div className="mt-6">
-          <div className="mb-2 flex justify-between">
-            <h3 className="font-semibold">Product images</h3>
-            <label className="cursor-pointer text-sm">
-              + Upload
+        <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-slate-900">Product Images</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Image 1 is the primary card image. Image 2 (optional) cross-fades smoothly on card hover across the store.
+              </p>
+            </div>
+            <label className="cursor-pointer rounded-lg bg-[#D6336C] px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#B42358] transition-colors">
+              + Upload Image
               <input
                 className="hidden"
                 type="file"
@@ -407,29 +412,50 @@ function ProductForm({
               />
             </label>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {images.map((image, i) => (
-              <div className="relative" key={image}>
-                <img
-                  src={image}
-                  alt="Product image preview"
-                  loading="lazy"
-                  decoding="async"
-                  className="h-24 w-full rounded object-cover"
-                />
-                <button
-                  className="absolute right-1 top-1 bg-white text-red-600 rounded-full p-0.5"
-                  type="button"
-                  onClick={() =>
-                    setImages((items) => items.filter((_, index) => index !== i))
-                  }
-                  aria-label="Remove image"
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+          {images.length === 0 ? (
+            <div className="mt-3 flex h-24 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white text-xs text-slate-400">
+              No images uploaded yet. Upload a primary image and an optional hover image.
+            </div>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {images.map((image, i) => (
+                <div className="relative group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xs" key={`${image}-${i}`}>
+                  <img
+                    src={image}
+                    alt={`Product preview ${i + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-28 w-full object-cover"
+                  />
+                  <div className="absolute top-1.5 left-1.5 z-10">
+                    {i === 0 ? (
+                      <span className="rounded-md bg-slate-900/85 backdrop-blur-xs px-2 py-0.5 text-[10px] font-extrabold uppercase text-white shadow-xs">
+                        1. Primary
+                      </span>
+                    ) : i === 1 ? (
+                      <span className="rounded-md bg-[#D6336C]/90 backdrop-blur-xs px-2 py-0.5 text-[10px] font-extrabold uppercase text-white shadow-xs flex items-center gap-1">
+                        ✨ 2. Hover Image
+                      </span>
+                    ) : (
+                      <span className="rounded-md bg-slate-600/80 backdrop-blur-xs px-2 py-0.5 text-[10px] font-extrabold uppercase text-white shadow-xs">
+                        {i + 1}. Gallery
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    className="absolute right-1.5 top-1.5 z-10 rounded-full bg-white/90 p-1 text-red-600 shadow-sm hover:bg-white transition-all"
+                    type="button"
+                    onClick={() =>
+                      setImages((items) => items.filter((_, index) => index !== i))
+                    }
+                    aria-label="Remove image"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mt-6">

@@ -28,35 +28,14 @@ export function Footer() {
   const subscribed = status === "success" || status === "duplicate";
 
   return (
-    <footer className="bg-[#D6527B] text-white pb-8 select-none">
-      {/* ── Wavy Top: pink waves rising from footer, transparent top shows white page ── */}
-      <div className="relative w-full overflow-hidden pointer-events-none" style={{ height: "130px" }}>
-        {/* Layer 1: Lighter pink wave (back, slower) — fills FROM wave curve downward */}
-        <svg
-          className="absolute top-0 left-0 w-[200%] h-full animate-wave-slow"
-          viewBox="0 0 2400 130"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0,70 C300,20 600,110 900,55 C1200,5 1500,100 1800,50 C2100,5 2300,90 2400,60 L2400,130 L0,130 Z"
-            fill="#EAA0B8"
-          />
-        </svg>
-
-        {/* Layer 2: Main footer pink wave (front, faster) — fills FROM wave curve downward */}
-        <svg
-          className="absolute top-0 left-0 w-[200%] h-full animate-wave-fast"
-          viewBox="0 0 2400 130"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0,90 C300,40 600,120 900,70 C1200,20 1500,110 1800,65 C2100,25 2300,105 2400,75 L2400,130 L0,130 Z"
-            fill="#D6527B"
-          />
-        </svg>
+    <footer className="w-full select-none overflow-x-hidden">
+      {/* ── Straight Top Divider ── */}
+      <div className="w-full flex flex-col pointer-events-none">
+        <div className="w-full h-6 bg-[#EAA0B8]"></div>
       </div>
+
+      {/* ── Main Footer Body ── */}
+      <div className="bg-[#D6527B] text-white pb-8 pt-4 -mt-0.5">
 
       <div className="mx-auto max-w-7xl px-6 md:px-12 relative z-20">
         {/* Top Grid: Links + Newsletter */}
@@ -109,7 +88,7 @@ export function Footer() {
             ) : (
               <form
                 onSubmit={submit}
-                className="flex items-center gap-2"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
               >
                 {/* Honeypot field for bot/spam prevention */}
                 <input
@@ -141,7 +120,7 @@ export function Footer() {
             )}
             {status === "error" && <p className="mt-2 text-[10px] font-semibold text-white">{message}</p>}
             <p className="text-[10px] text-white/50 mt-2">
-              Pruity formulas without compromises. What works.
+              Purity formulas without compromises. What works.
             </p>
           </div>
         </div>
@@ -160,7 +139,7 @@ export function Footer() {
         </div>
 
         {/* ── GIGANTIC DISPLAY BRAND LOGO ── */}
-        <div className="relative w-full overflow-hidden py-4 md:py-8 flex flex-col items-center justify-center">
+        <div className="relative w-full py-4 md:py-8 flex flex-col items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.7, y: 60 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -173,16 +152,28 @@ export function Footer() {
             }}
             className="w-full text-center"
           >
-            <motion.h1
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            <h1
               className="font-bodoni text-[clamp(5rem,18vw,18rem)] leading-[0.85] text-white/95 font-bold tracking-[0.25em] md:tracking-[0.35em] select-none uppercase drop-shadow-2xl pl-[0.25em]"
               style={{
                 textShadow: "0 0 80px rgba(255,255,255,0.15), 0 4px 32px rgba(0,0,0,0.2)"
               }}
             >
-              LEIA
-            </motion.h1>
+              {["L", "E", "I", "A"].map((char, i) => (
+                <motion.span
+                  key={i}
+                  animate={{ y: [0, -15, 0] }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity, 
+                    ease: "easeInOut",
+                    delay: i * 0.15 
+                  }}
+                  className="inline-block"
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </h1>
           </motion.div>
 
           {/* Bottom copyright bar */}
@@ -192,6 +183,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </div>
+  </footer>
+);
 }

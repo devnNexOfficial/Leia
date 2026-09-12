@@ -42,7 +42,7 @@ export function CategoryGrid() {
   const activeCat = useMemo(() => categories.find((c) => c.slug === active), [categories, active]);
 
   return (
-    <section className="py-16 px-5 md:px-8 bg-[#FFF5F8]">
+    <section className="py-12 md:py-16 px-4 sm:px-6 md:px-8 bg-[#FFF5F8]">
       <div className="mx-auto max-w-7xl">
         {/* Heading */}
         <motion.div
@@ -58,7 +58,7 @@ export function CategoryGrid() {
         </motion.div>
 
         {/* ── Circular Category Tabs ── */}
-        <div className="flex justify-center gap-6 md:gap-10 mb-12 flex-wrap">
+        <div className="flex justify-center gap-4 md:gap-10 mb-10 md:mb-12 flex-wrap">
           {categories.map((cat, ci) => {
             const isActive = cat.slug === active;
             return (
@@ -75,12 +75,12 @@ export function CategoryGrid() {
               >
                 {/* Circle */}
                 <div
-                  className={`relative rounded-full overflow-hidden transition-all duration-300 ${
+                  style={{ width: undefined, height: undefined }}
+                  className={`relative rounded-full overflow-hidden transition-all duration-300 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 ${
                     isActive
                       ? "ring-4 ring-[#D6336C] ring-offset-4 ring-offset-[#FFF5F8] shadow-xl shadow-[#D6336C]/30 scale-110"
                       : "ring-2 ring-[#F5C6D5] ring-offset-2 ring-offset-[#FFF5F8] group-hover:ring-[#D6336C] group-hover:scale-105 shadow-md"
                   }`}
-                  style={{ width: 96, height: 96 }}
                 >
                   <img
                     src={cat.image}
@@ -220,8 +220,19 @@ export function CategoryGrid() {
                           alt={product.name}
                           loading="lazy"
                           decoding="async"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className={`w-full h-full object-cover transition-all duration-300 ease-out group-hover:scale-105 ${
+                            product.hoverImage ? "opacity-100 group-hover:opacity-0" : ""
+                          }`}
                         />
+                        {product.hoverImage && (
+                          <img
+                            src={product.hoverImage}
+                            alt={`${product.name} alternate view`}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out group-hover:scale-105"
+                          />
+                        )}
                         <div className="absolute bottom-0 inset-x-0 bg-white/95 py-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                           <button
                             onClick={(e) => { e.preventDefault(); addItem(product); }}

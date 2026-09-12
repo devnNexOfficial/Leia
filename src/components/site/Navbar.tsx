@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, Menu, X, Heart } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Heart, Home, BookOpen, HelpCircle, Mail, Layers } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/components/cart-context";
 import { CartDrawer } from "@/components/site/CartDrawer";
@@ -33,7 +33,7 @@ export function Navbar() {
         }`}
       >
         <nav
-          className={`mx-auto flex items-center justify-between gap-4 transition-all duration-300 ${
+          className={`relative mx-auto flex items-center justify-between gap-4 transition-all duration-300 ${
             scrolled ? "px-4 sm:px-6 h-12 md:h-14" : "max-w-7xl px-5 md:px-8 h-14 md:h-18"
           }`}
         >
@@ -46,10 +46,10 @@ export function Navbar() {
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
 
-          {/* Logo */}
+          {/* Logo - Centered on Mobile, Left-aligned on Desktop */}
           <Link
             to="/"
-            className={`font-bodoni font-extrabold text-[#D6336C] tracking-[0.2em] uppercase shrink-0 hover:opacity-90 transition-all duration-300 ${
+            className={`font-bodoni font-extrabold text-[#D6336C] tracking-[0.2em] uppercase shrink-0 hover:opacity-90 transition-all duration-300 absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 ${
               scrolled ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
             }`}
           >
@@ -60,7 +60,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-1 flex-1 justify-center">
             <Link
               to="/"
-              className={`px-4 py-1 text-sm font-semibold rounded-full transition-colors text-gray-700 hover:text-[#D6336C] hover:bg-[#FFF0F4] ${
+              className={`px-4 py-1 font-semibold rounded-full transition-colors text-gray-700 hover:text-[#D6336C] hover:bg-[#FFF0F4] ${
                 scrolled ? "text-xs font-bold" : "text-sm"
               }`}
             >
@@ -71,7 +71,7 @@ export function Navbar() {
                 key={category.slug}
                 to="/shop"
                 search={{ category: category.name }}
-                className={`px-4 py-1 text-sm font-semibold rounded-full transition-colors text-gray-700 hover:text-[#D6336C] hover:bg-[#FFF0F4] ${
+                className={`px-4 py-1 font-semibold rounded-full transition-colors text-gray-700 hover:text-[#D6336C] hover:bg-[#FFF0F4] ${
                   scrolled ? "text-xs font-bold" : "text-sm"
                 }`}
               >
@@ -126,61 +126,77 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-[#F5C6D5] bg-white px-5 py-4 space-y-1 shadow-lg">
-            <Link
-              to="/"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-            >
-              Home
-            </Link>
-            <Link
-              to="/shop"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-            >
-              Shop All Products
-            </Link>
+          <div className="md:hidden border-t border-[#F5C6D5]/60 bg-white px-4 py-5 space-y-1.5 shadow-2xl rounded-b-2xl">
+            {/* Top Primary Links */}
+            <div className="space-y-1">
+              <Link
+                to="/"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-gray-900 transition-colors hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+              >
+                <Home className="size-4 text-[#D6336C]" />
+                <span>Home</span>
+              </Link>
+              <Link
+                to="/shop"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-gray-900 transition-colors hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+              >
+                <ShoppingBag className="size-4 text-[#D6336C]" />
+                <span>Shop All Products</span>
+              </Link>
+            </div>
 
-            {/* Categories */}
+            {/* Categories Section */}
             {categories.length > 0 && (
-              <div className="py-1 border-y border-gray-100 my-1.5 space-y-0.5">
-                <p className="px-4 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#D6336C]">Categories</p>
-                {categories.map((category) => (
-                  <Link
-                    key={category.slug}
-                    to="/shop"
-                    search={{ category: category.name }}
-                    onClick={() => setMobileOpen(false)}
-                    className="block px-6 py-2 rounded-xl text-xs font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
+              <div className="pt-3 pb-1 mt-2 mb-2 border-t border-gray-100 space-y-1">
+                <div className="px-3.5 pb-1 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-[#B81D52]">
+                  <Layers className="size-3.5" />
+                  <span>Categories</span>
+                </div>
+                <div className="pl-4 ml-3 border-l-2 border-[#F5C6D5]/50 my-1 space-y-0.5">
+                  {categories.map((category) => (
+                    <Link
+                      key={category.slug}
+                      to="/shop"
+                      search={{ category: category.name }}
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600 transition-colors hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
 
-            <Link
-              to="/blog"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-            >
-              Beauty Journal (Blog)
-            </Link>
-            <Link
-              to="/faqs"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-            >
-              FAQs & Help
-            </Link>
-            <Link
-              to="/contact"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-gray-700 hover:bg-[#FFF0F4] hover:text-[#D6336C]"
-            >
-              Contact Us
-            </Link>
+            {/* Secondary Links */}
+            <div className="pt-2 border-t border-gray-100 space-y-1">
+              <Link
+                to="/blog"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-700 transition-colors hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+              >
+                <BookOpen className="size-4 text-gray-500" />
+                <span>Beauty Journal (Blog)</span>
+              </Link>
+              <Link
+                to="/faqs"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-700 transition-colors hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+              >
+                <HelpCircle className="size-4 text-gray-500" />
+                <span>FAQs & Help</span>
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-700 transition-colors hover:bg-[#FFF0F4] hover:text-[#D6336C]"
+              >
+                <Mail className="size-4 text-gray-500" />
+                <span>Contact Us</span>
+              </Link>
+            </div>
           </div>
         )}
       </header>

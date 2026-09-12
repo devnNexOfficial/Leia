@@ -114,7 +114,7 @@ export function ReviewsSection() {
   const marqueeReviews = [...reviewsList, ...reviewsList, ...reviewsList];
 
   return (
-    <section className="py-16 bg-white overflow-hidden">
+    <section className="py-12 md:py-16 bg-white overflow-hidden">
       <div className="mx-auto max-w-7xl px-5 md:px-8 mb-10">
         {/* Header */}
         <motion.div
@@ -150,7 +150,7 @@ export function ReviewsSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.25, type: "spring", stiffness: 300 }}
-          className="flex items-center justify-center gap-3"
+          className="flex flex-wrap items-center justify-center gap-2 sm:gap-3"
         >
           <div className="flex text-amber-400">
             {[...Array(5)].map((_, i) => (

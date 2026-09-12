@@ -64,6 +64,7 @@ export type Product = {
   price: number;
   originalPrice?: number;
   image: string;
+  hoverImage?: string;
   gallery?: string[];
   shades: Shade[];
   size?: string;

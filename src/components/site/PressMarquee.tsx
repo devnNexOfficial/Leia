@@ -1,27 +1,35 @@
 const items = [
-  "💄 Luscious", "✨ Rivaj UK", "🌸 J.", "💎 Medora", "💫 MyGlamm",
-  "🎀 Sapphire", "🌹 Olivia", "✦ Makeup & Skincare", "🇵🇰 100% Authentic",
-  "🚚 Free Delivery", "💵 Cash on Delivery (COD)", "🎁 Gift Wrapping Available",
+  "LUSCIOUS COSMETICS",
+  "RIVAJ UK",
+  "J. BEAUTY",
+  "MEDORA",
+  "MYGLAMM",
+  "SAPPHIRE",
+  "OLIVIA",
+  "100% AUTHENTIC",
+  "FREE NATIONWIDE DELIVERY",
+  "CASH ON DELIVERY",
+  "SIGNATURE GIFT WRAPPING",
 ];
 
-// Tripled for seamless loop
-const marqueeItems = [...items, ...items, ...items];
+// Duplicate list for seamless 100% loop with translateX(-50%)
+const marqueeItems = [...items, ...items];
 
 export function PressMarquee() {
   return (
-    <div className="relative overflow-hidden bg-[#D6336C] border-y border-[#b82a5b] py-3 select-none">
-      {/* Fade edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-[#D6336C] to-transparent pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-[#D6336C] to-transparent pointer-events-none" />
+    <div className="relative h-9 flex items-center overflow-hidden bg-[#D6336C] border-y border-[#B82A5B] select-none">
+      {/* Subtle ambient fade edges */}
+      <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-[#D6336C] to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-l from-[#D6336C] to-transparent pointer-events-none" />
 
-      <div className="flex animate-marquee whitespace-nowrap">
+      <div className="flex animate-marquee-slow whitespace-nowrap items-center">
         {marqueeItems.map((item, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-5 mx-5 text-xs font-bold tracking-[0.15em] text-white/90 uppercase"
+            className="inline-flex items-center gap-8 sm:gap-12 mx-5 sm:mx-8 text-[11px] sm:text-xs font-semibold tracking-[0.18em] text-white uppercase shrink-0"
           >
-            {item}
-            <span className="text-white/40 text-xs">◆</span>
+            <span>{item}</span>
+            <span className="text-white/40 text-[9px] select-none">◆</span>
           </span>
         ))}
       </div>

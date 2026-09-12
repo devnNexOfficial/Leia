@@ -45,7 +45,7 @@ export function NewArrivalsSection() {
   const centerProduct = allProducts[current];
 
   return (
-    <section className="py-20 px-5 md:px-8 bg-white overflow-hidden select-none">
+    <section className="py-12 md:py-20 px-4 sm:px-6 md:px-8 bg-white overflow-hidden select-none">
       <div className="mx-auto max-w-6xl">
         {/* Title & Subtitle */}
         <motion.div
@@ -64,18 +64,18 @@ export function NewArrivalsSection() {
         </motion.div>
 
         {/* 3D Floating Carousel Area */}
-        <div className="relative flex items-center justify-center min-h-[380px] md:min-h-[420px]">
+        <div className="relative flex items-center justify-center min-h-[220px] sm:min-h-[260px] md:min-h-[420px]">
           {/* Left Arrow Button */}
           <button
             onClick={prev}
             aria-label="Previous"
-            className="absolute left-2 md:left-6 z-30 size-10 md:size-11 rounded-full bg-gray-200/70 hover:bg-gray-300/90 text-gray-700 flex items-center justify-center transition-all shadow-sm"
+            className="absolute left-1 md:left-6 z-30 size-9 md:size-11 rounded-full bg-white/90 hover:bg-white text-gray-700 flex items-center justify-center transition-all shadow-md"
           >
-            <ChevronLeft className="size-5" />
+            <ChevronLeft className="size-4 md:size-5" />
           </button>
 
           {/* Floating Products Container */}
-          <div className="relative w-full max-w-4xl h-[340px] md:h-[380px] flex items-center justify-center">
+          <div className="relative w-full max-w-4xl h-[200px] sm:h-[240px] md:h-[380px] flex items-center justify-center">
             {allProducts.map((product, i) => {
               const pos = getPos(i);
               if (pos === "hidden") return null;
@@ -90,8 +90,8 @@ export function NewArrivalsSection() {
                     isCenter
                       ? "z-20 scale-110 opacity-100 translate-x-0"
                       : isLeft
-                      ? "z-10 scale-75 opacity-40 -translate-x-[75%] md:-translate-x-[110%] blur-[0.5px]"
-                      : "z-10 scale-75 opacity-40 translate-x-[75%] md:translate-x-[110%] blur-[0.5px]"
+                      ? "z-10 scale-75 opacity-40 -translate-x-[60%] sm:-translate-x-[75%] md:-translate-x-[110%] blur-[0.5px]"
+                      : "z-10 scale-75 opacity-40 translate-x-[60%] sm:translate-x-[75%] md:translate-x-[110%] blur-[0.5px]"
                   }`}
                   onClick={() => setCurrent(i)}
                 >
@@ -102,7 +102,7 @@ export function NewArrivalsSection() {
                       alt={product.name}
                       loading="lazy"
                       decoding="async"
-                      className="h-44 md:h-56 max-w-[240px] md:max-w-[300px] object-contain filter drop-shadow-xl"
+                      className="h-32 sm:h-44 md:h-56 max-w-[160px] sm:max-w-[240px] md:max-w-[300px] object-contain filter drop-shadow-xl"
                     />
 
                     {/* Realistic Floating Oval Shadow */}
@@ -123,9 +123,9 @@ export function NewArrivalsSection() {
           <button
             onClick={next}
             aria-label="Next"
-            className="absolute right-2 md:right-6 z-30 size-10 md:size-11 rounded-full bg-gray-200/70 hover:bg-gray-300/90 text-gray-700 flex items-center justify-center transition-all shadow-sm"
+            className="absolute right-1 md:right-6 z-30 size-9 md:size-11 rounded-full bg-white/90 hover:bg-white text-gray-700 flex items-center justify-center transition-all shadow-md"
           >
-            <ChevronRight className="size-5" />
+            <ChevronRight className="size-4 md:size-5" />
           </button>
         </div>
 

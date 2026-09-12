@@ -254,11 +254,12 @@ function ProductDetailContent() {
         {/* Right: Product Info & Actions */}
         <Reveal index={1} className="flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-wrap mb-3">
               <span className="rounded-md bg-soft px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary">
                 {product.category}
               </span>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
@@ -267,7 +268,6 @@ function ProductDetailContent() {
                 <span className="font-semibold text-foreground">{product.rating}</span>
                 <span>({reviewsList.length} reviews)</span>
               </div>
-            </div>
 
             <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
               {product.name}
@@ -658,14 +658,25 @@ function ProductDetailContent() {
                     transition={spring}
                     className="group overflow-hidden rounded-2xl border border-border/70 bg-card p-4 shadow-[var(--shadow-card)] hover:border-accent hover:shadow-[var(--shadow-card-hover)]"
                   >
-                    <div className="overflow-hidden rounded-xl bg-soft/50">
+                    <div className="relative overflow-hidden rounded-xl bg-soft/50 h-56">
                       <img
                         src={p.image}
                         alt={p.name}
                         loading="lazy"
                         decoding="async"
-                        className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className={`h-full w-full object-cover transition-all duration-300 ease-out group-hover:scale-105 ${
+                          p.hoverImage ? "opacity-100 group-hover:opacity-0" : ""
+                        }`}
                       />
+                      {p.hoverImage && (
+                        <img
+                          src={p.hoverImage}
+                          alt={`${p.name} alternate view`}
+                          loading="lazy"
+                          decoding="async"
+                          className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out group-hover:scale-105"
+                        />
+                      )}
                     </div>
                     <div className="mt-4">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{p.category}</span>

@@ -103,9 +103,6 @@ function ShopContent() {
       if (match) {
         setSelectedCategory(match.name);
       } else {
-        // Keep navigation filters strict even while a category is missing from
-        // the database (for example, /shop?category=Face). Falling back to
-        // "All" would incorrectly show products from every category.
         setSelectedCategory(searchParams.category);
       }
     } else {
@@ -139,8 +136,7 @@ function ShopContent() {
           const query = searchQuery.toLowerCase();
           const matchName = p.name.toLowerCase().includes(query);
           const matchCat = p.category.toLowerCase().includes(query);
-          const matchBrand = p.brand.toLowerCase().includes(query);
-          if (!matchName && !matchCat && !matchBrand) return false;
+          if (!matchName && !matchCat) return false;
         }
         return true;
       })
@@ -253,8 +249,10 @@ function ShopContent() {
             )}
           </div>
 
-          {/* Sort Dropdown */}
-          <div className="relative w-full sm:w-auto shrink-0">
+          {/* Sort Filter Control */}
+          <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
+            {/* Sort Dropdown */}
+            <div className="relative flex-1 sm:flex-initial">
             <button
               onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
               className="w-full sm:w-auto flex items-center justify-between gap-3 bg-[#FFF5F8] border border-[#F5C6D5] hover:border-[#D6336C] text-gray-900 rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-2xs hover:bg-[#FFF0F4]"
@@ -314,6 +312,7 @@ function ShopContent() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* ── Animated Product Cards Grid ── */}
       <section className="w-full min-h-[400px]">
@@ -423,8 +422,20 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
+            decoding="async"
+            className={`h-full w-full object-cover transition-all duration-300 ease-out group-hover:scale-105 ${
+              product.hoverImage ? "opacity-100 group-hover:opacity-0" : ""
+            }`}
           />
+          {product.hoverImage && (
+            <img
+              src={product.hoverImage}
+              alt={`${product.name} alternate view`}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out group-hover:scale-105"
+            />
+          )}
 
           {/* Badges */}
           <div className="absolute left-2.5 top-2.5 flex flex-col gap-1 z-10">
