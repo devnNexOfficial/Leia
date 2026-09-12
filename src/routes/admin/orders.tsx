@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
+import { Search, X, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { AdminError, AdminLoading, EmptyState } from "@/components/admin/AdminStates";
 import { adminCard, adminInput } from "@/components/admin/AdminLayout";
@@ -256,9 +256,26 @@ function OrderDetail({
             <p className="text-sm text-slate-500">Order</p>
             <h2 className="text-xl font-bold">{order.order_number}</h2>
           </div>
-          <button onClick={close} aria-label="Close order details">
-            <X />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={async () => {
+                if (window.confirm("Are you sure you want to permanently delete this order?")) {
+                  if (supabase) {
+                    await supabase.from("order_items").delete().eq("order_id", order.id);
+                    await supabase.from("orders").delete().eq("id", order.id);
+                  }
+                  close();
+                }
+              }}
+              className="rounded-lg border border-red-200 p-2 text-red-500 hover:bg-red-50"
+              title="Delete Order"
+            >
+              <Trash2 className="size-5" />
+            </button>
+            <button onClick={close} aria-label="Close order details" className="p-2 text-slate-400 hover:text-slate-600">
+              <X className="size-6" />
+            </button>
+          </div>
         </div>
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2">

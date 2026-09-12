@@ -137,6 +137,8 @@ import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { CookieConsentBanner } from "@/components/site/CookieConsentBanner";
 import { StorefrontCatalogProvider } from "@/components/storefront-catalog-context";
 
+import { ScrollRestoration } from "@tanstack/react-router";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -145,6 +147,7 @@ function RootComponent() {
       <StorefrontCatalogProvider>
         <WishlistProvider>
           <CartProvider>
+            <ScrollRestoration />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <FloatingWhatsApp />

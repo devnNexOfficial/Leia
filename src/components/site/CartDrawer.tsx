@@ -215,20 +215,33 @@ export function CartDrawer() {
                   </div>
                 </div>
 
-                <Link to="/checkout" onClick={closeDrawer} className="block">
+                <button
+                  onClick={() => {
+                    closeDrawer();
+                    setTimeout(() => {
+                      window.location.href = "/checkout";
+                    }, 50);
+                  }}
+                  className="block w-full"
+                >
                   <BounceButton size="lg" className="w-full py-4 text-base font-semibold">
                     Proceed to checkout <ChevronRight className="size-4" />
                   </BounceButton>
-                </Link>
+                </button>
 
                 <div className="text-center">
-                  <Link
-                    to="/cart"
-                    onClick={closeDrawer}
-                    className="link-bounce text-xs font-semibold text-primary inline-block"
+                  <button
+                    onClick={() => {
+                      closeDrawer();
+                      // Small delay to allow the drawer to close without blocking the navigation
+                      setTimeout(() => {
+                        window.location.href = "/cart";
+                      }, 50);
+                    }}
+                    className="link-bounce text-xs font-semibold text-primary inline-block cursor-pointer"
                   >
                     View detailed cart page →
-                  </Link>
+                  </button>
                 </div>
               </div>
             )}
