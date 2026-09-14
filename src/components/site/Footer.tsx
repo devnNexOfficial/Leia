@@ -126,7 +126,7 @@ export function Footer() {
         </div>
 
         {/* Legal Links */}
-        <div className="flex flex-col items-center justify-center gap-4 mb-12 text-center border-t border-white/15 pt-8">
+        <div className="relative z-30 flex flex-col items-center justify-center gap-4 mb-12 text-center border-t border-white/15 pt-8">
           <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] text-white/70">
             <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <span>·</span>
@@ -139,7 +139,7 @@ export function Footer() {
         </div>
 
         {/* ── GIGANTIC DISPLAY BRAND LOGO ── */}
-        <div className="relative w-full py-4 md:py-8 flex flex-col items-center justify-center">
+        <div className="relative w-full py-4 md:py-8 flex flex-col items-center justify-center pointer-events-none">
           <motion.div
             initial={{ opacity: 0, scale: 0.7, y: 60 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
