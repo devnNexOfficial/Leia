@@ -9,7 +9,7 @@ import { ReviewsSection } from "@/components/site/ReviewsSection";
 import { VideoShowcaseSection } from "@/components/site/VideoShowcaseSection";
 import { FaqSection } from "@/components/site/FaqSection";
 import { Footer } from "@/components/site/Footer";
-import { ScrollToTopButton } from "@/components/site/ScrollToTopButton";
+
 
 const title = "LÉÏA — Pakistani Ladies Cosmetics Online Store";
 const description =
@@ -57,8 +57,7 @@ function Index() {
       {/* Footer */}
       <Footer />
 
-      {/* Floating scroll-to-top */}
-      <ScrollToTopButton />
+
     </div>
   );
 }

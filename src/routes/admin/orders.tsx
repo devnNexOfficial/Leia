@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, X, Trash2 } from "lucide-react";
+import { Search, X, Trash2, MessageCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { AdminError, AdminLoading, EmptyState } from "@/components/admin/AdminStates";
 import { adminCard, adminInput } from "@/components/admin/AdminLayout";
@@ -257,6 +257,18 @@ function OrderDetail({
             <h2 className="text-xl font-bold">{order.order_number}</h2>
           </div>
           <div className="flex items-center gap-2">
+            {order.customer_phone && (
+              <a
+                href={`https://wa.me/${order.customer_phone.replace(/[^0-9]/g, "").replace(/^0/, "92")}?text=${encodeURIComponent(`Hi! Yeh LEIA ki taraf se message hai. Aapka order ${order.order_number} confirm ho gaya hai. Koi sawaal ho to bata dein.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+                title="WhatsApp Customer"
+              >
+                <MessageCircle className="size-4" />
+                WhatsApp
+              </a>
+            )}
             <button
               onClick={async () => {
                 if (window.confirm("Are you sure you want to permanently delete this order?")) {
