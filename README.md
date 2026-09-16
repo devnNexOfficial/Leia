@@ -2,7 +2,7 @@
 
 A modern, luxury e-commerce platform for premium Pakistani cosmetics. Elegant, girlie, and sophisticated—not childish.
 
-**Live**: [leia.pk](https://leia.pk)
+**Live**: [[leia.pk](https://leia.pk)](https://leia-nine.vercel.app/)
 
 ---
 
