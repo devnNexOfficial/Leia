@@ -77,8 +77,17 @@ function ProductDetailContent() {
   useEffect(() => {
     if (product) {
       document.title = `${product.name} — LEIA Cosmetics`;
-      // Initialise reviews from product data when product first loads
-      if (product.reviews && product.reviews.length > 0) {
+      // Load reviews from localStorage first, fallback to product reviews
+      const saved = typeof window !== "undefined"
+        ? localStorage.getItem(`leia_reviews_${product.id}`)
+        : null;
+      if (saved) {
+        try {
+          setReviewsList(JSON.parse(saved));
+        } catch {
+          setReviewsList(product.reviews || []);
+        }
+      } else if (product.reviews && product.reviews.length > 0) {
         setReviewsList(product.reviews);
       }
     }
@@ -192,7 +201,12 @@ function ProductDetailContent() {
       verified: true,
     };
 
-    setReviewsList([newRev, ...reviewsList]);
+    const updated = [newRev, ...reviewsList];
+    setReviewsList(updated);
+    // Persist reviews to localStorage so they survive refresh
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`leia_reviews_${product.id}`, JSON.stringify(updated));
+    }
     setReviewSubmitted(true);
     window.setTimeout(() => {
       setShowReviewForm(false);
@@ -200,6 +214,7 @@ function ProductDetailContent() {
       setNewAuthor("");
       setNewTitle("");
       setNewComment("");
+      setNewRating(5);
     }, 1500);
   };
 
@@ -575,18 +590,26 @@ function ProductDetailContent() {
 
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-muted-foreground">Rating:</span>
-                      <div className="flex gap-1">
+                      <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             type="button"
                             key={star}
                             onClick={() => setNewRating(star)}
-                            className="p-1 text-amber-400 hover:scale-115 transition-transform"
+                            className="p-1 transition-transform hover:scale-110 active:scale-95"
+                            aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
                           >
-                            <Star className={`size-6 ${star <= newRating ? "fill-amber-400" : "text-muted"}`} />
+                            <Star
+                              className={`size-7 transition-all duration-150 ${
+                                star <= newRating
+                                  ? "fill-amber-400 text-amber-400 drop-shadow-sm"
+                                  : "fill-transparent text-amber-300"
+                              }`}
+                            />
                           </button>
                         ))}
                       </div>
+                      <span className="text-sm font-bold text-amber-500">{newRating}/5</span>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
