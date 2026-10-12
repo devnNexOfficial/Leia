@@ -365,7 +365,7 @@ function ShopContent() {
               {visibleCount < filteredProducts.length ? (
                 <BounceButton
                   onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
-                  variant="secondary"
+                  variant="outline"
                   className="w-full sm:w-auto px-8 py-3 rounded-2xl bg-white border border-[#F5C6D5] text-[#D6336C] font-extrabold text-xs uppercase tracking-wider hover:bg-[#FFF0F5] hover:border-[#D6336C] transition-all shadow-xs"
                 >
                   Load More Products ({filteredProducts.length - visibleProducts.length} remaining)

@@ -178,6 +178,9 @@ function ProductDetailContent() {
   const galleryImages = product.gallery || [product.image];
   const selectedShade: Shade | undefined = product.shades[selectedShadeIndex];
   const isOutOfStock = product.stockCount === 0 || (selectedShade ? selectedShade.stockCount === 0 : false);
+  const currentRating = reviewsList.length > 0
+    ? Number((reviewsList.reduce((sum, r) => sum + r.rating, 0) / reviewsList.length).toFixed(1))
+    : (product.rating || 5.0);
 
   const handleAddToCart = () => {
     addItem(product, selectedShade, quantity);
@@ -309,14 +312,14 @@ function ProductDetailContent() {
                     <Star
                       key={i}
                       className={`size-3.5 ${
-                        i < Math.round(product.rating)
+                        i < Math.round(currentRating)
                           ? "fill-amber-400 text-amber-400"
-                          : "fill-muted text-muted"
+                          : "fill-transparent text-amber-200"
                       }`}
                     />
                   ))}
                 </div>
-                <span className="font-semibold text-foreground">{product.rating}</span>
+                <span className="font-semibold text-foreground">{currentRating}</span>
                 <span>({reviewsList.length} reviews)</span>
               </div>
 
@@ -552,15 +555,15 @@ function ProductDetailContent() {
               {/* Rating summary banner */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6 rounded-3xl border border-border/60 bg-card p-8 shadow-xs">
                 <div className="text-center sm:text-left">
-                  <div className="font-display text-5xl font-bold text-primary">{product.rating || "—"}</div>
+                  <div className="font-display text-5xl font-bold text-primary">{currentRating}</div>
                   <div className="flex text-amber-400 my-2 justify-center sm:justify-start">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         className={`size-5 ${
-                          i < Math.round(product.rating)
+                          i < Math.round(currentRating)
                             ? "fill-amber-400 text-amber-400"
-                            : "fill-muted text-muted"
+                            : "fill-transparent text-amber-200"
                         }`}
                       />
                     ))}
@@ -674,7 +677,11 @@ function ProductDetailContent() {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`size-3.5 ${i < rev.rating ? "fill-amber-400 text-amber-400" : "text-muted"}`}
+                            className={`size-3.5 ${
+                              i < rev.rating
+                                ? "fill-amber-400 text-amber-400"
+                                : "fill-transparent text-amber-200"
+                            }`}
                           />
                         ))}
                       </div>
