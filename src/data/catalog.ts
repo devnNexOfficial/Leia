@@ -42,7 +42,8 @@ export type Shade = {
   hex: string;
   stockCount?: number;
   priceOverride?: number | null;
-  family?: "Pink" | "Rose" | "Nude" | "Berry" | "Red" | "Gold" | "Brown" | "Clear" | "Orange" | "Coral";
+  family?:
+    "Pink" | "Rose" | "Nude" | "Berry" | "Red" | "Gold" | "Brown" | "Clear" | "Orange" | "Coral";
 };
 
 export type Review = {
@@ -78,14 +79,9 @@ export type Product = {
   rating: number;
   reviewCount: number;
   stockCount?: number;
-  ingredientsText?: string;
   directions?: string;
   shortDescription?: string;
   fullDescription?: string;
-  ingredients?: {
-    keyActives: { name: string; benefit: string }[];
-    fullList: string;
-  };
   reviews?: Review[];
 };
 

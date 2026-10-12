@@ -172,8 +172,10 @@ function AboutPage() {
               <div className="size-10 rounded-full bg-[#FFF0F5] text-[#D6336C] flex items-center justify-center mx-auto">
                 <Heart className="size-5" />
               </div>
-              <h3 className="font-bold text-sm text-gray-900">Skin-Loving Ingredients</h3>
-              <p className="text-xs text-gray-500">Cruelty-free formulas crafted for real nourishment and long-lasting glow.</p>
+              <h3 className="font-bold text-sm text-gray-900">Skin-Loving Formulas</h3>
+              <p className="text-xs text-gray-500">
+                Cruelty-free formulas crafted for real nourishment and long-lasting glow.
+              </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white border border-[#F5C6D5] text-center space-y-2 shadow-sm">
@@ -181,7 +183,9 @@ function AboutPage() {
                 <ShieldCheck className="size-5" />
               </div>
               <h3 className="font-bold text-sm text-gray-900">100% Authentic Quality</h3>
-              <p className="text-xs text-gray-500">Dermatologically tested cosmetics meeting international safety standards.</p>
+              <p className="text-xs text-gray-500">
+                Dermatologically tested cosmetics meeting international safety standards.
+              </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white border border-[#F5C6D5] text-center space-y-2 shadow-sm">
@@ -189,7 +193,9 @@ function AboutPage() {
                 <Truck className="size-5" />
               </div>
               <h3 className="font-bold text-sm text-gray-900">Express Nationwide COD</h3>
-              <p className="text-xs text-gray-500">Swift doorstep delivery with Cash on Delivery across all cities in Pakistan.</p>
+              <p className="text-xs text-gray-500">
+                Swift doorstep delivery with Cash on Delivery across all cities in Pakistan.
+              </p>
             </div>
           </div>
         </section>

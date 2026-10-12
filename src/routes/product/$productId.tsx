@@ -43,18 +43,21 @@ export const Route = createFileRoute("/product/$productId")({
 
 function ProductDetailPage() {
   return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <ProductDetailContent />
-        <Footer />
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <ProductDetailContent />
+      <Footer />
+    </div>
   );
 }
 
 function ProductDetailContent() {
   const { productId } = useParams({ from: "/product/$productId" });
   const { products, loading } = useStorefrontCatalog();
-  const product = useMemo(() => products.find((item) => item.id === productId), [products, productId]);
+  const product = useMemo(
+    () => products.find((item) => item.id === productId),
+    [products, productId],
+  );
   const { addItem } = useCart();
 
   // ── ALL HOOKS MUST BE AT THE TOP — before any early returns ──
@@ -62,7 +65,7 @@ function ProductDetailContent() {
   const [selectedShadeIndex, setSelectedShadeIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [activeTab, setActiveTab] = useState<"description" | "ingredients" | "reviews">("description");
+  const [activeTab, setActiveTab] = useState<"description" | "reviews">("description");
 
   // Review form state
   const [reviewsList, setReviewsList] = useState<Review[]>([]);
@@ -83,9 +86,8 @@ function ProductDetailContent() {
         metaDesc.setAttribute("content", product.shortDescription);
       }
       // Load reviews from localStorage first, fallback to product reviews
-      const saved = typeof window !== "undefined"
-        ? localStorage.getItem(`leia_reviews_${product.id}`)
-        : null;
+      const saved =
+        typeof window !== "undefined" ? localStorage.getItem(`leia_reviews_${product.id}`) : null;
       if (saved) {
         try {
           setReviewsList(JSON.parse(saved));
@@ -126,7 +128,9 @@ function ProductDetailContent() {
         <div className="flex size-14 items-center justify-center rounded-full bg-[#FFF0F5] text-[#D6336C] animate-pulse border border-[#F5C6D5]">
           <Sparkles className="size-7" />
         </div>
-        <p className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-400">Loading Product Details...</p>
+        <p className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+          Loading Product Details...
+        </p>
       </main>
     );
   }
@@ -136,9 +140,13 @@ function ProductDetailContent() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-12 md:py-20 min-h-[60vh] flex flex-col justify-center">
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-gray-400">
-          <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
+          <Link to="/" className="hover:text-gray-900 transition-colors">
+            Home
+          </Link>
           <ChevronRight className="size-3" />
-          <Link to="/shop" className="hover:text-gray-900 transition-colors">Shop</Link>
+          <Link to="/shop" className="hover:text-gray-900 transition-colors">
+            Shop
+          </Link>
           <ChevronRight className="size-3" />
           <span className="font-semibold text-gray-700">Product Not Found</span>
         </nav>
@@ -168,12 +176,16 @@ function ProductDetailContent() {
             </h1>
 
             <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed">
-              We couldn't locate the product you were looking for. It may have been renamed, removed, or is temporarily out of stock.
+              We couldn't locate the product you were looking for. It may have been renamed,
+              removed, or is temporarily out of stock.
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link to="/shop" className="w-full sm:w-auto">
-                <BounceButton variant="primary" className="w-full sm:w-auto px-6 py-3 text-xs font-extrabold uppercase tracking-wider">
+                <BounceButton
+                  variant="primary"
+                  className="w-full sm:w-auto px-6 py-3 text-xs font-extrabold uppercase tracking-wider"
+                >
                   Explore Shop Catalog
                 </BounceButton>
               </Link>
@@ -194,18 +206,18 @@ function ProductDetailContent() {
   const selectedShade: Shade | undefined = product.shades[selectedShadeIndex];
   const availableStock = selectedShade
     ? (selectedShade.stockCount ?? product.stockCount ?? 99)
-    : (product.stockCount || 99);
+    : product.stockCount || 99;
   const isOutOfStock = availableStock === 0;
-  const currentRating = reviewsList.length > 0
+  const hasReviews = reviewsList.length > 0;
+  const currentRating = hasReviews
     ? Number((reviewsList.reduce((sum, r) => sum + r.rating, 0) / reviewsList.length).toFixed(1))
-    : (product.rating || 5.0);
+    : 0;
 
   const handleAddToCart = () => {
     addItem(product, selectedShade, quantity);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };
-
 
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,15 +265,20 @@ function ProductDetailContent() {
     });
   };
 
-
-
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 md:py-12">
       {/* Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">Home</Link>
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-8 flex items-center gap-2 text-xs text-muted-foreground"
+      >
+        <Link to="/" className="hover:text-foreground">
+          Home
+        </Link>
         <ChevronRight className="size-3" />
-        <Link to="/shop" className="hover:text-foreground">Shop</Link>
+        <Link to="/shop" className="hover:text-foreground">
+          Shop
+        </Link>
         <ChevronRight className="size-3" />
         <span className="hover:text-foreground">{product.category}</span>
         <ChevronRight className="size-3" />
@@ -339,21 +356,36 @@ function ProductDetailContent() {
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <div className="flex text-amber-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`size-3.5 ${
-                        i < Math.round(currentRating)
-                          ? "fill-amber-400 text-amber-400"
-                          : "fill-transparent text-amber-200"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="font-semibold text-foreground">{currentRating}</span>
-                <span>({reviewsList.length} reviews)</span>
-              </div>
+              {hasReviews ? (
+                <>
+                  <div className="flex text-amber-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`size-3.5 ${
+                          i < Math.round(currentRating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "fill-transparent text-amber-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-semibold text-foreground">{currentRating}</span>
+                  <span>
+                    ({reviewsList.length} {reviewsList.length === 1 ? "review" : "reviews"})
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="flex text-amber-300/40">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="size-3.5 fill-transparent text-amber-200" />
+                    ))}
+                  </div>
+                  <span className="text-muted-foreground">No reviews yet</span>
+                </>
+              )}
+            </div>
 
             <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
               {product.name}
@@ -361,7 +393,11 @@ function ProductDetailContent() {
 
             <p className="mt-3 text-2xl font-bold text-primary">
               {formatPKR(product.price)}
-              {product.originalPrice && <span className="ml-3 text-base font-medium text-muted-foreground line-through">{formatPKR(product.originalPrice)}</span>}
+              {product.originalPrice && (
+                <span className="ml-3 text-base font-medium text-muted-foreground line-through">
+                  {formatPKR(product.originalPrice)}
+                </span>
+              )}
             </p>
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
@@ -420,20 +456,28 @@ function ProductDetailContent() {
               <div className="mt-8 border-t border-border/60 pt-6 grid grid-cols-2 gap-3">
                 {product.size && (
                   <div className="rounded-2xl border border-border/70 bg-soft/50 p-3.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Volume / Size</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Volume / Size
+                    </p>
                     <p className="mt-1 text-sm font-bold text-foreground">{product.size}</p>
                   </div>
                 )}
                 {product.skinType && (
                   <div className="rounded-2xl border border-border/70 bg-soft/50 p-3.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Skin Type</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Skin Type
+                    </p>
                     <p className="mt-1 text-sm font-bold text-foreground">{product.skinType}</p>
                   </div>
                 )}
                 {product.keyBenefit && (
                   <div className="col-span-2 rounded-2xl border border-emerald-200/60 bg-emerald-50/50 p-3.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Key Formulation</p>
-                    <p className="mt-1 text-sm font-semibold text-emerald-900">{product.keyBenefit}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                      Key Formulation
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-emerald-900">
+                      {product.keyBenefit}
+                    </p>
                   </div>
                 )}
               </div>
@@ -454,9 +498,7 @@ function ProductDetailContent() {
                 <span className="font-semibold text-sm">{quantity}</span>
                 <motion.button
                   whileTap={{ scale: 0.85 }}
-                  onClick={() =>
-                    setQuantity((q) => Math.min(q + 1, availableStock))
-                  }
+                  onClick={() => setQuantity((q) => Math.min(q + 1, availableStock))}
                   disabled={quantity >= availableStock}
                   className="flex size-9 items-center justify-center rounded-lg hover:bg-muted text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
@@ -478,7 +520,8 @@ function ProductDetailContent() {
                   </>
                 ) : (
                   <>
-                    <ShoppingBag className="size-5" /> Add to cart • {formatPKR(product.price * quantity)}
+                    <ShoppingBag className="size-5" /> Add to cart •{" "}
+                    {formatPKR(product.price * quantity)}
                   </>
                 )}
               </BounceButton>
@@ -506,10 +549,10 @@ function ProductDetailContent() {
         </Reveal>
       </div>
 
-      {/* Below the Fold: Tabs for Description, Ingredients, Reviews */}
+      {/* Below the Fold: Tabs for Description, Reviews */}
       <section className="mt-20 border-t border-border/70 pt-12">
         <div className="flex items-center justify-center gap-4 sm:gap-8 border-b border-border/60 pb-4">
-          {(["description", "ingredients", "reviews"] as const).map((tab) => (
+          {(["description", "reviews"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -542,41 +585,14 @@ function ProductDetailContent() {
                 </p>
                 {product.directions && (
                   <div className="mt-8 border-t border-border/60 pt-6">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">How to Use</h4>
-                    <p className="text-sm font-medium text-foreground/80 leading-relaxed">{product.directions}</p>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                      How to Use
+                    </h4>
+                    <p className="text-sm font-medium text-foreground/80 leading-relaxed">
+                      {product.directions}
+                    </p>
                   </div>
                 )}
-              </div>
-            </Reveal>
-          )}
-
-          {/* Ingredients Tab */}
-          {activeTab === "ingredients" && (
-            <Reveal className="space-y-6">
-              <div className="rounded-3xl border border-border/60 bg-card p-8 shadow-xs">
-                <h3 className="font-display text-2xl font-bold text-primary mb-6">
-                  Key Actives & Botanical Formula
-                </h3>
-                <div className="grid gap-4 sm:grid-cols-3 mb-8">
-                  {product.ingredients?.keyActives.map((ka) => (
-                    <div key={ka.name} className="rounded-2xl border border-border/70 bg-soft/50 p-4">
-                      <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                        <Sparkles className="size-4" />
-                        <span>{ka.name}</span>
-                      </div>
-                      <p className="mt-2 text-xs text-muted-foreground">{ka.benefit}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-border/60 pt-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                    Full INCI Ingredients List
-                  </h4>
-                  <p className="text-xs leading-relaxed font-mono text-muted-foreground/90 bg-muted/40 p-4 rounded-xl border border-border/40">
-                    {product.ingredientsText ?? product.ingredients?.fullList}
-                  </p>
-                </div>
               </div>
             </Reveal>
           )}
@@ -587,26 +603,46 @@ function ProductDetailContent() {
               {/* Rating summary banner */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6 rounded-3xl border border-border/60 bg-card p-8 shadow-xs">
                 <div className="text-center sm:text-left">
-                  <div className="font-display text-5xl font-bold text-primary">{currentRating}</div>
-                  <div className="flex text-amber-400 my-2 justify-center sm:justify-start">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`size-5 ${
-                          i < Math.round(currentRating)
-                            ? "fill-amber-400 text-amber-400"
-                            : "fill-transparent text-amber-200"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Based on {reviewsList.length} customer reviews</p>
+                  {hasReviews ? (
+                    <>
+                      <div className="font-display text-5xl font-bold text-primary">
+                        {currentRating}
+                      </div>
+                      <div className="flex text-amber-400 my-2 justify-center sm:justify-start">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`size-5 ${
+                              i < Math.round(currentRating)
+                                ? "fill-amber-400 text-amber-400"
+                                : "fill-transparent text-amber-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Based on {reviewsList.length} customer{" "}
+                        {reviewsList.length === 1 ? "review" : "reviews"}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="font-display text-3xl font-bold text-foreground">
+                        No reviews yet
+                      </div>
+                      <div className="flex text-amber-300/40 my-2 justify-center sm:justify-start">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="size-5 fill-transparent text-amber-200" />
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        There are no reviews for this product yet.
+                      </p>
+                    </>
+                  )}
                 </div>
 
-                <BounceButton
-                  onClick={() => setShowReviewForm((v) => !v)}
-                  variant="outline"
-                >
+                <BounceButton onClick={() => setShowReviewForm((v) => !v)} variant="outline">
                   {showReviewForm ? "Close Form" : "Write a Review"}
                 </BounceButton>
               </div>
@@ -621,7 +657,9 @@ function ProductDetailContent() {
                     onSubmit={handleReviewSubmit}
                     className="rounded-3xl border border-accent/40 bg-card p-6 shadow-md space-y-4 overflow-hidden"
                   >
-                    <h3 className="font-display text-xl font-bold text-primary">Share your feedback</h3>
+                    <h3 className="font-display text-xl font-bold text-primary">
+                      Share your feedback
+                    </h3>
 
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-muted-foreground">Rating:</span>
@@ -690,55 +728,82 @@ function ProductDetailContent() {
 
               {/* Reviews List */}
               <div className="space-y-4">
-                {reviewsList.map((rev) => (
-                  <div key={rev.id} className="rounded-2xl border border-border/60 bg-card p-6 shadow-2xs">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground text-sm">{rev.author}</span>
-                        {rev.verified && (
-                          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                            <Check className="size-3" /> Verified Buyer
-                          </span>
-                        )}
+                {reviewsList.length === 0 ? (
+                  <div className="rounded-3xl border border-dashed border-border/80 bg-card/50 p-10 text-center">
+                    <p className="font-semibold text-foreground text-sm">No customer reviews yet</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Be the first to share your experience with this product!
+                    </p>
+                    {!showReviewForm && (
+                      <div className="mt-4">
+                        <BounceButton size="sm" onClick={() => setShowReviewForm(true)}>
+                          Write the First Review
+                        </BounceButton>
                       </div>
-                      <span className="text-xs text-muted-foreground">{rev.date}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="flex text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`size-3.5 ${
-                              i < rev.rating
-                                ? "fill-amber-400 text-amber-400"
-                                : "fill-transparent text-amber-200"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs font-semibold text-foreground">{rev.title}</span>
-                    </div>
-
-                    <p className="mt-3 text-sm leading-relaxed text-foreground/90">{rev.comment}</p>
-
-                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-3">
-                      <span>Shade: <strong className="text-foreground">{rev.shade}</strong></span>
-                      <button
-                        type="button"
-                        onClick={() => handleHelpful(rev.id)}
-                        className={`flex items-center gap-1.5 transition-colors ${
-                          helpfulVotes[rev.id]
-                            ? "text-primary font-bold"
-                            : "hover:text-foreground"
-                        }`}
-                      >
-                        <ThumbsUp className={`size-3.5 transition-transform active:scale-125 ${helpfulVotes[rev.id] ? "fill-primary text-primary" : ""}`} />
-                        <span>Helpful{helpfulVotes[rev.id] ? " (1)" : ""}</span>
-                      </button>
-                    </div>
+                    )}
                   </div>
-                ))}
+                ) : (
+                  reviewsList.map((rev) => (
+                    <div
+                      key={rev.id}
+                      className="rounded-2xl border border-border/60 bg-card p-6 shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground text-sm">
+                            {rev.author}
+                          </span>
+                          {rev.verified && (
+                            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                              <Check className="size-3" /> Verified Buyer
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground">{rev.date}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex text-amber-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`size-3.5 ${
+                                i < rev.rating
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "fill-transparent text-amber-200"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs font-semibold text-foreground">{rev.title}</span>
+                      </div>
+
+                      <p className="mt-3 text-sm leading-relaxed text-foreground/90">
+                        {rev.comment}
+                      </p>
+
+                      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-3">
+                        <span>
+                          Shade: <strong className="text-foreground">{rev.shade}</strong>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleHelpful(rev.id)}
+                          className={`flex items-center gap-1.5 transition-colors ${
+                            helpfulVotes[rev.id]
+                              ? "text-primary font-bold"
+                              : "hover:text-foreground"
+                          }`}
+                        >
+                          <ThumbsUp
+                            className={`size-3.5 transition-transform active:scale-125 ${helpfulVotes[rev.id] ? "fill-primary text-primary" : ""}`}
+                          />
+                          <span>Helpful{helpfulVotes[rev.id] ? " (1)" : ""}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </Reveal>
           )}
@@ -750,7 +815,9 @@ function ProductDetailContent() {
         <section className="mt-24 border-t border-border/70 pt-16">
           <Reveal className="mb-8 flex items-end justify-between">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-accent">Complete Your Ritual</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-accent">
+                Complete Your Ritual
+              </span>
               <h2 className="font-display text-3xl font-bold text-primary">You May Also Love</h2>
             </div>
             <Link to="/shop" className="text-xs font-semibold text-primary hover:underline">
@@ -788,9 +855,13 @@ function ProductDetailContent() {
                       )}
                     </div>
                     <div className="mt-4">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{p.category}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {p.category}
+                      </span>
                       <h3 className="font-display text-lg font-bold text-foreground">{p.name}</h3>
-                      <p className="mt-1 text-sm font-semibold text-primary">{formatPKR(p.price)}</p>
+                      <p className="mt-1 text-sm font-semibold text-primary">
+                        {formatPKR(p.price)}
+                      </p>
                     </div>
                   </motion.article>
                 </Link>

@@ -100,7 +100,7 @@ const DEFAULT_FAQS: FaqItem[] = [
     category: "Products",
     question: "Are LEIA products 100% authentic and skin-safe?",
     answer:
-      "Yes, absolutely. All LEIA cosmetic products are formulated with dermatologically tested, skin-loving ingredients, cruelty-free, and guaranteed 100% authentic.",
+      "Yes, absolutely. All LEIA cosmetic products are formulated with dermatologically tested, skin-loving formulas, cruelty-free, and guaranteed 100% authentic.",
     sort_order: 1,
   },
 ];
@@ -181,7 +181,8 @@ function FAQsPage() {
               Frequently Asked <span className="text-[#D6336C]">Questions</span>
             </h1>
             <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-              Find quick, clear answers about orders, shade selection, fast nationwide shipping, and returns.
+              Find quick, clear answers about orders, shade selection, fast nationwide shipping, and
+              returns.
             </p>
 
             {/* Search Bar */}
@@ -230,7 +231,8 @@ function FAQsPage() {
               <HelpCircle className="size-12 text-[#D6336C] mx-auto mb-3 opacity-60" />
               <h3 className="text-lg font-bold text-gray-900">No questions found</h3>
               <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
-                We couldn't find any questions matching "{search}". Try searching for something else or talk to our team directly.
+                We couldn't find any questions matching "{search}". Try searching for something else
+                or talk to our team directly.
               </p>
               <button
                 onClick={() => {
@@ -290,7 +292,8 @@ function FAQsPage() {
             <Sparkles className="size-8 mx-auto text-pink-200 animate-pulse" />
             <h3 className="text-xl md:text-2xl font-black">Still have questions?</h3>
             <p className="text-xs md:text-sm text-pink-100 max-w-md mx-auto">
-              Our customer care specialists are available Monday to Saturday to assist you with order inquiries and shade guidance.
+              Our customer care specialists are available Monday to Saturday to assist you with
+              order inquiries and shade guidance.
             </p>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <a

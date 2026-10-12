@@ -181,7 +181,6 @@ function ProductForm({
         ? [product.image_url]
         : [],
   );
-  const [ingredients, setIngredients] = useState(product?.ingredients ?? "");
   const [directions, setDirections] = useState(product?.directions ?? "");
   const [status, setStatus] = useState(product?.status ?? "Active");
   const [featured, setFeatured] = useState(product?.is_featured ?? false);
@@ -256,7 +255,7 @@ function ProductForm({
       category_id: categoryId || null,
       image_url: images[0] || null,
       image_urls: images,
-      ingredients: ingredients || null,
+      ingredients: null,
       directions: directions || null,
       status,
       is_featured: featured,
@@ -372,7 +371,6 @@ function ProductForm({
           </label>
 
           <Area label="Description" value={description} set={setDescription} />
-          <Area label="Ingredients" value={ingredients} set={setIngredients} />
           <Area label="How to use / Directions" value={directions} set={setDirections} />
         </div>
 

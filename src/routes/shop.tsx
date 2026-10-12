@@ -88,7 +88,12 @@ function ShopContent() {
   const sortOptions = [
     { value: "bestsellers", label: "Bestsellers", icon: Flame, color: "text-[#D6336C]" },
     { value: "newest", label: "Newest Arrivals", icon: Sparkles, color: "text-purple-500" },
-    { value: "price-asc", label: "Price: Low to High", icon: TrendingUp, color: "text-emerald-500" },
+    {
+      value: "price-asc",
+      label: "Price: Low to High",
+      icon: TrendingUp,
+      color: "text-emerald-500",
+    },
     { value: "price-desc", label: "Price: High to Low", icon: Tag, color: "text-amber-500" },
   ];
 
@@ -98,7 +103,7 @@ function ShopContent() {
       const match = categories.find(
         (c) =>
           c.name.toLowerCase() === searchParams.category?.toLowerCase() ||
-          c.slug.toLowerCase() === searchParams.category?.toLowerCase()
+          c.slug.toLowerCase() === searchParams.category?.toLowerCase(),
       );
       if (match) {
         setSelectedCategory(match.name);
@@ -124,7 +129,10 @@ function ShopContent() {
     return products
       .filter((p) => {
         // Category filter
-        if (selectedCategory !== "All" && p.category.toLowerCase() !== selectedCategory.toLowerCase()) {
+        if (
+          selectedCategory !== "All" &&
+          p.category.toLowerCase() !== selectedCategory.toLowerCase()
+        ) {
           return false;
         }
         // Price filter
@@ -143,7 +151,8 @@ function ShopContent() {
       .sort((a, b) => {
         if (sortBy === "price-asc") return a.price - b.price;
         if (sortBy === "price-desc") return b.price - a.price;
-        if (sortBy === "newest") return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
+        if (sortBy === "newest")
+          return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
         // default: bestsellers first then review count
         if (a.isBestseller !== b.isBestseller) return a.isBestseller ? -1 : 1;
         return b.reviewCount - a.reviewCount;
@@ -210,18 +219,18 @@ function ShopContent() {
             {selectedCategory === "All"
               ? "The Beauty Atelier"
               : selectedCategory === "Face"
-              ? "Complexion & Glow"
-              : `${selectedCategory} Atelier`}
+                ? "Complexion & Glow"
+                : `${selectedCategory} Atelier`}
           </h1>
 
           <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed max-w-lg mx-auto">
             {selectedCategory === "All"
               ? "Discover authentic cosmetics and botanical skincare crafted to enhance your natural beauty."
               : selectedCategory === "Eyes"
-              ? "Ultra-pigmented eyeshadow palettes, precise liners, and defining mascaras."
-              : selectedCategory === "Face"
-              ? "Breathable foundations, radiant blushes, and luminous highlighters."
-              : "Nourishing serums, balancing toners, and restorative botanical moisturizers."}
+                ? "Ultra-pigmented eyeshadow palettes, precise liners, and defining mascaras."
+                : selectedCategory === "Face"
+                  ? "Breathable foundations, radiant blushes, and luminous highlighters."
+                  : "Nourishing serums, balancing toners, and restorative botanical moisturizers."}
           </p>
         </div>
       </section>
@@ -253,66 +262,73 @@ function ShopContent() {
           <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
             {/* Sort Dropdown */}
             <div className="relative flex-1 sm:flex-initial">
-            <button
-              onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
-              className="w-full sm:w-auto flex items-center justify-between gap-3 bg-[#FFF5F8] border border-[#F5C6D5] hover:border-[#D6336C] text-gray-900 rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-2xs hover:bg-[#FFF0F4]"
-            >
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="size-3.5 text-[#D6336C]" />
-                <span className="text-gray-400 font-normal">Sort:</span>
-                <span className="text-[#D6336C]">{sortOptions.find((o) => o.value === sortBy)?.label}</span>
-              </div>
-              <ChevronDown
-                className={`size-3.5 text-[#D6336C] transition-transform duration-300 ${
-                  sortDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+              <button
+                onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+                className="w-full sm:w-auto flex items-center justify-between gap-3 bg-[#FFF5F8] border border-[#F5C6D5] hover:border-[#D6336C] text-gray-900 rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-2xs hover:bg-[#FFF0F4]"
+              >
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="size-3.5 text-[#D6336C]" />
+                  <span className="text-gray-400 font-normal">Sort:</span>
+                  <span className="text-[#D6336C]">
+                    {sortOptions.find((o) => o.value === sortBy)?.label}
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`size-3.5 text-[#D6336C] transition-transform duration-300 ${
+                    sortDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
-            {/* Custom Popover Menu */}
-            <AnimatePresence>
-              {sortDropdownOpen && (
-                <>
-                  <div onClick={() => setSortDropdownOpen(false)} className="fixed inset-0 z-20" />
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                    className="absolute right-0 top-full mt-2 z-30 w-52 bg-white border border-[#F5C6D5] rounded-2xl shadow-xl overflow-hidden p-1.5 space-y-1"
-                  >
-                    {sortOptions.map((opt) => {
-                      const Icon = opt.icon;
-                      const isSelected = sortBy === opt.value;
-                      return (
-                        <button
-                          key={opt.value}
-                          onClick={() => {
-                            setSortBy(opt.value as SortOption);
-                            setSortDropdownOpen(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                            isSelected
-                              ? "bg-[#D6336C] text-white shadow-xs"
-                              : "text-gray-700 hover:bg-[#FFF5F8] hover:text-[#D6336C]"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Icon className={`size-3.5 ${isSelected ? "text-white" : opt.color}`} />
-                            <span>{opt.label}</span>
-                          </div>
-                          {isSelected && <Check className="size-3.5 text-white" />}
-                        </button>
-                      );
-                    })}
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+              {/* Custom Popover Menu */}
+              <AnimatePresence>
+                {sortDropdownOpen && (
+                  <>
+                    <div
+                      onClick={() => setSortDropdownOpen(false)}
+                      className="fixed inset-0 z-20"
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                      className="absolute right-0 top-full mt-2 z-30 w-52 bg-white border border-[#F5C6D5] rounded-2xl shadow-xl overflow-hidden p-1.5 space-y-1"
+                    >
+                      {sortOptions.map((opt) => {
+                        const Icon = opt.icon;
+                        const isSelected = sortBy === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            onClick={() => {
+                              setSortBy(opt.value as SortOption);
+                              setSortDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                              isSelected
+                                ? "bg-[#D6336C] text-white shadow-xs"
+                                : "text-gray-700 hover:bg-[#FFF5F8] hover:text-[#D6336C]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon
+                                className={`size-3.5 ${isSelected ? "text-white" : opt.color}`}
+                              />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && <Check className="size-3.5 text-white" />}
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
       {/* ── Animated Product Cards Grid ── */}
       <section className="w-full min-h-[400px]">
@@ -325,7 +341,9 @@ function ShopContent() {
             <div className="flex size-16 items-center justify-center rounded-full bg-[#FFF0F5] text-[#D6336C] shadow-inner mb-4">
               <Sparkles className="size-8" />
             </div>
-            <h3 className="font-display text-2xl font-black text-[#1A0A10]">No matching products found</h3>
+            <h3 className="font-display text-2xl font-black text-[#1A0A10]">
+              No matching products found
+            </h3>
             <p className="mt-2 max-w-sm text-sm text-gray-500">
               Try adjusting your search query, shade selection, or click below to view all items.
             </p>
@@ -335,7 +353,10 @@ function ShopContent() {
           </motion.div>
         ) : (
           <>
-            <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <motion.div
+              layout
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+            >
               <AnimatePresence mode="popLayout">
                 {visibleProducts.map((p, i) => (
                   <ShopProductCard key={p.id} product={p} index={i} />
@@ -347,8 +368,10 @@ function ShopContent() {
             <div className="mt-12 flex flex-col items-center justify-center space-y-4">
               <div className="flex flex-col items-center gap-2 w-full max-w-xs text-center">
                 <span className="text-xs font-bold text-gray-500">
-                  Showing <span className="text-[#D6336C] font-black">{visibleProducts.length}</span> of{" "}
-                  <span className="text-gray-900 font-black">{filteredProducts.length}</span> products
+                  Showing{" "}
+                  <span className="text-[#D6336C] font-black">{visibleProducts.length}</span> of{" "}
+                  <span className="text-gray-900 font-black">{filteredProducts.length}</span>{" "}
+                  products
                 </span>
                 <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden border border-gray-200/50">
                   <motion.div
@@ -402,7 +425,8 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
   };
 
   const selectedShade: Shade | undefined = product.shades[shadeIndex];
-  const isOutOfStock = product.stockCount === 0 || (selectedShade ? selectedShade.stockCount === 0 : false);
+  const isOutOfStock =
+    product.stockCount === 0 || (selectedShade ? selectedShade.stockCount === 0 : false);
 
   return (
     <motion.article
@@ -499,12 +523,18 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
       {/* Card Body */}
       <div className="flex flex-1 flex-col p-3.5 sm:p-4">
         <div className="flex items-center justify-between text-[11px] mb-1">
-          <span className="font-bold tracking-widest text-[#D6336C] uppercase text-[10px] sm:text-[11px]">{product.brand}</span>
-          <div className="flex items-center gap-1 text-amber-500 font-bold">
-            <Star className="size-3 fill-amber-400 text-amber-400" />
-            <span className="text-xs">{product.rating}</span>
-            <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
-          </div>
+          <span className="font-bold tracking-widest text-[#D6336C] uppercase text-[10px] sm:text-[11px]">
+            {product.brand}
+          </span>
+          {product.reviewCount > 0 ? (
+            <div className="flex items-center gap-1 text-amber-500 font-bold">
+              <Star className="size-3 fill-amber-400 text-amber-400" />
+              <span className="text-xs">{product.rating}</span>
+              <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
+            </div>
+          ) : (
+            <span className="text-[10px] text-gray-400">No reviews</span>
+          )}
         </div>
 
         <Link to="/product/$productId" params={{ productId: product.id }}>
@@ -561,7 +591,9 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
                 </button>
               ))}
               {product.shades.length > 5 && (
-                <span className="text-[9px] font-bold text-gray-400">+{product.shades.length - 5}</span>
+                <span className="text-[9px] font-bold text-gray-400">
+                  +{product.shades.length - 5}
+                </span>
               )}
             </div>
           </div>
@@ -595,7 +627,9 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
             onClick={handleAdd}
             disabled={isOutOfStock}
             className={`w-full py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 transition-all duration-200 active:scale-[0.98] ${
-              added ? "bg-emerald-600 text-white" : "bg-[#FFF0F5] text-[#D6336C] hover:bg-[#D6336C] hover:text-white"
+              added
+                ? "bg-emerald-600 text-white"
+                : "bg-[#FFF0F5] text-[#D6336C] hover:bg-[#D6336C] hover:text-white"
             }`}
           >
             {added ? <Check className="size-3" /> : <Plus className="size-3" />}
