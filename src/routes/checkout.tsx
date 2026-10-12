@@ -6,7 +6,7 @@ import {
   ChevronLeft,
   Truck,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
 import { BounceButton, Reveal } from "../components/motion";
@@ -64,6 +64,28 @@ function CheckoutContent() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Restore saved delivery information if previously saved
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("leia_saved_checkout_customer");
+        if (saved) {
+          const data = JSON.parse(saved);
+          if (data.email) setEmail(data.email);
+          if (data.firstName) setFirstName(data.firstName);
+          if (data.lastName) setLastName(data.lastName);
+          if (data.address) setAddress(data.address);
+          if (data.city) setCity(data.city);
+          if (data.postalCode) setPostalCode(data.postalCode);
+          if (data.phone) setPhone(data.phone);
+          setSaveInfo(true);
+        }
+      } catch (err) {
+        console.error("Failed to load saved checkout customer info", err);
+      }
+    }
+  }, []);
 
 
 
@@ -134,6 +156,31 @@ function CheckoutContent() {
         orderId: order.order_number,
         shippingFee: Number(order.shipping_fee),
       });
+
+      // Save or clear customer details based on checkbox
+      if (typeof window !== "undefined") {
+        if (saveInfo) {
+          try {
+            localStorage.setItem(
+              "leia_saved_checkout_customer",
+              JSON.stringify({
+                email: email.trim(),
+                firstName: cleanFirstName,
+                lastName: cleanLastName,
+                address: address.trim(),
+                city,
+                postalCode: postalCode.trim(),
+                phone: standardPhone,
+              })
+            );
+          } catch (err) {
+            console.error("Failed to save checkout info to localStorage", err);
+          }
+        } else {
+          localStorage.removeItem("leia_saved_checkout_customer");
+        }
+      }
+
       setIsSubmitting(false);
       navigate({ to: "/confirmation" });
     } catch (error) {

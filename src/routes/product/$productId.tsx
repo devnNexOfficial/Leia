@@ -72,11 +72,16 @@ function ProductDetailContent() {
   const [newTitle, setNewTitle] = useState("");
   const [newComment, setNewComment] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({});
 
   // Effects — also must be before early returns
   useEffect(() => {
     if (product) {
       document.title = `${product.name} — LEIA Cosmetics`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && product.shortDescription) {
+        metaDesc.setAttribute("content", product.shortDescription);
+      }
       // Load reviews from localStorage first, fallback to product reviews
       const saved = typeof window !== "undefined"
         ? localStorage.getItem(`leia_reviews_${product.id}`)
@@ -89,6 +94,16 @@ function ProductDetailContent() {
         }
       } else if (product.reviews && product.reviews.length > 0) {
         setReviewsList(product.reviews);
+      }
+
+      // Load helpful votes
+      if (typeof window !== "undefined") {
+        try {
+          const savedHelpful = localStorage.getItem("leia_helpful_reviews");
+          if (savedHelpful) setHelpfulVotes(JSON.parse(savedHelpful));
+        } catch {
+          // ignore
+        }
       }
     }
     return () => {
@@ -177,7 +192,10 @@ function ProductDetailContent() {
   // ── Derived values (not hooks) — safe after early returns ──
   const galleryImages = product.gallery || [product.image];
   const selectedShade: Shade | undefined = product.shades[selectedShadeIndex];
-  const isOutOfStock = product.stockCount === 0 || (selectedShade ? selectedShade.stockCount === 0 : false);
+  const availableStock = selectedShade
+    ? (selectedShade.stockCount ?? product.stockCount ?? 99)
+    : (product.stockCount || 99);
+  const isOutOfStock = availableStock === 0;
   const currentRating = reviewsList.length > 0
     ? Number((reviewsList.reduce((sum, r) => sum + r.rating, 0) / reviewsList.length).toFixed(1))
     : (product.rating || 5.0);
@@ -219,6 +237,20 @@ function ProductDetailContent() {
       setNewComment("");
       setNewRating(5);
     }, 1500);
+  };
+
+  const handleHelpful = (revId: string) => {
+    setHelpfulVotes((prev) => {
+      const next = { ...prev, [revId]: !prev[revId] };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("leia_helpful_reviews", JSON.stringify(next));
+        } catch {
+          // ignore
+        }
+      }
+      return next;
+    });
   };
 
 
@@ -423,9 +455,9 @@ function ProductDetailContent() {
                 <motion.button
                   whileTap={{ scale: 0.85 }}
                   onClick={() =>
-                    setQuantity((q) => Math.min(q + 1, product.stockCount || 99))
+                    setQuantity((q) => Math.min(q + 1, availableStock))
                   }
-                  disabled={quantity >= (product.stockCount || 99)}
+                  disabled={quantity >= availableStock}
                   className="flex size-9 items-center justify-center rounded-lg hover:bg-muted text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
@@ -692,8 +724,17 @@ function ProductDetailContent() {
 
                     <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-3">
                       <span>Shade: <strong className="text-foreground">{rev.shade}</strong></span>
-                      <button className="flex items-center gap-1 hover:text-foreground">
-                        <ThumbsUp className="size-3.5" /> Helpful
+                      <button
+                        type="button"
+                        onClick={() => handleHelpful(rev.id)}
+                        className={`flex items-center gap-1.5 transition-colors ${
+                          helpfulVotes[rev.id]
+                            ? "text-primary font-bold"
+                            : "hover:text-foreground"
+                        }`}
+                      >
+                        <ThumbsUp className={`size-3.5 transition-transform active:scale-125 ${helpfulVotes[rev.id] ? "fill-primary text-primary" : ""}`} />
+                        <span>Helpful{helpfulVotes[rev.id] ? " (1)" : ""}</span>
                       </button>
                     </div>
                   </div>
