@@ -21,14 +21,36 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { formatPKR, type Review, type Shade } from "@/data/catalog";
 import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/product/$productId")({
-  head: ({ params }) => {
-    const prod = { name: "LEIA", shortDescription: `Shop product ${params.productId}` };
+  loader: async ({ params }) => {
+    if (!supabase) return { productName: null, productDescription: null };
+    try {
+      const { data } = await supabase
+        .from("products")
+        .select("name, description")
+        .eq("id", params.productId)
+        .maybeSingle();
+      return {
+        productName: data?.name ?? null,
+        productDescription: data?.description ?? null,
+      };
+    } catch {
+      return { productName: null, productDescription: null };
+    }
+  },
+  head: ({ loaderData }) => {
+    const name = loaderData?.productName ?? "Luxury Cosmetics";
+    const description =
+      loaderData?.productDescription ??
+      "Shop authentic luxury cosmetics from LEIA Pakistan — radiant foundations, botanical serums, and high-pigment palettes.";
     return {
       meta: [
-        { title: `${prod.name} — LEIA Cosmetics` },
-        { name: "description", content: prod.shortDescription },
+        { title: `${name} — LEIA Cosmetics` },
+        { name: "description", content: description },
+        { property: "og:title", content: `${name} — LEIA Cosmetics` },
+        { property: "og:description", content: description },
       ],
     };
   },
@@ -262,7 +284,14 @@ function ProductDetailContent() {
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
+                    <Star
+                      key={i}
+                      className={`size-3.5 ${
+                        i < Math.round(product.rating)
+                          ? "fill-amber-400 text-amber-400"
+                          : "fill-muted text-muted"
+                      }`}
+                    />
                   ))}
                 </div>
                 <span className="font-semibold text-foreground">{product.rating}</span>
@@ -368,8 +397,11 @@ function ProductDetailContent() {
                 <span className="font-semibold text-sm">{quantity}</span>
                 <motion.button
                   whileTap={{ scale: 0.85 }}
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="flex size-9 items-center justify-center rounded-lg hover:bg-muted text-foreground"
+                  onClick={() =>
+                    setQuantity((q) => Math.min(q + 1, product.stockCount || 99))
+                  }
+                  disabled={quantity >= (product.stockCount || 99)}
+                  className="flex size-9 items-center justify-center rounded-lg hover:bg-muted text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
                   <Plus className="size-4" />
@@ -451,20 +483,12 @@ function ProductDetailContent() {
                 <p className="text-base leading-relaxed text-foreground/90">
                   {product.fullDescription}
                 </p>
-                <div className="mt-8 grid gap-6 sm:grid-cols-3 border-t border-border/60 pt-6">
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Finish</h4>
-                    <p className="mt-1 text-sm font-semibold text-foreground">Velvet Satin / Lit-From-Within</p>
+                {product.directions && (
+                  <div className="mt-8 border-t border-border/60 pt-6">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">How to Use</h4>
+                    <p className="text-sm font-medium text-foreground/80 leading-relaxed">{product.directions}</p>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Coverage</h4>
-                    <p className="mt-1 text-sm font-semibold text-foreground">Buildable Medium to Full</p>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Wear Time</h4>
-                    <p className="mt-1 text-sm font-semibold text-foreground">Up to 12 Hours Transfer-Resistant</p>
-                  </div>
-                </div>
+                )}
               </div>
             </Reveal>
           )}
@@ -506,10 +530,17 @@ function ProductDetailContent() {
               {/* Rating summary banner */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6 rounded-3xl border border-border/60 bg-card p-8 shadow-xs">
                 <div className="text-center sm:text-left">
-                  <div className="font-display text-5xl font-bold text-primary">{product.rating}</div>
+                  <div className="font-display text-5xl font-bold text-primary">{product.rating || "—"}</div>
                   <div className="flex text-amber-400 my-2 justify-center sm:justify-start">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="size-5 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        className={`size-5 ${
+                          i < Math.round(product.rating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "fill-muted text-muted"
+                        }`}
+                      />
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground">Based on {reviewsList.length} customer reviews</p>

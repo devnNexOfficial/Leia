@@ -152,7 +152,7 @@ export function Footer() {
             }}
             className="w-full text-center"
           >
-            <h1
+            <p
               className="font-bodoni text-[clamp(5rem,18vw,18rem)] leading-[0.85] text-white/95 font-bold tracking-[0.25em] md:tracking-[0.35em] select-none uppercase drop-shadow-2xl pl-[0.25em]"
               style={{
                 textShadow: "0 0 80px rgba(255,255,255,0.15), 0 4px 32px rgba(0,0,0,0.2)"
@@ -173,7 +173,7 @@ export function Footer() {
                   {char}
                 </motion.span>
               ))}
-            </h1>
+            </p>
           </motion.div>
 
           {/* Bottom copyright bar */}

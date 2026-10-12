@@ -68,7 +68,8 @@ function CheckoutContent() {
 
 
 
-  const shippingFee = 350;
+  const FREE_SHIPPING_THRESHOLD = 5000;
+  const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 250;
   const total = subtotal + shippingFee;
 
   const paymentOptions = [
@@ -355,9 +356,22 @@ function CheckoutContent() {
           <Reveal index={2} className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-4">
             <h2 className="font-display text-xl font-bold text-foreground">Shipping method</h2>
             <div className="flex items-center justify-between rounded-2xl border-2 border-accent bg-accent/5 px-5 py-4">
-              <span className="font-semibold text-foreground text-sm">Shipping</span>
-              <span className="font-bold text-foreground text-sm">{formatPKR(shippingFee)}</span>
+              <span className="font-semibold text-foreground text-sm">Standard Nationwide Delivery</span>
+              <span className="font-bold text-foreground text-sm">
+                {shippingFee === 0 ? (
+                  <span className="text-emerald-600">FREE</span>
+                ) : (
+                  formatPKR(shippingFee)
+                )}
+              </span>
             </div>
+            {subtotal < FREE_SHIPPING_THRESHOLD && (
+              <p className="text-xs text-muted-foreground">
+                🎁 Add{" "}
+                <span className="font-bold text-primary">{formatPKR(FREE_SHIPPING_THRESHOLD - subtotal)}</span>{" "}
+                more to unlock <span className="font-bold text-emerald-600">FREE shipping</span>!
+              </p>
+            )}
           </Reveal>
 
           {/* ── PAYMENT METHOD ── */}

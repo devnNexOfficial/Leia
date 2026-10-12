@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import {
   Banknote,
@@ -8,6 +8,7 @@ import {
   ShoppingBag,
   Truck,
 } from "lucide-react";
+import { useEffect } from "react";
 
 import { useCart } from "@/components/cart-context";
 import { BounceButton, Reveal } from "../components/motion";
@@ -37,27 +38,21 @@ function ConfirmationPage() {
 
 function ConfirmationContent() {
   const { lastOrder } = useCart();
+  const navigate = useNavigate();
 
-  // Fallback order details if visited directly
-  const order = lastOrder || {
-    orderId: "MR-2026-98412",
-    customerName: "Valued Customer",
-    phone: "0300 1234567",
-    address: "House 14, Main Boulevard, Gulberg III",
-    city: "Lahore",
-    paymentMethod: "Cash on Delivery" as const,
-    items: [],
-    subtotal: 10350,
-    shippingFee: 0,
-    discountAmount: 0,
-    total: 10350,
-    date: new Date().toLocaleDateString("en-PK", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-    estimatedDelivery: "2 to 3 Business Days (Express Nationwide)",
-  };
+  // Redirect to shop if there's no real order — prevents showing fake data
+  useEffect(() => {
+    if (!lastOrder) {
+      navigate({ to: "/shop" });
+    }
+  }, [lastOrder, navigate]);
+
+  if (!lastOrder) {
+    return null; // will redirect
+  }
+
+  const order = lastOrder;
+
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
