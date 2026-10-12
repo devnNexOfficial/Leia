@@ -117,9 +117,7 @@ function Banners() {
                       className="h-12 w-20 rounded object-cover"
                     />
                   </td>
-                  <td className="px-5 py-3 font-medium">
-                    {banner.title || "Untitled banner"}
-                  </td>
+                  <td className="px-5 py-3 font-medium">{banner.title || "Untitled banner"}</td>
                   <td className="px-5 py-3">Homepage Hero</td>
                   <td className="px-5 py-3">{banner.display_order ?? "—"}</td>
                   <td className="px-5 py-3">
@@ -157,20 +155,12 @@ function Banners() {
         </div>
       )}
 
-      {editing !== undefined && (
-        <BannerForm banner={editing} close={() => setEditing(undefined)} />
-      )}
+      {editing !== undefined && <BannerForm banner={editing} close={() => setEditing(undefined)} />}
     </section>
   );
 }
 
-function BannerForm({
-  banner,
-  close,
-}: {
-  banner: Banner | null;
-  close: () => void;
-}) {
+function BannerForm({ banner, close }: { banner: Banner | null; close: () => void }) {
   const [title, setTitle] = useState(banner?.title ?? "");
   const [image, setImage] = useState(banner?.image_url ?? "");
   const [link, setLink] = useState(banner?.link_url ?? "");
@@ -185,7 +175,7 @@ function BannerForm({
     setError("");
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `banner-${crypto.randomUUID()}.${ext}`;
+      const path = `banners/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from("product-images")
         .upload(path, file, { contentType: file.type });
@@ -226,17 +216,11 @@ function BannerForm({
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4">
-      <form
-        onSubmit={submit}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
-      >
-        <h2 className="text-lg font-semibold">
-          {banner ? "Edit banner" : "Add banner"}
-        </h2>
+      <form onSubmit={submit} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <h2 className="text-lg font-semibold">{banner ? "Edit banner" : "Add banner"}</h2>
 
         <label className="mt-5 block text-sm font-medium">
-          Title / label{" "}
-          <span className="font-normal text-slate-400">(admin reference)</span>
+          Title / label <span className="font-normal text-slate-400">(admin reference)</span>
           <input
             className={`${adminInput} mt-1`}
             value={title}
@@ -245,9 +229,7 @@ function BannerForm({
         </label>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium mb-1">
-            Image URL or Upload
-          </label>
+          <label className="block text-sm font-medium mb-1">Image URL or Upload</label>
           <div className="flex gap-2">
             <input
               className={`${adminInput} flex-1`}
@@ -306,22 +288,14 @@ function BannerForm({
         </label>
 
         <label className="mt-4 flex items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            checked={active}
-            onChange={(e) => setActive(e.target.checked)}
-          />{" "}
+          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />{" "}
           Active on storefront
         </label>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            className="h-9 rounded border px-3 text-sm"
-            onClick={close}
-          >
+          <button type="button" className="h-9 rounded border px-3 text-sm" onClick={close}>
             Cancel
           </button>
           <button type="submit" className={adminButton}>

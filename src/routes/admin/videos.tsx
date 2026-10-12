@@ -51,10 +51,7 @@ function Videos() {
       setVideos((vData ?? []) as HomepageVideo[]);
     }
 
-    const { data: pData } = await supabase
-      .from("products")
-      .select("id, name, price")
-      .order("name");
+    const { data: pData } = await supabase.from("products").select("id, name, price").order("name");
 
     setProducts((pData ?? []) as ProductOption[]);
     setLoading(false);
@@ -239,7 +236,7 @@ function VideoForm({
 
     if (file.size > VIDEO_MAX_BYTES) {
       setError(
-        `Video file is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 50 MB.`
+        `Video file is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 50 MB.`,
       );
       return;
     }
@@ -248,7 +245,7 @@ function VideoForm({
     setError("");
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "mp4";
-      const path = `video-${crypto.randomUUID()}.${ext}`;
+      const path = `videos/${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
@@ -257,9 +254,7 @@ function VideoForm({
       if (uploadError) {
         setError(uploadError.message);
       } else {
-        const publicUrl = supabase.storage
-          .from("product-images")
-          .getPublicUrl(path).data.publicUrl;
+        const publicUrl = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
         setUrl(publicUrl);
       }
     } catch (err) {
@@ -276,7 +271,7 @@ function VideoForm({
     setError("");
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `thumbnail-${crypto.randomUUID()}.${ext}`;
+      const path = `videos/thumbnails/${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
@@ -285,9 +280,7 @@ function VideoForm({
       if (uploadError) {
         setError(uploadError.message);
       } else {
-        const publicUrl = supabase.storage
-          .from("product-images")
-          .getPublicUrl(path).data.publicUrl;
+        const publicUrl = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
         setThumbnail(publicUrl);
       }
     } catch (err) {
@@ -325,18 +318,12 @@ function VideoForm({
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4 overflow-y-auto">
-      <form
-        onSubmit={submit}
-        className="my-6 w-full max-w-lg rounded-lg bg-white p-6 shadow-xl"
-      >
-        <h2 className="text-lg font-semibold">
-          {video ? "Edit video" : "Add video"}
-        </h2>
+      <form onSubmit={submit} className="my-6 w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+        <h2 className="text-lg font-semibold">{video ? "Edit video" : "Add video"}</h2>
 
         {/* Title */}
         <label className="mt-5 block text-sm font-medium">
-          Title / caption{" "}
-          <span className="font-normal text-slate-400">(optional)</span>
+          Title / caption <span className="font-normal text-slate-400">(optional)</span>
           <input
             className={`${adminInput} mt-1`}
             value={title}
@@ -435,7 +422,8 @@ function VideoForm({
             ))}
           </select>
           <p className="mt-1 text-[11px] text-slate-400">
-            If selected, a &quot;Featured Product&quot; card and &quot;Buy Now&quot; button will appear on the video. If left empty, no product overlay will be shown.
+            If selected, a &quot;Featured Product&quot; card and &quot;Buy Now&quot; button will
+            appear on the video. If left empty, no product overlay will be shown.
           </p>
         </div>
 
@@ -444,7 +432,11 @@ function VideoForm({
           <label className="block text-sm font-medium mb-1">
             Thumbnail image URL or Upload{" "}
             <span className="font-normal text-slate-400">
-              ({sourceInfo.type === "youtube" ? "Auto-fetched from YouTube if left empty" : "optional"})
+              (
+              {sourceInfo.type === "youtube"
+                ? "Auto-fetched from YouTube if left empty"
+                : "optional"}
+              )
             </span>
           </label>
           <div className="flex gap-2">
@@ -502,29 +494,17 @@ function VideoForm({
 
         {/* Active toggle */}
         <label className="mt-4 flex items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            checked={active}
-            onChange={(e) => setActive(e.target.checked)}
-          />{" "}
+          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />{" "}
           Active on homepage
         </label>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            className="h-9 rounded border px-3 text-sm"
-            onClick={close}
-          >
+          <button type="button" className="h-9 rounded border px-3 text-sm" onClick={close}>
             Cancel
           </button>
-          <button
-            type="submit"
-            className={adminButton}
-            disabled={uploadingVideo || uploadingThumb}
-          >
+          <button type="submit" className={adminButton} disabled={uploadingVideo || uploadingThumb}>
             Save video
           </button>
         </div>

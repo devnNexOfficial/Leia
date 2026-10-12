@@ -1,33 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  ChevronRight,
-  Minus,
-  Plus,
-  ShoppingBag,
-  Trash2,
-  Truck,
-  X,
-} from "lucide-react";
+import { ChevronRight, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 
 import { useCart } from "@/components/cart-context";
 import { BounceButton, spring } from "../motion";
 import { formatPKR } from "@/data/catalog";
 
 export function CartDrawer() {
-  const {
-    items,
-    count,
-    subtotal,
-    isDrawerOpen,
-    closeDrawer,
-    updateQuantity,
-    removeItem,
-  } = useCart();
+  const { items, count, subtotal, isDrawerOpen, closeDrawer, updateQuantity, removeItem } =
+    useCart();
 
   const freeShippingThreshold = 5000;
-  const amountNeededForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
-  const freeShippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
   return (
     <AnimatePresence>
@@ -75,28 +58,6 @@ export function CartDrawer() {
                 <X className="size-5" />
               </motion.button>
             </div>
-
-            {/* Free Shipping Progress Strip */}
-            {items.length > 0 && (
-              <div className="border-b border-border/60 bg-soft/20 px-6 py-3">
-                <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
-                  <span className="flex items-center gap-1.5 text-foreground">
-                    <Truck className="size-3.5 text-primary" />
-                    {amountNeededForFreeShipping === 0
-                      ? "You unlocked FREE Express Shipping!"
-                      : `Add ${formatPKR(amountNeededForFreeShipping)} more for FREE Shipping`}
-                  </span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/60">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${freeShippingProgress}%` }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="h-full bg-gradient-to-r from-primary to-accent"
-                  />
-                </div>
-              </div>
-            )}
 
             {/* Cart Items List */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -211,7 +172,9 @@ export function CartDrawer() {
                   </div>
                   <div className="flex justify-between text-base font-bold text-primary border-t border-border/60 pt-2">
                     <span>Total</span>
-                    <span>{formatPKR(subtotal + (subtotal >= freeShippingThreshold ? 0 : 250))}</span>
+                    <span>
+                      {formatPKR(subtotal + (subtotal >= freeShippingThreshold ? 0 : 250))}
+                    </span>
                   </div>
                 </div>
 

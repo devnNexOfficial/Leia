@@ -1,14 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Sparkles,
-  Save,
-  ExternalLink,
-  Upload,
-  CheckCircle,
-  Heart,
-  Quote,
-  Eye,
-} from "lucide-react";
+import { Sparkles, Save, ExternalLink, Upload, CheckCircle, Heart, Quote, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdminError, AdminLoading } from "@/components/admin/AdminStates";
 import { adminButton, adminCard, adminInput } from "@/components/admin/AdminLayout";
@@ -90,7 +81,7 @@ function AdminStoryPage() {
 
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `story-hero-${crypto.randomUUID()}.${ext}`;
+      const path = `story/${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
@@ -256,7 +247,11 @@ function AdminStoryPage() {
           </div>
           {story.hero_image && (
             <div className="mt-3 relative w-full h-44 rounded-2xl overflow-hidden border border-slate-200">
-              <img src={story.hero_image} alt="Hero banner" className="w-full h-full object-cover" />
+              <img
+                src={story.hero_image}
+                alt="Hero banner"
+                className="w-full h-full object-cover"
+              />
             </div>
           )}
         </div>

@@ -40,6 +40,9 @@ type Order = {
   payment_method: string;
   shipping_address: string;
   city: string;
+  customer_name?: string | null;
+  customer_phone?: string | null;
+  customer_email?: string | null;
   order_items: OrderItem[];
 };
 
@@ -55,9 +58,9 @@ type Customer = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  Pending:   "bg-amber-50 text-amber-700 border-amber-200",
+  Pending: "bg-amber-50 text-amber-700 border-amber-200",
   Confirmed: "bg-blue-50 text-blue-700 border-blue-200",
-  Shipped:   "bg-purple-50 text-purple-700 border-purple-200",
+  Shipped: "bg-purple-50 text-purple-700 border-purple-200",
   Delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
   Cancelled: "bg-red-50 text-red-600 border-red-200",
 };
@@ -101,12 +104,12 @@ function CustomersPage() {
   const customers = useMemo<Customer[]>(() => {
     const map = new Map<string, Customer>();
     for (const order of orders) {
-      const key = (order as any).customer_phone as string;
+      const key = order.customer_phone || "Unknown";
       if (!map.has(key)) {
         map.set(key, {
           phone: key,
-          name: (order as any).customer_name ?? "Unknown",
-          email: (order as any).customer_email ?? null,
+          name: order.customer_name ?? "Unknown",
+          email: order.customer_email ?? null,
           orderCount: 0,
           totalSpent: 0,
           firstOrderDate: order.created_at,
@@ -120,13 +123,13 @@ function CustomersPage() {
       if (order.created_at < c.firstOrderDate) c.firstOrderDate = order.created_at;
       if (order.created_at > c.lastOrderDate) {
         c.lastOrderDate = order.created_at;
-        c.name = (order as any).customer_name ?? c.name;
-        c.email = (order as any).customer_email ?? c.email;
+        c.name = order.customer_name ?? c.name;
+        c.email = order.customer_email ?? c.email;
       }
       c.orders.push(order);
     }
     return Array.from(map.values()).sort(
-      (a, b) => new Date(b.lastOrderDate).getTime() - new Date(a.lastOrderDate).getTime()
+      (a, b) => new Date(b.lastOrderDate).getTime() - new Date(a.lastOrderDate).getTime(),
     );
   }, [orders]);
 
@@ -137,7 +140,7 @@ function CustomersPage() {
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.phone.includes(q) ||
-        (c.email ?? "").toLowerCase().includes(q)
+        (c.email ?? "").toLowerCase().includes(q),
     );
   }, [customers, query]);
 
@@ -162,15 +165,21 @@ function CustomersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className={`${adminCard} flex flex-col gap-1 p-4`}>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Customers</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Total Customers
+          </p>
           <p className="text-2xl font-black text-slate-900">{customers.length}</p>
         </div>
         <div className={`${adminCard} flex flex-col gap-1 p-4`}>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Orders</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Total Orders
+          </p>
           <p className="text-2xl font-black text-slate-900">{orders.length}</p>
         </div>
         <div className={`${adminCard} flex flex-col gap-1 p-4 col-span-2 sm:col-span-1`}>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Revenue</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Total Revenue
+          </p>
           <p className="text-2xl font-black text-[#D6336C]">{formatRupees(totalRevenue)}</p>
         </div>
       </div>
@@ -264,7 +273,9 @@ function CustomersPage() {
                     <td className="px-5 py-4 text-xs text-slate-500">
                       <div className="flex items-center gap-1">
                         <Clock className="size-3 text-slate-400" />
-                        {new Date(c.lastOrderDate).toLocaleDateString("en-PK", { dateStyle: "medium" })}
+                        {new Date(c.lastOrderDate).toLocaleDateString("en-PK", {
+                          dateStyle: "medium",
+                        })}
                       </div>
                     </td>
                     <td className="px-5 py-4 text-right">
@@ -290,11 +301,19 @@ function CustomersPage() {
             {/* Header */}
             <div className="bg-[#D6336C] p-6 text-white flex items-start justify-between">
               <div className="space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-widest text-pink-200">Customer Profile</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-pink-200">
+                  Customer Profile
+                </span>
                 <h2 className="text-xl font-bold">{selected.name}</h2>
                 <div className="flex flex-wrap gap-3 mt-2 text-sm text-pink-100">
-                  <span className="flex items-center gap-1"><Phone className="size-3.5" /> {selected.phone}</span>
-                  {selected.email && <span className="flex items-center gap-1"><Mail className="size-3.5" /> {selected.email}</span>}
+                  <span className="flex items-center gap-1">
+                    <Phone className="size-3.5" /> {selected.phone}
+                  </span>
+                  {selected.email && (
+                    <span className="flex items-center gap-1">
+                      <Mail className="size-3.5" /> {selected.email}
+                    </span>
+                  )}
                 </div>
               </div>
               <button
@@ -308,22 +327,34 @@ function CustomersPage() {
             {/* Stats */}
             <div className="grid grid-cols-3 divide-x divide-slate-100 border-b border-slate-100">
               <div className="p-4 text-center">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Orders</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Orders
+                </p>
                 <p className="text-2xl font-black text-slate-900">{selected.orderCount}</p>
               </div>
               <div className="p-4 text-center">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Spent</p>
-                <p className="text-2xl font-black text-[#D6336C]">{formatRupees(selected.totalSpent)}</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Total Spent
+                </p>
+                <p className="text-2xl font-black text-[#D6336C]">
+                  {formatRupees(selected.totalSpent)}
+                </p>
               </div>
               <div className="p-4 text-center">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Avg. Order</p>
-                <p className="text-2xl font-black text-slate-900">{formatRupees(Math.round(selected.totalSpent / selected.orderCount))}</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Avg. Order
+                </p>
+                <p className="text-2xl font-black text-slate-900">
+                  {formatRupees(Math.round(selected.totalSpent / selected.orderCount))}
+                </p>
               </div>
             </div>
 
             {/* Order History */}
             <div className="p-6 space-y-3 max-h-[50vh] overflow-y-auto">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Order History</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                Order History
+              </p>
               {selected.orders
                 .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                 .map((order) => (
@@ -334,7 +365,9 @@ function CustomersPage() {
                         <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500">
                           <span className="flex items-center gap-1">
                             <Clock className="size-3" />
-                            {new Date(order.created_at).toLocaleDateString("en-PK", { dateStyle: "medium" })}
+                            {new Date(order.created_at).toLocaleDateString("en-PK", {
+                              dateStyle: "medium",
+                            })}
                           </span>
                           <span className="flex items-center gap-1">
                             <MapPin className="size-3" />
@@ -343,10 +376,14 @@ function CustomersPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${STATUS_STYLES[order.status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${STATUS_STYLES[order.status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}
+                        >
                           {order.status}
                         </span>
-                        <span className="font-black text-slate-900">{formatRupees(order.total)}</span>
+                        <span className="font-black text-slate-900">
+                          {formatRupees(order.total)}
+                        </span>
                       </div>
                     </div>
                     {/* Items */}
@@ -358,7 +395,9 @@ function CustomersPage() {
                             {item.variant_name ? ` — ${item.variant_name}` : ""}
                             {item.quantity > 1 ? ` × ${item.quantity}` : ""}
                           </span>
-                          <span className="font-semibold">{formatRupees(item.unit_price * item.quantity)}</span>
+                          <span className="font-semibold">
+                            {formatRupees(item.unit_price * item.quantity)}
+                          </span>
                         </div>
                       ))}
                     </div>

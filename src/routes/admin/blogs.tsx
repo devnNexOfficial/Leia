@@ -196,9 +196,7 @@ function AdminBlogsPage() {
                         )}
                         <div className="min-w-0 max-w-md">
                           <p className="font-bold text-slate-900 truncate">{blog.title}</p>
-                          <p className="text-xs text-slate-500 truncate mt-0.5">
-                            /{blog.slug}
-                          </p>
+                          <p className="text-xs text-slate-500 truncate mt-0.5">/{blog.slug}</p>
                         </div>
                       </div>
                     </td>
@@ -263,20 +261,12 @@ function AdminBlogsPage() {
       )}
 
       {/* Create / Edit Modal Form */}
-      {editing !== undefined && (
-        <BlogModal blog={editing} close={() => setEditing(undefined)} />
-      )}
+      {editing !== undefined && <BlogModal blog={editing} close={() => setEditing(undefined)} />}
     </section>
   );
 }
 
-function BlogModal({
-  blog,
-  close,
-}: {
-  blog: BlogPost | null;
-  close: () => void;
-}) {
+function BlogModal({ blog, close }: { blog: BlogPost | null; close: () => void }) {
   const [title, setTitle] = useState(blog?.title ?? "");
   const [slug, setSlug] = useState(blog?.slug ?? "");
   const [category, setCategory] = useState(blog?.category ?? "Beauty Guide");
@@ -309,7 +299,7 @@ function BlogModal({
 
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `blog-${crypto.randomUUID()}.${ext}`;
+      const path = `blogs/${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
@@ -527,7 +517,10 @@ function BlogModal({
               onChange={(e) => setPublished(e.target.checked)}
               className="size-4 rounded text-[#D6336C] focus:ring-[#D6336C]"
             />
-            <label htmlFor="published-toggle" className="text-xs font-bold text-slate-700 select-none">
+            <label
+              htmlFor="published-toggle"
+              className="text-xs font-bold text-slate-700 select-none"
+            >
               Publish immediately (visible to all customers on /blog)
             </label>
           </div>

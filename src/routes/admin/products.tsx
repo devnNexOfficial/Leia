@@ -74,9 +74,7 @@ function Products() {
       <div className="mb-7 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Products</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Manage products, inventory, and variants.
-          </p>
+          <p className="mt-1 text-sm text-slate-500">Manage products, inventory, and variants.</p>
         </div>
         <button className={adminButton} onClick={() => setEditing(null)}>
           <Plus className="mr-1 size-4" /> Add product
@@ -121,13 +119,11 @@ function Products() {
                     </div>
                   </td>
                   <td className="px-5 py-3">{p.categories?.name ?? "—"}</td>
-                  <td className="px-5 py-3">
-                    Rs. {Number(p.price).toLocaleString()}
-                  </td>
+                  <td className="px-5 py-3">Rs. {Number(p.price).toLocaleString()}</td>
                   <td className="px-5 py-3">
                     {p.product_variants?.length
                       ? p.product_variants.reduce((n, v) => n + v.stock_count, 0)
-                      : p.stock_count ?? 0}
+                      : (p.stock_count ?? 0)}
                   </td>
                   <td className="px-5 py-3">
                     <button
@@ -182,8 +178,8 @@ function ProductForm({
     product?.image_urls?.length
       ? product.image_urls
       : product?.image_url
-      ? [product.image_url]
-      : []
+        ? [product.image_url]
+        : [],
   );
   const [ingredients, setIngredients] = useState(product?.ingredients ?? "");
   const [directions, setDirections] = useState(product?.directions ?? "");
@@ -191,7 +187,7 @@ function ProductForm({
   const [featured, setFeatured] = useState(product?.is_featured ?? false);
   const [newArrival, setNewArrival] = useState(product?.is_new_arrival ?? false);
   const [variants, setVariants] = useState<(ProductVariant | DraftVariant)[]>(
-    product?.product_variants ?? []
+    product?.product_variants ?? [],
   );
   const [error, setError] = useState("");
   const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
@@ -206,13 +202,15 @@ function ProductForm({
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      setError(`Image file is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Maximum allowed size is 5 MB.`);
+      setError(
+        `Image file is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Maximum allowed size is 5 MB.`,
+      );
       return;
     }
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const sanitizedExt = ["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext) ? ext : "jpg";
-    const path = `${crypto.randomUUID()}.${sanitizedExt}`;
+    const path = `products/${crypto.randomUUID()}.${sanitizedExt}`;
 
     const result = await supabase!.storage.from("product-images").upload(path, file, {
       contentType: file.type,
@@ -237,13 +235,13 @@ function ProductForm({
                 key === "stock_count"
                   ? Number(value)
                   : key === "price_override"
-                  ? value
-                    ? Number(value)
-                    : null
-                  : value || null,
+                    ? value
+                      ? Number(value)
+                      : null
+                    : value || null,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -309,9 +307,7 @@ function ProductForm({
       >
         <div className="flex justify-between">
           <div>
-            <h2 className="text-lg font-semibold">
-              {product ? "Edit product" : "Add product"}
-            </h2>
+            <h2 className="text-lg font-semibold">{product ? "Edit product" : "Add product"}</h2>
             <p className="text-sm text-slate-500">
               Product information, images, inventory, and variants.
             </p>
@@ -355,12 +351,7 @@ function ProductForm({
             </select>
           </label>
 
-          <Field
-            label="Overall stock (no variants)"
-            value={stock}
-            set={setStock}
-            number
-          />
+          <Field label="Overall stock (no variants)" value={stock} set={setStock} number />
 
           <label className="flex items-center gap-2 self-end pb-2 text-sm font-medium">
             <input
@@ -382,11 +373,7 @@ function ProductForm({
 
           <Area label="Description" value={description} set={setDescription} />
           <Area label="Ingredients" value={ingredients} set={setIngredients} />
-          <Area
-            label="How to use / Directions"
-            value={directions}
-            set={setDirections}
-          />
+          <Area label="How to use / Directions" value={directions} set={setDirections} />
         </div>
 
         <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50/50 p-4">
@@ -394,7 +381,8 @@ function ProductForm({
             <div>
               <h3 className="font-semibold text-slate-900">Product Images</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Image 1 is the primary card image. Image 2 (optional) cross-fades smoothly on card hover across the store.
+                Image 1 is the primary card image. Image 2 (optional) cross-fades smoothly on card
+                hover across the store.
               </p>
             </div>
             <label className="cursor-pointer rounded-lg bg-[#D6336C] px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#B42358] transition-colors">
@@ -405,9 +393,7 @@ function ProductForm({
                 accept="image/*"
                 onChange={(e) =>
                   e.target.files?.[0] &&
-                  upload(e.target.files[0], (url) =>
-                    setImages((current) => [...current, url])
-                  )
+                  upload(e.target.files[0], (url) => setImages((current) => [...current, url]))
                 }
               />
             </label>
@@ -419,7 +405,10 @@ function ProductForm({
           ) : (
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {images.map((image, i) => (
-                <div className="relative group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xs" key={`${image}-${i}`}>
+                <div
+                  className="relative group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xs"
+                  key={`${image}-${i}`}
+                >
                   <img
                     src={image}
                     alt={`Product preview ${i + 1}`}
@@ -445,9 +434,7 @@ function ProductForm({
                   <button
                     className="absolute right-1.5 top-1.5 z-10 rounded-full bg-white/90 p-1 text-red-600 shadow-sm hover:bg-white transition-all"
                     type="button"
-                    onClick={() =>
-                      setImages((items) => items.filter((_, index) => index !== i))
-                    }
+                    onClick={() => setImages((items) => items.filter((_, index) => index !== i))}
                     aria-label="Remove image"
                   >
                     <X className="size-3.5" />
@@ -508,18 +495,14 @@ function ProductForm({
                   className="hidden"
                   onChange={(e) =>
                     e.target.files?.[0] &&
-                    upload(e.target.files[0], (url) =>
-                      updateVariant(i, "image_url", url)
-                    )
+                    upload(e.target.files[0], (url) => updateVariant(i, "image_url", url))
                   }
                 />
               </label>
               <button
                 type="button"
                 className="text-red-600 text-xs font-semibold hover:underline"
-                onClick={() =>
-                  setVariants((items) => items.filter((_, index) => index !== i))
-                }
+                onClick={() => setVariants((items) => items.filter((_, index) => index !== i))}
               >
                 Remove
               </button>
@@ -530,11 +513,7 @@ function ProductForm({
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            className="h-9 rounded border px-3 text-sm"
-            onClick={close}
-          >
+          <button type="button" className="h-9 rounded border px-3 text-sm" onClick={close}>
             Cancel
           </button>
           <button type="submit" className={adminButton}>

@@ -9,7 +9,6 @@ import {
   ShoppingBag,
   Sparkles,
   Trash2,
-  Truck,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -23,7 +22,10 @@ export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
       { title: "Shopping Cart — LEIA Cosmetics" },
-      { name: "description", content: "Review your selected luxury beauty items and skincare essentials." },
+      {
+        name: "description",
+        content: "Review your selected luxury beauty items and skincare essentials.",
+      },
     ],
   }),
   component: CartPage,
@@ -31,11 +33,11 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <CartPageContent />
-        <Footer />
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <CartPageContent />
+      <Footer />
+    </div>
   );
 }
 
@@ -67,7 +69,10 @@ function CartPageContent() {
             Shopping Bag ({count})
           </h1>
         </div>
-        <Link to="/shop" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+        <Link
+          to="/shop"
+          className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+        >
           <ArrowLeft className="size-4" /> Continue Shopping
         </Link>
       </Reveal>
@@ -82,7 +87,8 @@ function CartPageContent() {
             Your shopping bag is empty
           </h2>
           <p className="mt-3 max-w-md mx-auto text-sm text-muted-foreground leading-relaxed">
-            Discover our atelier collection of luxury lipsticks, radiance serums and editorial eye palettes, formulated for warm skin tones.
+            Discover our atelier collection of luxury lipsticks, radiance serums and editorial eye
+            palettes, formulated for warm skin tones.
           </p>
           <div className="mt-8">
             <Link to="/shop">
@@ -95,24 +101,6 @@ function CartPageContent() {
         <div className="grid gap-12 lg:grid-cols-3">
           {/* Items List (2 Cols) */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Free Shipping Alert Banner */}
-            <div className="rounded-2xl border border-border/70 bg-soft/30 p-4">
-              <div className="flex items-center gap-3">
-                <Truck className="size-5 text-primary flex-shrink-0" />
-                <div className="text-xs">
-                  {subtotal >= freeShippingThreshold ? (
-                    <span className="font-bold text-emerald-800">
-                      Congratulations! You unlocked FREE Express Nationwide Shipping.
-                    </span>
-                  ) : (
-                    <span className="text-foreground/90">
-                      Add <strong className="text-primary">{formatPKR(freeShippingThreshold - subtotal)}</strong> more to qualify for <strong>FREE Shipping</strong>.
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
             {/* Items Table */}
             <div className="rounded-3xl border border-border/70 bg-card shadow-xs overflow-hidden">
               <div className="divide-y divide-border/60">
@@ -147,7 +135,10 @@ function CartPageContent() {
                           </h3>
                           {item.shade && (
                             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                              <span className="size-3 rounded-full border border-border" style={{ backgroundColor: item.shade.hex }} />
+                              <span
+                                className="size-3 rounded-full border border-border"
+                                style={{ backgroundColor: item.shade.hex }}
+                              />
                               <span>{item.shade.name}</span>
                             </div>
                           )}
@@ -256,10 +247,7 @@ function CartPageContent() {
               </div>
 
               <Link to="/checkout" className="block">
-                <BounceButton
-                  size="lg"
-                  className="w-full py-4 text-base font-semibold"
-                >
+                <BounceButton size="lg" className="w-full py-4 text-base font-semibold">
                   Proceed to checkout <ChevronRight className="size-4" />
                 </BounceButton>
               </Link>

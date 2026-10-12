@@ -135,13 +135,7 @@ function Categories() {
   );
 }
 
-function CategoryForm({
-  category,
-  close,
-}: {
-  category: AdminCategory | null;
-  close: () => void;
-}) {
+function CategoryForm({ category, close }: { category: AdminCategory | null; close: () => void }) {
   const [name, setName] = useState(category?.name ?? "");
   const [image, setImage] = useState(category?.image_url ?? "");
   const [description, setDescription] = useState(category?.description ?? "");
@@ -155,7 +149,7 @@ function CategoryForm({
     setError("");
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `category-${crypto.randomUUID()}.${ext}`;
+      const path = `categories/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from("product-images")
         .upload(path, file, { contentType: file.type });
@@ -194,13 +188,8 @@ function CategoryForm({
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4">
-      <form
-        onSubmit={submit}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
-      >
-        <h2 className="text-lg font-semibold">
-          {category ? "Edit category" : "Add category"}
-        </h2>
+      <form onSubmit={submit} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <h2 className="text-lg font-semibold">{category ? "Edit category" : "Add category"}</h2>
 
         <label className="mt-5 block text-sm font-medium">
           Name
@@ -233,8 +222,7 @@ function CategoryForm({
 
         <div className="mt-4">
           <label className="block text-sm font-medium mb-1">
-            Image URL or Upload{" "}
-            <span className="font-normal text-slate-400">(optional)</span>
+            Image URL or Upload <span className="font-normal text-slate-400">(optional)</span>
           </label>
           <div className="flex gap-2">
             <input
@@ -268,11 +256,7 @@ function CategoryForm({
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            className="h-9 rounded-md border px-3 text-sm"
-            onClick={close}
-          >
+          <button type="button" className="h-9 rounded-md border px-3 text-sm" onClick={close}>
             Cancel
           </button>
           <button type="submit" className={adminButton}>

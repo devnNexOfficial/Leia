@@ -1,11 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import {
-  Banknote,
-  Check,
-  ChevronLeft,
-  Truck,
-} from "lucide-react";
+import { Banknote, Check, ChevronLeft, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
@@ -33,11 +28,11 @@ export const Route = createFileRoute("/checkout")({
 
 function CheckoutPage() {
   return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <CheckoutContent />
-        <Footer />
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <CheckoutContent />
+      <Footer />
+    </div>
   );
 }
 
@@ -86,9 +81,6 @@ function CheckoutContent() {
       }
     }
   }, []);
-
-
-
 
   const FREE_SHIPPING_THRESHOLD = 5000;
   const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 250;
@@ -171,7 +163,7 @@ function CheckoutContent() {
                 city,
                 postalCode: postalCode.trim(),
                 phone: standardPhone,
-              })
+              }),
             );
           } catch (err) {
             console.error("Failed to save checkout info to localStorage", err);
@@ -184,7 +176,13 @@ function CheckoutContent() {
       setIsSubmitting(false);
       navigate({ to: "/confirmation" });
     } catch (error) {
-      setErrors(current => ({ ...current, checkout: error instanceof Error ? error.message : "Your order could not be placed. Please try again." }));
+      setErrors((current) => ({
+        ...current,
+        checkout:
+          error instanceof Error
+            ? error.message
+            : "Your order could not be placed. Please try again.",
+      }));
       setIsSubmitting(false);
     }
   };
@@ -196,7 +194,9 @@ function CheckoutContent() {
           <Truck className="size-10 text-primary" />
         </div>
         <h1 className="mt-6 font-display text-3xl font-bold text-primary">Your cart is empty</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Add items to your cart before proceeding to checkout.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Add items to your cart before proceeding to checkout.
+        </p>
         <div className="mt-8">
           <Link to="/shop">
             <BounceButton size="lg">Return to shop</BounceButton>
@@ -211,7 +211,10 @@ function CheckoutContent() {
       {/* Back button & Title */}
       <Reveal className="mb-8">
         <div>
-          <Link to="/cart" className="mb-2 flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground">
+          <Link
+            to="/cart"
+            className="mb-2 flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
             <ChevronLeft className="size-4" /> Back to Cart
           </Link>
           <h1 className="font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
@@ -221,10 +224,11 @@ function CheckoutContent() {
       </Reveal>
 
       <form onSubmit={handleSubmitOrder} className="grid gap-12 lg:grid-cols-12">
-        {errors.checkout && <p className="lg:col-span-12 text-sm text-destructive">{errors.checkout}</p>}
+        {errors.checkout && (
+          <p className="lg:col-span-12 text-sm text-destructive">{errors.checkout}</p>
+        )}
         {/* Left Column */}
         <div className="lg:col-span-7 space-y-8">
-
           {/* ── CONTACT ── */}
           <Reveal className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-5">
             <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
@@ -236,15 +240,27 @@ function CheckoutContent() {
                   type="email"
                   placeholder="Email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(p => ({ ...p, email: "" })); }}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors((p) => ({ ...p, email: "" }));
+                  }}
                   className={
                     "w-full rounded-xl border bg-background px-4 py-3 pr-10 text-sm text-foreground focus:outline-none transition-all " +
-                    (errors.email ? "border-destructive ring-1 ring-destructive" : "border-border focus:border-accent")
+                    (errors.email
+                      ? "border-destructive ring-1 ring-destructive"
+                      : "border-border focus:border-accent")
                   }
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 select-none cursor-help" title="We'll send your order confirmation here">?</span>
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 select-none cursor-help"
+                  title="We'll send your order confirmation here"
+                >
+                  ?
+                </span>
               </div>
-              {errors.email && <p className="mt-1 text-xs font-semibold text-destructive">{errors.email}</p>}
+              {errors.email && (
+                <p className="mt-1 text-xs font-semibold text-destructive">{errors.email}</p>
+              )}
             </div>
 
             {/* Newsletter checkbox */}
@@ -260,7 +276,10 @@ function CheckoutContent() {
           </Reveal>
 
           {/* ── DELIVERY ── */}
-          <Reveal index={1} className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-5">
+          <Reveal
+            index={1}
+            className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-5"
+          >
             <h2 className="font-display text-xl font-bold text-foreground">Delivery</h2>
 
             {/* Country (fixed) */}
@@ -273,8 +292,12 @@ function CheckoutContent() {
                 >
                   <option>Pakistan</option>
                 </select>
-                <span className="absolute left-4 top-1.5 text-[10px] text-muted-foreground font-semibold tracking-wide pointer-events-none">Country/Region</span>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">▾</span>
+                <span className="absolute left-4 top-1.5 text-[10px] text-muted-foreground font-semibold tracking-wide pointer-events-none">
+                  Country/Region
+                </span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                  ▾
+                </span>
               </div>
             </div>
 
@@ -285,26 +308,40 @@ function CheckoutContent() {
                   type="text"
                   placeholder="First name"
                   value={firstName}
-                  onChange={(e) => { setFirstName(e.target.value); if (errors.firstName) setErrors(p => ({ ...p, firstName: "" })); }}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    if (errors.firstName) setErrors((p) => ({ ...p, firstName: "" }));
+                  }}
                   className={
                     "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground focus:outline-none transition-all " +
-                    (errors.firstName ? "border-destructive ring-1 ring-destructive" : "border-border focus:border-accent")
+                    (errors.firstName
+                      ? "border-destructive ring-1 ring-destructive"
+                      : "border-border focus:border-accent")
                   }
                 />
-                {errors.firstName && <p className="mt-1 text-xs text-destructive">{errors.firstName}</p>}
+                {errors.firstName && (
+                  <p className="mt-1 text-xs text-destructive">{errors.firstName}</p>
+                )}
               </div>
               <div>
                 <input
                   type="text"
                   placeholder="Last name"
                   value={lastName}
-                  onChange={(e) => { setLastName(e.target.value); if (errors.lastName) setErrors(p => ({ ...p, lastName: "" })); }}
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                    if (errors.lastName) setErrors((p) => ({ ...p, lastName: "" }));
+                  }}
                   className={
                     "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground focus:outline-none transition-all " +
-                    (errors.lastName ? "border-destructive ring-1 ring-destructive" : "border-border focus:border-accent")
+                    (errors.lastName
+                      ? "border-destructive ring-1 ring-destructive"
+                      : "border-border focus:border-accent")
                   }
                 />
-                {errors.lastName && <p className="mt-1 text-xs text-destructive">{errors.lastName}</p>}
+                {errors.lastName && (
+                  <p className="mt-1 text-xs text-destructive">{errors.lastName}</p>
+                )}
               </div>
             </div>
 
@@ -314,10 +351,15 @@ function CheckoutContent() {
                 type="text"
                 placeholder="Address"
                 value={address}
-                onChange={(e) => { setAddress(e.target.value); if (errors.address) setErrors(p => ({ ...p, address: "" })); }}
+                onChange={(e) => {
+                  setAddress(e.target.value);
+                  if (errors.address) setErrors((p) => ({ ...p, address: "" }));
+                }}
                 className={
                   "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground focus:outline-none transition-all " +
-                  (errors.address ? "border-destructive ring-1 ring-destructive" : "border-border focus:border-accent")
+                  (errors.address
+                    ? "border-destructive ring-1 ring-destructive"
+                    : "border-border focus:border-accent")
                 }
               />
               {errors.address && <p className="mt-1 text-xs text-destructive">{errors.address}</p>}
@@ -328,10 +370,15 @@ function CheckoutContent() {
               <div>
                 <select
                   value={city}
-                  onChange={(e) => { setCity(e.target.value); if (errors.city) setErrors(p => ({ ...p, city: "" })); }}
+                  onChange={(e) => {
+                    setCity(e.target.value);
+                    if (errors.city) setErrors((p) => ({ ...p, city: "" }));
+                  }}
                   className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground focus:border-accent focus:outline-none cursor-pointer"
                 >
-                  <option value="" disabled>City</option>
+                  <option value="" disabled>
+                    City
+                  </option>
                   <option>Lahore</option>
                   <option>Karachi</option>
                   <option>Islamabad</option>
@@ -379,12 +426,21 @@ function CheckoutContent() {
                   }}
                   className={
                     "w-full rounded-xl border bg-background py-3 pl-20 pr-10 text-sm text-foreground focus:outline-none transition-all " +
-                    (errors.phone ? "border-destructive ring-1 ring-destructive" : "border-border focus:border-accent")
+                    (errors.phone
+                      ? "border-destructive ring-1 ring-destructive"
+                      : "border-border focus:border-accent")
                   }
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 cursor-help text-xs" title="11-digit Pakistani mobile number for delivery rider contact">?</span>
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 cursor-help text-xs"
+                  title="11-digit Pakistani mobile number for delivery rider contact"
+                >
+                  ?
+                </span>
               </div>
-              {errors.phone && <p className="mt-1 text-xs font-semibold text-destructive">{errors.phone}</p>}
+              {errors.phone && (
+                <p className="mt-1 text-xs font-semibold text-destructive">{errors.phone}</p>
+              )}
             </div>
 
             {/* Save info checkbox */}
@@ -400,10 +456,15 @@ function CheckoutContent() {
           </Reveal>
 
           {/* ── SHIPPING METHOD ── */}
-          <Reveal index={2} className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-4">
+          <Reveal
+            index={2}
+            className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-4"
+          >
             <h2 className="font-display text-xl font-bold text-foreground">Shipping method</h2>
             <div className="flex items-center justify-between rounded-2xl border-2 border-accent bg-accent/5 px-5 py-4">
-              <span className="font-semibold text-foreground text-sm">Standard Nationwide Delivery</span>
+              <span className="font-semibold text-foreground text-sm">
+                Standard Nationwide Delivery
+              </span>
               <span className="font-bold text-foreground text-sm">
                 {shippingFee === 0 ? (
                   <span className="text-emerald-600">FREE</span>
@@ -412,17 +473,13 @@ function CheckoutContent() {
                 )}
               </span>
             </div>
-            {subtotal < FREE_SHIPPING_THRESHOLD && (
-              <p className="text-xs text-muted-foreground">
-                🎁 Add{" "}
-                <span className="font-bold text-primary">{formatPKR(FREE_SHIPPING_THRESHOLD - subtotal)}</span>{" "}
-                more to unlock <span className="font-bold text-emerald-600">FREE shipping</span>!
-              </p>
-            )}
           </Reveal>
 
           {/* ── PAYMENT METHOD ── */}
-          <Reveal index={3} className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-4">
+          <Reveal
+            index={3}
+            className="rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-4"
+          >
             <div className="flex items-center gap-2 border-b border-border/60 pb-4">
               <h2 className="font-display text-xl font-bold text-foreground">Payment</h2>
             </div>
@@ -434,7 +491,10 @@ function CheckoutContent() {
                   <motion.div
                     key={opt.id}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => { setPaymentMethod(opt.id); if (errors.paymentMethod) setErrors(p => ({ ...p, paymentMethod: "" })); }}
+                    onClick={() => {
+                      setPaymentMethod(opt.id);
+                      if (errors.paymentMethod) setErrors((p) => ({ ...p, paymentMethod: "" }));
+                    }}
                     className={
                       "relative flex cursor-pointer items-center justify-between rounded-2xl border p-4 transition-all " +
                       (isSelected
@@ -443,10 +503,14 @@ function CheckoutContent() {
                     }
                   >
                     <div className="flex items-center gap-4">
-                      <div className={
-                        "flex size-10 items-center justify-center rounded-xl border " +
-                        (isSelected ? "border-accent bg-accent text-accent-foreground" : "border-border/60 bg-muted text-muted-foreground")
-                      }>
+                      <div
+                        className={
+                          "flex size-10 items-center justify-center rounded-xl border " +
+                          (isSelected
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border/60 bg-muted text-muted-foreground")
+                        }
+                      >
                         <IconComponent className="size-5" />
                       </div>
                       <div>
@@ -472,7 +536,10 @@ function CheckoutContent() {
 
         {/* Right Column: Sticky Order Summary */}
         <div className="lg:col-span-5">
-          <Reveal index={4} className="sticky top-24 rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-6">
+          <Reveal
+            index={4}
+            className="sticky top-24 rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-6"
+          >
             <h2 className="font-display text-2xl font-bold text-primary">
               Order Summary ({count} {count === 1 ? "item" : "items"})
             </h2>
@@ -495,16 +562,23 @@ function CheckoutContent() {
                       </span>
                     </div>
                     <div>
-                      <h4 className="font-display text-sm font-bold text-foreground line-clamp-1">{item.name}</h4>
+                      <h4 className="font-display text-sm font-bold text-foreground line-clamp-1">
+                        {item.name}
+                      </h4>
                       {item.shade && (
                         <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <span className="size-2.5 rounded-full border border-border" style={{ backgroundColor: item.shade.hex }} />
+                          <span
+                            className="size-2.5 rounded-full border border-border"
+                            style={{ backgroundColor: item.shade.hex }}
+                          />
                           <span>{item.shade.name}</span>
                         </div>
                       )}
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-primary">{formatPKR(item.price * item.quantity)}</span>
+                  <span className="text-sm font-bold text-primary">
+                    {formatPKR(item.price * item.quantity)}
+                  </span>
                 </div>
               ))}
             </div>

@@ -26,14 +26,18 @@ export function CookieConsentBanner() {
   const handleAccept = () => {
     try {
       localStorage.setItem(COOKIE_STORAGE_KEY, "accepted");
-    } catch {}
+    } catch {
+      // Ignore storage errors if disabled/blocked
+    }
     setIsVisible(false);
   };
 
   const handleDecline = () => {
     try {
       localStorage.setItem(COOKIE_STORAGE_KEY, "essential_only");
-    } catch {}
+    } catch {
+      // Ignore storage errors if disabled/blocked
+    }
     setIsVisible(false);
   };
 
@@ -65,7 +69,8 @@ export function CookieConsentBanner() {
                 </button>
               </div>
               <p className="mt-1 leading-relaxed text-gray-600">
-                We use cookies to save your cart, personalize your beauty shopping experience, and deliver fast checkout. Learn more in our{" "}
+                We use cookies to save your cart, personalize your beauty shopping experience, and
+                deliver fast checkout. Learn more in our{" "}
                 <Link
                   to="/cookie-policy"
                   className="font-semibold text-[#D6336C] underline underline-offset-2 hover:text-[#b82a5b]"
