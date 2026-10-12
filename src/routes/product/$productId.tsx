@@ -13,7 +13,7 @@ import {
   ThumbsUp,
   Truck,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
 import { BounceButton, Reveal, spring } from "../../components/motion";
@@ -21,39 +21,23 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { formatPKR, type Review, type Shade } from "@/data/catalog";
 import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
-import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/product/$productId")({
-  loader: async ({ params }) => {
-    if (!supabase) return { productName: null, productDescription: null };
-    try {
-      const { data } = await supabase
-        .from("products")
-        .select("name, description")
-        .eq("id", params.productId)
-        .maybeSingle();
-      return {
-        productName: data?.name ?? null,
-        productDescription: data?.description ?? null,
-      };
-    } catch {
-      return { productName: null, productDescription: null };
-    }
-  },
-  head: ({ loaderData }) => {
-    const name = loaderData?.productName ?? "Luxury Cosmetics";
-    const description =
-      loaderData?.productDescription ??
-      "Shop authentic luxury cosmetics from LEIA Pakistan — radiant foundations, botanical serums, and high-pigment palettes.";
-    return {
-      meta: [
-        { title: `${name} — LEIA Cosmetics` },
-        { name: "description", content: description },
-        { property: "og:title", content: `${name} — LEIA Cosmetics` },
-        { property: "og:description", content: description },
-      ],
-    };
-  },
+  head: () => ({
+    meta: [
+      { title: "Product — LEIA Cosmetics" },
+      {
+        name: "description",
+        content:
+          "Shop authentic luxury cosmetics from LEIA Pakistan — radiant foundations, botanical serums, and high-pigment palettes.",
+      },
+      { property: "og:title", content: "Product — LEIA Cosmetics" },
+      {
+        property: "og:description",
+        content: "Shop authentic luxury cosmetics from LEIA Pakistan.",
+      },
+    ],
+  }),
   component: ProductDetailPage,
 });
 
@@ -72,6 +56,16 @@ function ProductDetailContent() {
   const { products, loading } = useStorefrontCatalog();
   const product = useMemo(() => products.find((item) => item.id === productId), [products, productId]);
   const { addItem } = useCart();
+
+  // Update page title client-side once product loads (SEO improvement)
+  useEffect(() => {
+    if (product) {
+      document.title = `${product.name} — LEIA Cosmetics`;
+    }
+    return () => {
+      document.title = "LEIA — Authentic Luxury Cosmetics Online Store";
+    };
+  }, [product]);
 
   if (loading) {
     return (
