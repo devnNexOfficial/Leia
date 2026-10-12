@@ -57,16 +57,45 @@ function ProductDetailContent() {
   const product = useMemo(() => products.find((item) => item.id === productId), [products, productId]);
   const { addItem } = useCart();
 
-  // Update page title client-side once product loads (SEO improvement)
+  // ── ALL HOOKS MUST BE AT THE TOP — before any early returns ──
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedShadeIndex, setSelectedShadeIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+  const [activeTab, setActiveTab] = useState<"description" | "ingredients" | "reviews">("description");
+
+  // Review form state
+  const [reviewsList, setReviewsList] = useState<Review[]>([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [newAuthor, setNewAuthor] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newComment, setNewComment] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Effects — also must be before early returns
   useEffect(() => {
     if (product) {
       document.title = `${product.name} — LEIA Cosmetics`;
+      // Initialise reviews from product data when product first loads
+      if (product.reviews && product.reviews.length > 0) {
+        setReviewsList(product.reviews);
+      }
     }
     return () => {
       document.title = "LEIA — Authentic Luxury Cosmetics Online Store";
     };
-  }, [product]);
+  }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Related products memo — also must be before early returns
+  const relatedProducts = useMemo(() => {
+    if (!product) return [];
+    return products
+      .filter((p) => p.id !== product.id && p.category === product.category)
+      .slice(0, 3);
+  }, [product, products]);
+
+  // ── Early returns AFTER all hooks ──
   if (loading) {
     return (
       <main className="mx-auto max-w-7xl px-6 py-16 flex flex-col items-center justify-center min-h-[50vh]">
@@ -136,22 +165,8 @@ function ProductDetailContent() {
     );
   }
 
+  // ── Derived values (not hooks) — safe after early returns ──
   const galleryImages = product.gallery || [product.image];
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedShadeIndex, setSelectedShadeIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
-  const [activeTab, setActiveTab] = useState<"description" | "ingredients" | "reviews">("description");
-
-  // Review form state
-  const [reviewsList, setReviewsList] = useState<Review[]>(product.reviews || []);
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [newRating, setNewRating] = useState(5);
-  const [newAuthor, setNewAuthor] = useState("");
-  const [newTitle, setNewTitle] = useState("");
-  const [newComment, setNewComment] = useState("");
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
-
   const selectedShade: Shade | undefined = product.shades[selectedShadeIndex];
   const isOutOfStock = product.stockCount === 0 || (selectedShade ? selectedShade.stockCount === 0 : false);
 
@@ -160,6 +175,7 @@ function ProductDetailContent() {
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };
+
 
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,10 +203,7 @@ function ProductDetailContent() {
     }, 1500);
   };
 
-  // Related products
-  const relatedProducts = useMemo(() => {
-    return products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 3);
-  }, [product, products]);
+
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 md:py-12">
