@@ -4,10 +4,13 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { GTM_ID, trackPageView } from "@/lib/gtm";
 
 import appCss from "../styles.css?url";
 
@@ -33,7 +36,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
 
@@ -164,6 +167,17 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {GTM_ID ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.dataLayer = window.dataLayer || [];(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`,
+            }}
+          />
+        ) : null}
         <HeadContent />
         <script
           type="application/ld+json"
@@ -175,6 +189,16 @@ function RootShell({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
+        {GTM_ID ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        ) : null}
         {children}
         <Scripts />
       </body>
@@ -188,6 +212,20 @@ import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { CookieConsentBanner } from "@/components/site/CookieConsentBanner";
 import { StorefrontCatalogProvider } from "@/components/storefront-catalog-context";
 
+function GtmRouteTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!GTM_ID) return;
+    const timer = setTimeout(() => {
+      trackPageView(location.href);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [location.href]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -196,6 +234,7 @@ function RootComponent() {
       <StorefrontCatalogProvider>
         <WishlistProvider>
           <CartProvider>
+            <GtmRouteTracker />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <FloatingWhatsApp />

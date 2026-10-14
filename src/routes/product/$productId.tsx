@@ -814,7 +814,7 @@ function ProductDetailContent() {
                     </p>
                     {!showReviewForm && (
                       <div className="mt-4">
-                        <BounceButton size="sm" onClick={() => setShowReviewForm(true)}>
+                        <BounceButton size="md" onClick={() => setShowReviewForm(true)}>
                           Write the First Review
                         </BounceButton>
                       </div>
