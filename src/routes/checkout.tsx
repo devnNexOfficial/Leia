@@ -107,8 +107,18 @@ function CheckoutContent() {
           item_price: i.price,
         })),
       });
+
+      if (typeof window !== "undefined") {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "begin_checkout",
+          content_ids: items.map((i) => i.productId),
+          value: subtotal,
+          currency: "PKR",
+        });
+      }
     }
-  }, [items, total, count]);
+  }, [items, total, count, subtotal]);
 
   const paymentOptions = [
     {
@@ -207,6 +217,19 @@ function CheckoutContent() {
           },
           `purchase_${order.order_number}`,
         );
+
+        const gtmPurchaseKey = `gtm_purchase_tracked_${order.order_number}`;
+        if (!sessionStorage.getItem(gtmPurchaseKey)) {
+          sessionStorage.setItem(gtmPurchaseKey, "true");
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: "purchase",
+            transaction_id: order.order_number,
+            content_ids: purchasedItems.map((i) => i.productId),
+            value: safePurchaseValue,
+            currency: "PKR",
+          });
+        }
       }
 
       // Save or clear customer details based on checkbox

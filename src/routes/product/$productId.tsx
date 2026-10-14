@@ -144,6 +144,17 @@ function ProductDetailContent() {
           value: product.price,
           currency: "PKR",
         });
+
+        if (typeof window !== "undefined") {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: "view_item",
+            content_ids: [product.id],
+            content_name: product.name,
+            value: product.price,
+            currency: "PKR",
+          });
+        }
       }
 
       document.title = `${product.name} — LEIA Cosmetics`;

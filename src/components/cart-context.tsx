@@ -127,6 +127,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ],
       });
 
+      if (typeof window !== "undefined") {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "add_to_cart",
+          content_ids: [product.id],
+          content_name: product.name,
+          value: product.price * quantity,
+          currency: "PKR",
+        });
+      }
+
       setItems((prev) => {
         let updated: CartItem[];
         const existingIndex = prev.findIndex((i) => i.id === itemKey);
