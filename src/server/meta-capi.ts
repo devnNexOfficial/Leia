@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const ALLOWED_EVENTS = [
+  "PageView",
   "ViewContent",
   "AddToCart",
   "InitiateCheckout",
@@ -255,6 +256,17 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
   }
 
   const payload = parsed.data;
+
+  // Feature flag: ENABLE_PAGEVIEW_CAPI (defaults to false)
+  if (payload.event_name === "PageView") {
+    const isPageViewCapiEnabled = getServerEnv("ENABLE_PAGEVIEW_CAPI", env) === "true";
+    if (!isPageViewCapiEnabled) {
+      return new Response(JSON.stringify({ ok: true, skipped: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 
   // Extract cookies
   const cookies = parseCookies(request.headers.get("cookie"));

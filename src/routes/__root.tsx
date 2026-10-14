@@ -8,7 +8,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { GTM_ID } from "@/lib/gtm";
 
 import appCss from "../styles.css?url";
@@ -206,6 +206,7 @@ import { CartProvider } from "@/components/cart-context";
 import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { CookieConsentBanner } from "@/components/site/CookieConsentBanner";
 import { StorefrontCatalogProvider } from "@/components/storefront-catalog-context";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 
 function GtmRouteTracker() {
   const router = useRouter();
@@ -237,6 +238,57 @@ function GtmRouteTracker() {
   return null;
 }
 
+function MetaPageViewTracker() {
+  const isEnabled =
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_ENABLE_PAGEVIEW_TRACKING === "true";
+
+  if (!isEnabled) {
+    return null;
+  }
+
+  return <MetaPageViewTrackerActive />;
+}
+
+function MetaPageViewTrackerActive() {
+  const router = useRouter();
+  const lastTrackedPath = useRef<string | null>(null);
+
+  const firePageView = useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    // Respect cookie consent: Skip if user explicitly chose "essential_only"
+    try {
+      const consent = localStorage.getItem("leia_cookie_consent_v1");
+      if (consent === "essential_only") return;
+    } catch {
+      // LocalStorage blocked/unavailable
+    }
+
+    const currentPath = window.location.pathname + window.location.search;
+    if (lastTrackedPath.current === currentPath) return;
+    lastTrackedPath.current = currentPath;
+
+    try {
+      trackMetaEvent("PageView");
+    } catch (err) {
+      if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
+        console.warn("[Meta Pixel] Failed to track PageView:", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    firePageView();
+    const unsubscribe = router.subscribe("onResolved", () => {
+      setTimeout(firePageView, 0);
+    });
+    return () => unsubscribe();
+  }, [router, firePageView]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -246,6 +298,7 @@ function RootComponent() {
         <WishlistProvider>
           <CartProvider>
             <GtmRouteTracker />
+            <MetaPageViewTracker />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <FloatingWhatsApp />

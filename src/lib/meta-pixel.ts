@@ -1,4 +1,5 @@
 export type MetaEventName =
+  | "PageView"
   | "ViewContent"
   | "AddToCart"
   | "InitiateCheckout"
