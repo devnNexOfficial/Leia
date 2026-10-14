@@ -1,13 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import {
-  Banknote,
-  Check,
-  MapPin,
-  Phone,
-  ShoppingBag,
-  Truck,
-} from "lucide-react";
+import { Banknote, Check, MapPin, Phone, ShoppingBag, Truck } from "lucide-react";
 import { useEffect } from "react";
 
 import { useCart } from "@/components/cart-context";
@@ -16,23 +9,30 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { formatPKR } from "@/data/catalog";
 
+import { siteUrl } from "@/lib/siteConfig";
+
 export const Route = createFileRoute("/confirmation")({
   head: () => ({
     meta: [
       { title: "Order Confirmed — LEIA Cosmetics" },
-      { name: "description", content: "Thank you for your order! Your luxury cosmetics purchase is confirmed." },
+      {
+        name: "description",
+        content: "Thank you for your order! Your luxury cosmetics purchase is confirmed.",
+      },
+      { name: "robots", content: "noindex, follow" },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/confirmation` }],
   }),
   component: ConfirmationPage,
 });
 
 function ConfirmationPage() {
   return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <ConfirmationContent />
-        <Footer />
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <ConfirmationContent />
+      <Footer />
+    </div>
   );
 }
 
@@ -52,7 +52,6 @@ function ConfirmationContent() {
   }
 
   const order = lastOrder;
-
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
@@ -76,7 +75,8 @@ function ConfirmationContent() {
         </h1>
 
         <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-          We've received your order and our atelier team is preparing your luxury cosmetics for dispatch.
+          We've received your order and our atelier team is preparing your luxury cosmetics for
+          dispatch.
         </p>
 
         <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-soft/60 px-4 py-2 text-xs font-semibold text-foreground border border-border/60">
@@ -86,7 +86,10 @@ function ConfirmationContent() {
       </Reveal>
 
       {/* Delivery Status Card */}
-      <Reveal index={1} className="mt-10 rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-6">
+      <Reveal
+        index={1}
+        className="mt-10 rounded-3xl border border-border/70 bg-card p-6 sm:p-8 shadow-xs space-y-6"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
           <div className="flex items-center gap-3">
             <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -110,7 +113,9 @@ function ConfirmationContent() {
               <MapPin className="size-4 text-primary" /> Delivery Address
             </h4>
             <p className="font-bold text-foreground">{order.customerName}</p>
-            <p className="text-muted-foreground text-xs">{order.address}, {order.city}</p>
+            <p className="text-muted-foreground text-xs">
+              {order.address}, {order.city}
+            </p>
             <p className="text-muted-foreground text-xs flex items-center gap-1">
               <Phone className="size-3" /> {order.phone}
             </p>
@@ -127,7 +132,9 @@ function ConfirmationContent() {
                 ? "Please keep exact cash ready upon delivery rider arrival."
                 : "Payment confirmed via mobile wallet."}
             </p>
-            <p className="text-xs text-emerald-800 font-semibold mt-1">Payment Status: Pending at Delivery</p>
+            <p className="text-xs text-emerald-800 font-semibold mt-1">
+              Payment Status: Pending at Delivery
+            </p>
           </div>
         </div>
 
@@ -149,10 +156,15 @@ function ConfirmationContent() {
                       className="size-14 rounded-xl object-cover border border-border/60 bg-soft/40"
                     />
                     <div>
-                      <h5 className="font-display text-sm font-bold text-foreground">{item.name}</h5>
+                      <h5 className="font-display text-sm font-bold text-foreground">
+                        {item.name}
+                      </h5>
                       {item.shade && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                          <span className="size-2.5 rounded-full border border-border" style={{ backgroundColor: item.shade.hex }} />
+                          <span
+                            className="size-2.5 rounded-full border border-border"
+                            style={{ backgroundColor: item.shade.hex }}
+                          />
                           <span>{item.shade.name}</span>
                         </div>
                       )}
@@ -186,7 +198,10 @@ function ConfirmationContent() {
       </Reveal>
 
       {/* Action Buttons */}
-      <Reveal index={2} className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+      <Reveal
+        index={2}
+        className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-center"
+      >
         <Link to="/shop">
           <BounceButton size="lg">
             <ShoppingBag className="size-5" /> Continue Shopping

@@ -21,6 +21,7 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { formatPKR, type Review, type Shade } from "@/data/catalog";
 import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
+import { siteConfig, siteUrl, defaultOgImage, getCanonicalUrl } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/product/$productId")({
   head: () => ({
@@ -31,11 +32,17 @@ export const Route = createFileRoute("/product/$productId")({
         content:
           "Shop authentic luxury cosmetics from LEIA Pakistan — radiant foundations, botanical serums, and high-pigment palettes.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
       { property: "og:title", content: "Product — LEIA Cosmetics" },
       {
         property: "og:description",
         content: "Shop authentic luxury cosmetics from LEIA Pakistan.",
       },
+      { property: "og:type", content: "product" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
+      { name: "twitter:image", content: defaultOgImage },
     ],
   }),
   component: ProductDetailPage,
@@ -85,6 +92,29 @@ function ProductDetailContent() {
       if (metaDesc && product.shortDescription) {
         metaDesc.setAttribute("content", product.shortDescription);
       }
+
+      // Update or create canonical link
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement("link");
+        canonical.setAttribute("rel", "canonical");
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute("href", getCanonicalUrl(`/product/${product.id}`));
+
+      // Update Open Graph tags dynamically
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute("content", `${product.name} — LEIA Cosmetics`);
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute("content", getCanonicalUrl(`/product/${product.id}`));
+      const ogImage = document.querySelector('meta[property="og:image"]');
+      if (ogImage && product.image) {
+        ogImage.setAttribute(
+          "content",
+          product.image.startsWith("http") ? product.image : `${siteUrl}${product.image}`,
+        );
+      }
+
       // Load reviews from localStorage first, fallback to product reviews
       const saved =
         typeof window !== "undefined" ? localStorage.getItem(`leia_reviews_${product.id}`) : null;
@@ -110,6 +140,10 @@ function ProductDetailContent() {
     }
     return () => {
       document.title = "LEIA — Authentic Luxury Cosmetics Online Store";
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) {
+        canonical.setAttribute("href", siteUrl);
+      }
     };
   }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -267,7 +301,51 @@ function ProductDetailContent() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 md:py-12">
+      {/* Product JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            image: product.image
+              ? product.image.startsWith("http")
+                ? product.image
+                : `${siteUrl}${product.image}`
+              : defaultOgImage,
+            description:
+              product.shortDescription ||
+              product.fullDescription ||
+              `Buy ${product.name} at Leia Cosmetics. Authentic luxury cosmetics in Pakistan.`,
+            brand: {
+              "@type": "Brand",
+              name: product.brand || "Leia Cosmetics",
+            },
+            offers: {
+              "@type": "Offer",
+              url: getCanonicalUrl(`/product/${product.id}`),
+              priceCurrency: "PKR",
+              price: product.price,
+              availability:
+                availableStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              itemCondition: "https://schema.org/NewCondition",
+            },
+            ...(product.rating && product.reviewCount
+              ? {
+                  aggregateRating: {
+                    "@type": "AggregateRating",
+                    ratingValue: product.rating,
+                    reviewCount: Math.max(product.reviewCount, 1),
+                  },
+                }
+              : {}),
+          }),
+        }}
+      />
+
       {/* Breadcrumb Navigation */}
+
       <nav
         aria-label="Breadcrumb"
         className="mb-8 flex items-center gap-2 text-xs text-muted-foreground"

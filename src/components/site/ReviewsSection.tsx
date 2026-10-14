@@ -100,7 +100,7 @@ export function ReviewsSection() {
               shade: r.shade || "Authentic Shade",
               product: r.product_name || "LEIA Cosmetics",
               avatar: r.avatar_color || "#D6336C",
-            }))
+            })),
           );
         }
       } catch {

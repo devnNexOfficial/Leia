@@ -71,9 +71,7 @@ export function VideoShowcaseSection() {
   const liveReels = useMemo<VideoReel[]>(() => {
     return rawVideos.map((video) => {
       const source = getVideoSourceInfo(video.video_url, video.thumbnail_url);
-      const linked = video.product_id
-        ? products.find((p) => p.id === video.product_id)
-        : null;
+      const linked = video.product_id ? products.find((p) => p.id === video.product_id) : null;
 
       const product: VideoReelProduct | null = linked
         ? {
@@ -137,7 +135,8 @@ export function VideoShowcaseSection() {
             See The Magic In Action
           </h2>
           <p className="text-xs md:text-sm text-gray-500 mt-2">
-            Watch real Pakistani beauty creators demonstrate our bestseller products. Tap any reel to watch and shop!
+            Watch real Pakistani beauty creators demonstrate our bestseller products. Tap any reel
+            to watch and shop!
           </p>
         </motion.div>
 
@@ -200,10 +199,16 @@ export function VideoShowcaseSection() {
                 {reel.product && (
                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-white/20 flex items-center justify-between">
                     <div>
-                      <p className="text-[9px] font-bold text-white/70 uppercase">{reel.product.brand}</p>
-                      <p className="text-xs font-bold text-white truncate max-w-[120px]">{reel.product.name}</p>
+                      <p className="text-[9px] font-bold text-white/70 uppercase">
+                        {reel.product.brand}
+                      </p>
+                      <p className="text-xs font-bold text-white truncate max-w-[120px]">
+                        {reel.product.name}
+                      </p>
                     </div>
-                    <span className="text-xs font-black text-[#FFB6C1]">{formatPKR(reel.product.price)}</span>
+                    <span className="text-xs font-black text-[#FFB6C1]">
+                      {formatPKR(reel.product.price)}
+                    </span>
                   </div>
                 )}
               </div>
@@ -269,7 +274,11 @@ export function VideoShowcaseSection() {
                       onClick={() => setIsPlaying(!isPlaying)}
                       className="text-white hover:text-[#FFB6C1] p-1.5 transition-colors"
                     >
-                      {isPlaying ? <Pause className="size-5" /> : <Play className="size-5 fill-current" />}
+                      {isPlaying ? (
+                        <Pause className="size-5" />
+                      ) : (
+                        <Play className="size-5 fill-current" />
+                      )}
                     </button>
                     <span className="text-xs text-white/80 font-medium truncate max-w-[180px]">
                       {activeVideo.title}

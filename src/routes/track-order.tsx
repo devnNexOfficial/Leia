@@ -4,6 +4,7 @@ import { Package, Phone, MessageCircle, ArrowLeft } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { BounceButton } from "../components/motion";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/track-order")({
   head: () => ({
@@ -14,7 +15,20 @@ export const Route = createFileRoute("/track-order")({
         content:
           "Track your LEIA order status. Contact us via WhatsApp or call for live order updates.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Track Your Order — LEIA Cosmetics" },
+      {
+        property: "og:description",
+        content:
+          "Track your LEIA order status. Contact us via WhatsApp or call for live order updates.",
+      },
+      { property: "og:url", content: `${siteUrl}/track-order` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/track-order` }],
   }),
   component: TrackOrderPage,
 });
@@ -58,9 +72,8 @@ function TrackOrderPage() {
             </h1>
 
             <p className="text-sm text-gray-600 font-medium leading-relaxed">
-              Online order tracking is coming very soon! For now, contact us on
-              WhatsApp or call us directly — we'll give you a real-time update
-              on your order within minutes.
+              Online order tracking is coming very soon! For now, contact us on WhatsApp or call us
+              directly — we'll give you a real-time update on your order within minutes.
             </p>
 
             {/* Contact options */}

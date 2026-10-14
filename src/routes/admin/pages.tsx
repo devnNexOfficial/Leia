@@ -32,7 +32,7 @@ function Pages() {
         legalPages.map((page) => ({
           ...page,
           ...(overrides.get(page.slug) ?? {}),
-        })) as StoredPage[]
+        })) as StoredPage[],
       );
     }
     setLoading(false);
@@ -69,18 +69,12 @@ function Pages() {
       ) : (
         <div className={`${adminCard} divide-y divide-slate-100`}>
           {pages.map((page) => (
-            <div
-              className="flex items-center justify-between gap-5 p-5"
-              key={page.slug}
-            >
+            <div className="flex items-center justify-between gap-5 p-5" key={page.slug}>
               <div>
                 <h2 className="font-semibold">{page.title}</h2>
                 <p className="mt-1 text-sm text-slate-500">/{page.slug}</p>
               </div>
-              <button
-                className={adminButton}
-                onClick={() => setEditing(page)}
-              >
+              <button className={adminButton} onClick={() => setEditing(page)}>
                 <Pencil className="mr-1 size-4" /> Edit
               </button>
             </div>
@@ -88,20 +82,12 @@ function Pages() {
         </div>
       )}
 
-      {editing && (
-        <PageForm page={editing} close={() => setEditing(null)} />
-      )}
+      {editing && <PageForm page={editing} close={() => setEditing(null)} />}
     </section>
   );
 }
 
-function PageForm({
-  page,
-  close,
-}: {
-  page: StoredPage;
-  close: () => void;
-}) {
+function PageForm({ page, close }: { page: StoredPage; close: () => void }) {
   const [title, setTitle] = useState(page.title);
   const [content, setContent] = useState(page.content);
   const [error, setError] = useState("");
@@ -112,16 +98,14 @@ function PageForm({
     if (!supabase) return;
 
     setSaving(true);
-    const { error: saveError } = await supabase
-      .from("site_pages")
-      .upsert(
-        {
-          slug: page.slug as LegalPageSlug,
-          title: title.trim(),
-          content: content.trim(),
-        },
-        { onConflict: "slug" }
-      );
+    const { error: saveError } = await supabase.from("site_pages").upsert(
+      {
+        slug: page.slug as LegalPageSlug,
+        title: title.trim(),
+        content: content.trim(),
+      },
+      { onConflict: "slug" },
+    );
 
     setSaving(false);
     if (saveError) {
@@ -165,18 +149,10 @@ function PageForm({
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            className="h-9 rounded border px-3 text-sm"
-            onClick={close}
-          >
+          <button type="button" className="h-9 rounded border px-3 text-sm" onClick={close}>
             Cancel
           </button>
-          <button
-            type="submit"
-            className={adminButton}
-            disabled={saving}
-          >
+          <button type="submit" className={adminButton} disabled={saving}>
             {saving ? "Saving…" : "Save page"}
           </button>
         </div>

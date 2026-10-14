@@ -74,46 +74,44 @@
 :root {
   --radius: 0.5rem;
   /* #FFF5F8 background */
-  --background: #FFF5F8;
-  --foreground: #1A0A10;
-  --card: #FFFFFF;
-  --card-foreground: #1A0A10;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A0A10;
+  --background: #fff5f8;
+  --foreground: #1a0a10;
+  --card: #ffffff;
+  --card-foreground: #1a0a10;
+  --popover: #ffffff;
+  --popover-foreground: #1a0a10;
   /* #D6336C primary */
-  --primary: #D6336C;
-  --primary-foreground: #FFFFFF;
+  --primary: #d6336c;
+  --primary-foreground: #ffffff;
   /* #FFB6C1 secondary/soft */
-  --secondary: #FFB6C1;
-  --secondary-foreground: #6B0F2A;
-  --muted: #FFF0F4;
-  --muted-foreground: #9B4D6A;
+  --secondary: #ffb6c1;
+  --secondary-foreground: #6b0f2a;
+  --muted: #fff0f4;
+  --muted-foreground: #9b4d6a;
   /* #FF4081 accent */
-  --accent: #FF4081;
-  --accent-foreground: #FFFFFF;
-  --soft: #FFB6C1;
-  --soft-foreground: #6B0F2A;
+  --accent: #ff4081;
+  --accent-foreground: #ffffff;
+  --soft: #ffb6c1;
+  --soft-foreground: #6b0f2a;
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: #FFFFFF;
-  --border: #F5C6D5;
-  --input: #F5C6D5;
-  --ring: #D6336C;
-  --chart-1: #D6336C;
-  --chart-2: #FF4081;
-  --chart-3: #FFB6C1;
-  --chart-4: #9B4D6A;
-  --chart-5: #6B0F2A;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1A0A10;
-  --sidebar-primary: #D6336C;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FFF0F4;
-  --sidebar-accent-foreground: #6B0F2A;
-  --sidebar-border: #F5C6D5;
-  --sidebar-ring: #D6336C;
+  --destructive-foreground: #ffffff;
+  --border: #f5c6d5;
+  --input: #f5c6d5;
+  --ring: #d6336c;
+  --chart-1: #d6336c;
+  --chart-2: #ff4081;
+  --chart-3: #ffb6c1;
+  --chart-4: #9b4d6a;
+  --chart-5: #6b0f2a;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a0a10;
+  --sidebar-primary: #d6336c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fff0f4;
+  --sidebar-accent-foreground: #6b0f2a;
+  --sidebar-border: #f5c6d5;
+  --sidebar-ring: #d6336c;
 }
-
-
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
@@ -197,7 +195,8 @@
 }
 
 @keyframes bounceGentle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -244,14 +243,17 @@
 /* ── Extra Homepage Animations ── */
 
 @keyframes gradientShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 @utility animate-gradient {
   background-size: 200% 200%;
   animation: gradientShift 4s ease infinite;
 }
-
-
-

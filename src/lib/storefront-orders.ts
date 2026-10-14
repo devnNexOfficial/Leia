@@ -3,7 +3,12 @@ import { supabase } from "@/lib/supabase";
 import { sendOrderNotifications } from "@/lib/order-emails";
 import { normalizePakistaniPhone } from "@/lib/utils";
 
-export type StorefrontOrder = { order_id: string; order_number: string; total: number; shipping_fee: number };
+export type StorefrontOrder = {
+  order_id: string;
+  order_number: string;
+  total: number;
+  shipping_fee: number;
+};
 
 export async function submitStorefrontOrder(input: {
   customerName: string;
@@ -14,7 +19,8 @@ export async function submitStorefrontOrder(input: {
   paymentMethod: string;
   items: CartItem[];
 }): Promise<StorefrontOrder> {
-  if (!supabase) throw new Error("Checkout is currently unavailable (Database connection not configured).");
+  if (!supabase)
+    throw new Error("Checkout is currently unavailable (Database connection not configured).");
 
   const standardPhone = normalizePakistaniPhone(input.phone);
   const paymentMethod = input.paymentMethod === "Cash on Delivery" ? "COD" : input.paymentMethod;
@@ -43,12 +49,20 @@ export async function submitStorefrontOrder(input: {
       }
     }
 
-    if (error && error.code !== "PGRST202" && !error.message.includes("Could not find the function")) {
+    if (
+      error &&
+      error.code !== "PGRST202" &&
+      !error.message.includes("Could not find the function")
+    ) {
       throw new Error(error.message);
     }
   } catch (rpcErr) {
     const errMessage = rpcErr instanceof Error ? rpcErr.message : "";
-    if (errMessage && !errMessage.includes("Could not find the function") && !errMessage.includes("PGRST202")) {
+    if (
+      errMessage &&
+      !errMessage.includes("Could not find the function") &&
+      !errMessage.includes("PGRST202")
+    ) {
       throw rpcErr;
     }
   }

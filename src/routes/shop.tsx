@@ -23,6 +23,7 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { formatPKR, type Product, type Shade } from "@/data/catalog";
 import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 type SortOption = "bestsellers" | "newest" | "price-asc" | "price-desc";
 
@@ -50,8 +51,29 @@ export const Route = createFileRoute("/shop")({
         content:
           "Browse authentic luxury cosmetics, radiant foundations, botanical serums, and high-pigment eye palettes from LEIA Pakistan. Filter by category, price, and shade.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Shop Luxury Cosmetics — LEIA Pakistan" },
+      {
+        property: "og:description",
+        content:
+          "Browse authentic luxury cosmetics, radiant foundations, botanical serums, and high-pigment eye palettes from LEIA Pakistan.",
+      },
+      { property: "og:url", content: `${siteUrl}/shop` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
+      { name: "twitter:title", content: "Shop Luxury Cosmetics — LEIA Pakistan" },
+      {
+        name: "twitter:description",
+        content:
+          "Browse authentic luxury cosmetics, radiant foundations, botanical serums, and high-pigment eye palettes from LEIA Pakistan.",
+      },
+      { name: "twitter:image", content: defaultOgImage },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/shop` }],
   }),
+
   component: ShopPage,
 });
 

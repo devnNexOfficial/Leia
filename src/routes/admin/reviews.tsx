@@ -315,13 +315,7 @@ function AdminReviewsPage() {
   );
 }
 
-function ReviewModal({
-  review,
-  close,
-}: {
-  review: CustomerReview | null;
-  close: () => void;
-}) {
+function ReviewModal({ review, close }: { review: CustomerReview | null; close: () => void }) {
   const [name, setName] = useState(review?.name ?? "");
   const [location, setLocation] = useState(review?.location ?? "Lahore");
   const [rating, setRating] = useState(review?.rating ?? 5);
@@ -495,7 +489,9 @@ function ReviewModal({
                   type="button"
                   onClick={() => setAvatarColor(c)}
                   className={`size-7 rounded-full border-2 transition-transform ${
-                    avatarColor === c ? "border-slate-900 scale-110 shadow-md" : "border-transparent"
+                    avatarColor === c
+                      ? "border-slate-900 scale-110 shadow-md"
+                      : "border-transparent"
                   }`}
                   style={{ backgroundColor: c }}
                 />
@@ -513,7 +509,10 @@ function ReviewModal({
                 onChange={(e) => setIsVerified(e.target.checked)}
                 className="size-4 rounded text-[#D6336C] focus:ring-[#D6336C]"
               />
-              <label htmlFor="verified-toggle" className="text-xs font-bold text-slate-700 select-none">
+              <label
+                htmlFor="verified-toggle"
+                className="text-xs font-bold text-slate-700 select-none"
+              >
                 Show as "Verified Buyer" badge
               </label>
             </div>
@@ -526,7 +525,10 @@ function ReviewModal({
                 onChange={(e) => setIsFeatured(e.target.checked)}
                 className="size-4 rounded text-[#D6336C] focus:ring-[#D6336C]"
               />
-              <label htmlFor="featured-toggle" className="text-xs font-bold text-slate-700 select-none">
+              <label
+                htmlFor="featured-toggle"
+                className="text-xs font-bold text-slate-700 select-none"
+              >
                 Feature in Homepage Infinite Review Marquee
               </label>
             </div>

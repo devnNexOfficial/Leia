@@ -68,27 +68,44 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+import {
+  siteConfig,
+  siteUrl,
+  defaultTitle,
+  defaultDescription,
+  defaultOgImage,
+} from "@/lib/siteConfig";
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LÉÏA — Authentic Luxury Cosmetics Online Store" },
+      { name: "theme-color", content: "#FFF5F8" },
+      { title: defaultTitle },
       {
         name: "description",
-        content:
-          "Shop authentic luxury cosmetics, radiant foundations, botanical serums, and high-pigment palettes from LEIA Pakistan. Express nationwide delivery.",
+        content: defaultDescription,
       },
-      { name: "author", content: "LEIA" },
-      { property: "og:title", content: "LÉÏA — Authentic Luxury Cosmetics Online Store" },
+      { name: "author", content: "Leia Cosmetics" },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: defaultTitle },
       {
         property: "og:description",
-        content:
-          "Shop authentic luxury cosmetics, radiant foundations, botanical serums, and high-pigment palettes from LEIA Pakistan.",
+        content: defaultDescription,
       },
+      { property: "og:url", content: siteUrl },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Leia Cosmetics — Authentic Luxury Cosmetics" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@LeiaCosmetics" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
+      { name: "twitter:creator", content: siteConfig.social.twitter },
+      { name: "twitter:title", content: defaultTitle },
+      { name: "twitter:description", content: defaultDescription },
+      { name: "twitter:image", content: defaultOgImage },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -101,6 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "canonical", href: siteUrl },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "icon", href: "/favicon.ico" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
@@ -113,11 +131,48 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.siteName,
+  alternateName: "LÉÏA",
+  url: siteUrl,
+  logo: `${siteUrl}/apple-touch-icon.png`,
+  sameAs: [siteConfig.social.instagram],
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+92-341-7813558",
+    contactType: "customer service",
+    areaServed: "PK",
+    availableLanguage: ["English", "Urdu"],
+  },
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteConfig.siteName,
+  url: siteUrl,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteUrl}/shop?search={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
       </head>
       <body>
         {children}

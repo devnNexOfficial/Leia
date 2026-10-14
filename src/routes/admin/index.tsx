@@ -27,7 +27,9 @@ function Dashboard() {
       ]);
 
       if (orderResult.error || productResult.error) {
-        setError(orderResult.error?.message ?? productResult.error?.message ?? "Could not load dashboard.");
+        setError(
+          orderResult.error?.message ?? productResult.error?.message ?? "Could not load dashboard.",
+        );
       } else {
         setOrders((orderResult.data ?? []) as AdminOrder[]);
         setProductCount(productResult.count ?? 0);
@@ -104,7 +106,9 @@ function Dashboard() {
                     <td className="px-5 py-3">{o.customer_name}</td>
                     <td className="px-5 py-3">Rs. {Number(o.total).toLocaleString()}</td>
                     <td className="px-5 py-3">
-                      <span className="rounded-full bg-slate-100 px-2 py-1 text-xs">{o.status}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-1 text-xs">
+                        {o.status}
+                      </span>
                     </td>
                     <td className="px-5 py-3 text-slate-500">
                       {new Date(o.created_at).toLocaleDateString()}

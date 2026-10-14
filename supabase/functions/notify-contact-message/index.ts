@@ -99,23 +99,27 @@ Deno.serve(async (req) => {
     const adminEmail = Deno.env.get("ADMIN_EMAIL") || "shop.nigah@gmail.com";
 
     if (!resendApiKey) {
-      console.warn("⚠️ [Edge Function notify-contact-message]: RESEND_API_KEY secret is not set in Supabase");
+      console.warn(
+        "⚠️ [Edge Function notify-contact-message]: RESEND_API_KEY secret is not set in Supabase",
+      );
       return new Response(
         JSON.stringify({ error: "RESEND_API_KEY secret is not set in Supabase" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     const payload = (await req.json()) as ContactPayload;
 
     if (!payload || !payload.name || !payload.email || !payload.message) {
-      return new Response(
-        JSON.stringify({ error: "Missing required contact payload fields" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Missing required contact payload fields" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log(`🚀 [Edge Function notify-contact-message]: Dispatching inquiry notification from ${payload.name} (${payload.email})`);
+    console.log(
+      `🚀 [Edge Function notify-contact-message]: Dispatching inquiry notification from ${payload.name} (${payload.email})`,
+    );
 
     const resendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -135,23 +139,26 @@ Deno.serve(async (req) => {
     const resendData = await resendRes.json();
 
     if (resendRes.ok) {
-      console.log(`✅ [Edge Function]: Contact notification delivered to ${adminEmail}`, resendData);
-      return new Response(
-        JSON.stringify({ success: true, data: resendData }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      console.log(
+        `✅ [Edge Function]: Contact notification delivered to ${adminEmail}`,
+        resendData,
       );
+      return new Response(JSON.stringify({ success: true, data: resendData }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     } else {
       console.warn(`⚠️ [Edge Function]: Resend API notice:`, resendData);
       return new Response(
         JSON.stringify({ success: false, error: resendData.message || "Failed to send email" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
   } catch (err) {
     console.error("❌ [Edge Function Exception]:", err);
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : "Internal Server Error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });

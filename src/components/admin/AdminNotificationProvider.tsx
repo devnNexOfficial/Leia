@@ -60,48 +60,48 @@ export function AdminNotificationProvider({ children }: { children: ReactNode })
 
     const channel = supabase
       .channel("admin-realtime-orders-feed")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "orders" },
-        (payload) => {
-          const row = payload.new as {
-            id: string;
-            order_number: string;
-            customer_name: string;
-            city: string;
-            total: number;
-            payment_method: string;
-            created_at: string;
-          };
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
+        const row = payload.new as {
+          id: string;
+          order_number: string;
+          customer_name: string;
+          city: string;
+          total: number;
+          payment_method: string;
+          created_at: string;
+        };
 
-          const newAlert: NewOrderAlert = {
-            id: row.id || crypto.randomUUID(),
-            orderNumber: row.order_number,
-            customerName: row.customer_name || "Valued Customer",
-            city: row.city || "Pakistan",
-            total: Number(row.total || 0),
-            paymentMethod: row.payment_method || "COD",
-            createdAt: row.created_at || new Date().toISOString(),
-          };
+        const newAlert: NewOrderAlert = {
+          id: row.id || crypto.randomUUID(),
+          orderNumber: row.order_number,
+          customerName: row.customer_name || "Valued Customer",
+          city: row.city || "Pakistan",
+          total: Number(row.total || 0),
+          paymentMethod: row.payment_method || "COD",
+          createdAt: row.created_at || new Date().toISOString(),
+        };
 
-          // 1. Play audio chime
-          playOrderChime();
+        // 1. Play audio chime
+        playOrderChime();
 
-          // 2. Update state & badge count
-          setUnreadCount((c) => c + 1);
-          setRecentOrders((prev) => [newAlert, ...prev.slice(0, 19)]);
-          setActiveToast(newAlert);
+        // 2. Update state & badge count
+        setUnreadCount((c) => c + 1);
+        setRecentOrders((prev) => [newAlert, ...prev.slice(0, 19)]);
+        setActiveToast(newAlert);
 
-          // 3. Trigger native desktop notification if permission granted
-          if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-            new Notification(`🛍️ New Order Received: ${newAlert.orderNumber}`, {
-              body: `${newAlert.customerName} placed an order for Rs. ${newAlert.total.toLocaleString()} (${newAlert.city})`,
-              icon: "/favicon.ico",
-              tag: newAlert.id,
-            });
-          }
+        // 3. Trigger native desktop notification if permission granted
+        if (
+          typeof window !== "undefined" &&
+          "Notification" in window &&
+          Notification.permission === "granted"
+        ) {
+          new Notification(`🛍️ New Order Received: ${newAlert.orderNumber}`, {
+            body: `${newAlert.customerName} placed an order for Rs. ${newAlert.total.toLocaleString()} (${newAlert.city})`,
+            icon: "/favicon.ico",
+            tag: newAlert.id,
+          });
         }
-      )
+      })
       .subscribe();
 
     return () => {

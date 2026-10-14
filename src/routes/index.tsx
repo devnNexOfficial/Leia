@@ -10,23 +10,40 @@ import { VideoShowcaseSection } from "@/components/site/VideoShowcaseSection";
 import { FaqSection } from "@/components/site/FaqSection";
 import { Footer } from "@/components/site/Footer";
 
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
-const title = "LÉÏA — Pakistani Ladies Cosmetics Online Store";
+const title = "LÉÏA Cosmetics — Luxury Online Beauty Store";
 const description =
-  "Shop 100% authentic Pakistani cosmetics — Luscious, Rivaj UK, J. and more. Free delivery and Cash on Delivery (COD) nationwide. Eyes, Face, Skincare.";
+  "Shop 100% authentic luxury Pakistani cosmetics, foundations, serums, and lip shades from LEIA. Free express delivery and Cash on Delivery (COD) nationwide.";
 
-export const Route = createFileRoute("/")(({
+export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title },
       { name: "description", content: description },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
-      { name: "keywords", content: "Pakistani cosmetics, Rivaj foundation, online makeup Pakistan, ladies cosmetics, beauty products Pakistan, skincare" },
+      { property: "og:url", content: siteUrl },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:image", content: defaultOgImage },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+      { name: "twitter:image", content: defaultOgImage },
+      {
+        name: "keywords",
+        content:
+          "Pakistani cosmetics, luxury cosmetics Pakistan, online makeup Pakistan, ladies cosmetics, beauty products Pakistan, skincare",
+      },
     ],
+    links: [{ rel: "canonical", href: siteUrl }],
   }),
   component: Index,
-}));
+});
 
 function Index() {
   return (
@@ -56,8 +73,6 @@ function Index() {
 
       {/* Footer */}
       <Footer />
-
-
     </div>
   );
 }

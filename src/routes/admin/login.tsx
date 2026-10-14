@@ -11,10 +11,7 @@ const STORAGE_KEY_LOCKOUT = "leia_admin_lockout_until";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
-    meta: [
-      { name: "robots", content: "noindex, nofollow" },
-      { title: "Admin Sign In — LEIA" },
-    ],
+    meta: [{ name: "robots", content: "noindex, nofollow" }, { title: "Admin Sign In — LEIA" }],
   }),
   component: AdminLogin,
 });
@@ -48,10 +45,14 @@ function AdminLogin() {
       const lockoutTime = Date.now() + LOCKOUT_SECONDS * 1000;
       sessionStorage.setItem(STORAGE_KEY_LOCKOUT, lockoutTime.toString());
       setLockoutRemaining(LOCKOUT_SECONDS);
-      setError(`Too many failed login attempts. For security, please wait ${LOCKOUT_SECONDS} seconds before trying again.`);
+      setError(
+        `Too many failed login attempts. For security, please wait ${LOCKOUT_SECONDS} seconds before trying again.`,
+      );
     } else {
       const attemptsLeft = MAX_FAILED_ATTEMPTS - currentFails;
-      setError(`${message} (${attemptsLeft} attempt${attemptsLeft === 1 ? "" : "s"} remaining before temporary lockout)`);
+      setError(
+        `${message} (${attemptsLeft} attempt${attemptsLeft === 1 ? "" : "s"} remaining before temporary lockout)`,
+      );
     }
   };
 
@@ -156,11 +157,7 @@ function AdminLogin() {
               className={`${adminButton} mt-6 w-full`}
               disabled={loading || isLocked}
             >
-              {isLocked
-                ? `Locked (${lockoutRemaining}s)`
-                : loading
-                ? "Signing in…"
-                : "Sign in"}
+              {isLocked ? `Locked (${lockoutRemaining}s)` : loading ? "Signing in…" : "Sign in"}
             </button>
           </>
         )}

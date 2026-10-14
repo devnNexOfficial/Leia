@@ -150,7 +150,9 @@ export function FaqSection() {
                     transition={{ type: "spring", stiffness: 400 }}
                     className="w-full flex items-center justify-between py-5 text-left gap-4"
                   >
-                    <span className="font-bold text-gray-900 text-sm leading-snug">{faq.question}</span>
+                    <span className="font-bold text-gray-900 text-sm leading-snug">
+                      {faq.question}
+                    </span>
                     <motion.div
                       animate={{ rotate: isOpen ? 45 : 0 }}
                       transition={{ type: "spring", stiffness: 400, damping: 18 }}

@@ -1,24 +1,10 @@
-User-agent: Googlebot
-Disallow: /admin/
-Disallow: /admin
-Allow: /
-
-User-agent: Bingbot
-Disallow: /admin/
-Disallow: /admin
-Allow: /
-
-User-agent: Twitterbot
-Disallow: /admin/
-Disallow: /admin
-Allow: /
-
-User-agent: facebookexternalhit
-Disallow: /admin/
-Disallow: /admin
-Allow: /
-
 User-agent: *
-Disallow: /admin/
-Disallow: /admin
 Allow: /
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /confirmation
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: https://www.leiacosmetics.store/sitemap.xml

@@ -39,7 +39,11 @@ function Subscribers() {
 
     const channel = client
       .channel("admin-newsletter-subscribers")
-      .on("postgres_changes", { event: "*", schema: "public", table: "newsletter_subscribers" }, load)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "newsletter_subscribers" },
+        load,
+      )
       .subscribe();
 
     return () => {
@@ -50,7 +54,7 @@ function Subscribers() {
   const copyAll = async () => {
     try {
       await navigator.clipboard.writeText(
-        subscribers.map((subscriber) => subscriber.email).join("\n")
+        subscribers.map((subscriber) => subscriber.email).join("\n"),
       );
       setNotice("All email addresses copied.");
     } catch {
@@ -63,14 +67,11 @@ function Subscribers() {
     const csv = [
       "Email,Subscribed at",
       ...subscribers.map(
-        (subscriber) =>
-          `${escape(subscriber.email)},${escape(subscriber.subscribed_at)}`
+        (subscriber) => `${escape(subscriber.email)},${escape(subscriber.subscribed_at)}`,
       ),
     ].join("\n");
 
-    const url = URL.createObjectURL(
-      new Blob([csv], { type: "text/csv;charset=utf-8" })
-    );
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url;
     link.download = "newsletter-subscribers.csv";
@@ -88,18 +89,10 @@ function Subscribers() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
-            className={adminButton}
-            onClick={copyAll}
-            disabled={subscribers.length === 0}
-          >
+          <button className={adminButton} onClick={copyAll} disabled={subscribers.length === 0}>
             <Copy className="mr-1 size-4" /> Copy all emails
           </button>
-          <button
-            className={adminButton}
-            onClick={exportCsv}
-            disabled={subscribers.length === 0}
-          >
+          <button className={adminButton} onClick={exportCsv} disabled={subscribers.length === 0}>
             <Download className="mr-1 size-4" /> Export CSV
           </button>
         </div>

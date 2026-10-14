@@ -59,8 +59,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => {
     if (typeof window !== "undefined") {
-      const saved =
-        localStorage.getItem("leia_cart") || localStorage.getItem("maisonrouge_cart");
+      const saved = localStorage.getItem("leia_cart") || localStorage.getItem("maisonrouge_cart");
       if (saved) {
         try {
           return JSON.parse(saved);
@@ -75,8 +74,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lastOrder, setLastOrder] = useState<OrderDetails | null>(() => {
     if (typeof window !== "undefined") {
       const saved =
-        localStorage.getItem("leia_last_order") ||
-        localStorage.getItem("maisonrouge_last_order");
+        localStorage.getItem("leia_last_order") || localStorage.getItem("maisonrouge_last_order");
       if (saved) {
         try {
           return JSON.parse(saved);
@@ -141,7 +139,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return updated;
       });
     },
-    [triggerPulse]
+    [triggerPulse],
   );
 
   const updateQuantity = useCallback((itemId: string, quantity: number) => {
@@ -170,14 +168,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage([]);
   }, []);
 
-  const count = useMemo(
-    () => items.reduce((acc, item) => acc + item.quantity, 0),
-    [items]
-  );
+  const count = useMemo(() => items.reduce((acc, item) => acc + item.quantity, 0), [items]);
 
   const subtotal = useMemo(
     () => items.reduce((acc, item) => acc + item.price * item.quantity, 0),
-    [items]
+    [items],
   );
 
   const placeOrder = useCallback(
@@ -230,7 +225,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return order;
     },
-    [items, subtotal]
+    [items, subtotal],
   );
 
   const value = useMemo(
@@ -265,7 +260,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       clearCart,
       placeOrder,
-    ]
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

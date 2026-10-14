@@ -26,7 +26,7 @@ export function getVideoSourceInfo(url: string, customThumbnail?: string | null)
 
   // 1. YouTube link detection (watch, shorts, embed, or short link youtu.be)
   const ytMatch = cleanUrl.match(
-    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i,
   );
   if (ytMatch && ytMatch[1]) {
     const videoId = ytMatch[1];

@@ -1,9 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw, CheckCircle2, XCircle, Package, Clock, AlertTriangle, ArrowRight } from "lucide-react";
+import {
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  Package,
+  Clock,
+  AlertTriangle,
+  ArrowRight,
+} from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/returns")({
+  head: () => ({
+    meta: [
+      { title: "Returns & Exchange Policy — LEIA Pakistan" },
+      {
+        name: "description",
+        content:
+          "Hassle-free 7-day return and exchange policy for LEIA cosmetics. Learn about our terms for damaged items, wrong orders, and refunds.",
+      },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Returns & Exchange Policy — LEIA Pakistan" },
+      {
+        property: "og:description",
+        content: "Hassle-free 7-day return and exchange policy for LEIA cosmetics.",
+      },
+      { property: "og:url", content: `${siteUrl}/returns` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
+    ],
+    links: [{ rel: "canonical", href: `${siteUrl}/returns` }],
+  }),
   component: ReturnsPage,
 });
 
@@ -24,10 +55,30 @@ const notEligible = [
 ];
 
 const steps = [
-  { step: "01", title: "Contact Support", desc: "WhatsApp us at 0341-7813558 with your Order ID and clear photos of the product within 7 days of delivery.", icon: Package },
-  { step: "02", title: "Get Approval", desc: "Our team will review your request within 24 hours and send you a return approval with pickup details.", icon: CheckCircle2 },
-  { step: "03", title: "Schedule Pickup", desc: "Once approved, we'll schedule a free pickup from your address via our courier partner.", icon: RefreshCw },
-  { step: "04", title: "Receive Refund", desc: "After inspection, your refund is processed within 5–7 business days via original payment method or store credit.", icon: Clock },
+  {
+    step: "01",
+    title: "Contact Support",
+    desc: "WhatsApp us at 0341-7813558 with your Order ID and clear photos of the product within 7 days of delivery.",
+    icon: Package,
+  },
+  {
+    step: "02",
+    title: "Get Approval",
+    desc: "Our team will review your request within 24 hours and send you a return approval with pickup details.",
+    icon: CheckCircle2,
+  },
+  {
+    step: "03",
+    title: "Schedule Pickup",
+    desc: "Once approved, we'll schedule a free pickup from your address via our courier partner.",
+    icon: RefreshCw,
+  },
+  {
+    step: "04",
+    title: "Receive Refund",
+    desc: "After inspection, your refund is processed within 5–7 business days via original payment method or store credit.",
+    icon: Clock,
+  },
 ];
 
 function ReturnsPage() {
@@ -41,8 +92,12 @@ function ReturnsPage() {
           <div className="inline-flex items-center gap-2 bg-[#D6336C]/10 text-[#D6336C] rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest mb-5">
             <RefreshCw className="size-3.5" /> Returns Policy
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Returns &amp; <span className="text-[#D6336C]">Exchanges</span></h1>
-          <p className="text-gray-500 text-base">We want you to love every purchase. If something isn't right, we'll make it right.</p>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+            Returns &amp; <span className="text-[#D6336C]">Exchanges</span>
+          </h1>
+          <p className="text-gray-500 text-base">
+            We want you to love every purchase. If something isn't right, we'll make it right.
+          </p>
         </div>
       </section>
 
@@ -59,7 +114,10 @@ function ReturnsPage() {
                 <p className="text-white/80 text-sm">From the date of delivery</p>
               </div>
             </div>
-            <a href="/contact" className="shrink-0 bg-white text-[#D6336C] font-bold text-sm px-6 py-3 rounded-full hover:bg-gray-50 transition-colors shadow-md flex items-center gap-2">
+            <a
+              href="/contact"
+              className="shrink-0 bg-white text-[#D6336C] font-bold text-sm px-6 py-3 rounded-full hover:bg-gray-50 transition-colors shadow-md flex items-center gap-2"
+            >
               Initiate Return <ArrowRight className="size-4" />
             </a>
           </div>
@@ -77,7 +135,7 @@ function ReturnsPage() {
               <h3 className="font-black text-gray-900 text-lg">Eligible for Return</h3>
             </div>
             <ul className="space-y-3">
-              {eligible.map(item => (
+              {eligible.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm text-gray-700">
                   <CheckCircle2 className="size-4 text-emerald-500 mt-0.5 shrink-0" />
                   {item}
@@ -94,7 +152,7 @@ function ReturnsPage() {
               <h3 className="font-black text-gray-900 text-lg">Not Eligible for Return</h3>
             </div>
             <ul className="space-y-3">
-              {notEligible.map(item => (
+              {notEligible.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm text-gray-700">
                   <XCircle className="size-4 text-red-400 mt-0.5 shrink-0" />
                   {item}
@@ -140,7 +198,10 @@ function ReturnsPage() {
             <div>
               <p className="text-sm font-bold text-gray-900 mb-1">Important Note</p>
               <p className="text-xs text-gray-600 leading-relaxed">
-                For hygiene reasons, we cannot accept returns on opened cosmetic products unless they are defective or damaged. Please check your order carefully upon delivery and report any issues within 7 days. We reserve the right to decline returns that do not meet our policy criteria.
+                For hygiene reasons, we cannot accept returns on opened cosmetic products unless
+                they are defective or damaged. Please check your order carefully upon delivery and
+                report any issues within 7 days. We reserve the right to decline returns that do not
+                meet our policy criteria.
               </p>
             </div>
           </div>

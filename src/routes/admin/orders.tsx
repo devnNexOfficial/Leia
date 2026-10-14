@@ -10,13 +10,7 @@ export const Route = createFileRoute("/admin/orders")({
   component: Orders,
 });
 
-const statuses: OrderStatus[] = [
-  "Pending",
-  "Confirmed",
-  "Shipped",
-  "Delivered",
-  "Cancelled",
-];
+const statuses: OrderStatus[] = ["Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"];
 
 function Orders() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -65,23 +59,18 @@ function Orders() {
           (status === "All" || o.status === status) &&
           `${o.customer_name} ${o.order_number} ${o.shipping_address ?? ""} ${o.city ?? ""} ${o.customer_phone ?? ""}`
             .toLowerCase()
-            .includes(query.toLowerCase())
+            .includes(query.toLowerCase()),
       ),
-    [orders, query, status]
+    [orders, query, status],
   );
 
   const updateStatus = async (order: AdminOrder, next: OrderStatus) => {
-    const { error } = await supabase!
-      .from("orders")
-      .update({ status: next })
-      .eq("id", order.id);
+    const { error } = await supabase!.from("orders").update({ status: next }).eq("id", order.id);
 
     if (error) {
       setError(error.message);
     } else {
-      setSelected((current) =>
-        current?.id === order.id ? { ...current, status: next } : current
-      );
+      setSelected((current) => (current?.id === order.id ? { ...current, status: next } : current));
     }
   };
 
@@ -104,11 +93,7 @@ function Orders() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </label>
-        <select
-          className={adminInput}
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
+        <select className={adminInput} value={status} onChange={(e) => setStatus(e.target.value)}>
           <option>All</option>
           {statuses.map((s) => (
             <option key={s}>{s}</option>
@@ -171,7 +156,9 @@ function Orders() {
                   {/* Delivery Address & City */}
                   <td className="px-5 py-3.5 max-w-[280px]">
                     <div className="text-xs text-slate-800 line-clamp-2 leading-relaxed font-normal">
-                      {o.shipping_address || <span className="text-slate-400 italic">No address provided</span>}
+                      {o.shipping_address || (
+                        <span className="text-slate-400 italic">No address provided</span>
+                      )}
                     </div>
                     {o.city && (
                       <span className="mt-1 inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-700">
@@ -203,9 +190,7 @@ function Orders() {
                       className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-xs focus:border-slate-500 focus:outline-none cursor-pointer"
                       value={o.status}
                       onClick={(e) => e.stopPropagation()}
-                      onChange={(e) =>
-                        updateStatus(o, e.target.value as OrderStatus)
-                      }
+                      onChange={(e) => updateStatus(o, e.target.value as OrderStatus)}
                     >
                       {statuses.map((s) => (
                         <option key={s}>{s}</option>
@@ -229,11 +214,7 @@ function Orders() {
       )}
 
       {selected && (
-        <OrderDetail
-          order={selected}
-          updateStatus={updateStatus}
-          close={() => setSelected(null)}
-        />
+        <OrderDetail order={selected} updateStatus={updateStatus} close={() => setSelected(null)} />
       )}
     </section>
   );
@@ -284,7 +265,11 @@ function OrderDetail({
             >
               <Trash2 className="size-5" />
             </button>
-            <button onClick={close} aria-label="Close order details" className="p-2 text-slate-400 hover:text-slate-600">
+            <button
+              onClick={close}
+              aria-label="Close order details"
+              className="p-2 text-slate-400 hover:text-slate-600"
+            >
               <X className="size-6" />
             </button>
           </div>
@@ -337,10 +322,7 @@ function OrderDetail({
           <h3 className="mb-3 text-sm font-semibold">Items</h3>
           <div className="divide-y rounded-md border">
             {order.order_items?.map((i) => (
-              <div
-                className="flex items-center justify-between gap-4 p-3 text-sm"
-                key={i.id}
-              >
+              <div className="flex items-center justify-between gap-4 p-3 text-sm" key={i.id}>
                 <div className="flex items-center gap-3">
                   {i.image_url ? (
                     <img
@@ -354,9 +336,7 @@ function OrderDetail({
                   <span>
                     {i.product_name}
                     {i.variant_name ? (
-                      <span className="block text-xs text-slate-500">
-                        {i.variant_name}
-                      </span>
+                      <span className="block text-xs text-slate-500">{i.variant_name}</span>
                     ) : null}
                   </span>
                 </div>

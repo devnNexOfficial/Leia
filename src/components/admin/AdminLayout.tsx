@@ -194,5 +194,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 }
 
 export const adminCard = "rounded-lg border border-slate-200 bg-white shadow-sm";
-export const adminButton = "inline-flex h-9 items-center justify-center rounded-md bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50";
-export const adminInput = "h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none focus:border-slate-500";
+export const adminButton =
+  "inline-flex h-9 items-center justify-center rounded-md bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50";
+export const adminInput =
+  "h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none focus:border-slate-500";

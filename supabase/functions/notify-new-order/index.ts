@@ -55,7 +55,7 @@ function buildAdminEmailHtml(order: OrderPayload): string {
         Rs. ${(item.price * item.quantity).toLocaleString()}
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 
@@ -134,7 +134,7 @@ function buildCustomerEmailHtml(order: OrderPayload): string {
         Rs. ${(item.price * item.quantity).toLocaleString()}
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 
@@ -200,23 +200,27 @@ Deno.serve(async (req) => {
     const adminEmail = Deno.env.get("ADMIN_EMAIL") || "shop.nigah@gmail.com";
 
     if (!resendApiKey) {
-      console.error("❌ [Edge Function]: RESEND_API_KEY secret is missing in Supabase Edge environment");
+      console.error(
+        "❌ [Edge Function]: RESEND_API_KEY secret is missing in Supabase Edge environment",
+      );
       return new Response(
         JSON.stringify({ error: "RESEND_API_KEY secret is not set in Supabase" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     const payload = (await req.json()) as OrderPayload;
 
     if (!payload || !payload.orderNumber) {
-      return new Response(
-        JSON.stringify({ error: "Missing orderNumber or payload" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Missing orderNumber or payload" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log(`🚀 [Edge Function notify-new-order]: Processing order #${payload.orderNumber} for ${payload.customerName}`);
+    console.log(
+      `🚀 [Edge Function notify-new-order]: Processing order #${payload.orderNumber} for ${payload.customerName}`,
+    );
 
     const results = {
       adminEmail: false,
@@ -243,7 +247,10 @@ Deno.serve(async (req) => {
 
       const adminData = await adminRes.json();
       if (adminRes.ok) {
-        console.log(`✅ [Edge Function]: Admin alert successfully delivered to ${adminEmail}`, adminData);
+        console.log(
+          `✅ [Edge Function]: Admin alert successfully delivered to ${adminEmail}`,
+          adminData,
+        );
         results.adminEmail = true;
       } else {
         console.warn(`⚠️ [Edge Function]: Admin email failed:`, adminData);
@@ -273,11 +280,15 @@ Deno.serve(async (req) => {
 
         const custData = await custRes.json();
         if (custRes.ok) {
-          console.log(`✅ [Edge Function]: Customer confirmation delivered to ${payload.customerEmail}`);
+          console.log(
+            `✅ [Edge Function]: Customer confirmation delivered to ${payload.customerEmail}`,
+          );
           results.customerEmail = true;
         } else {
           // Expected in Resend test mode for unverified domains
-          console.log(`ℹ️ [Edge Function]: Customer email notice (testing mode): ${custData.message}`);
+          console.log(
+            `ℹ️ [Edge Function]: Customer email notice (testing mode): ${custData.message}`,
+          );
           results.customerError = custData.message;
         }
       } catch (custErr) {
@@ -292,13 +303,13 @@ Deno.serve(async (req) => {
         orderNumber: payload.orderNumber,
         results,
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
     console.error("❌ [Edge Function Global Exception]:", err);
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : "Internal Server Error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });

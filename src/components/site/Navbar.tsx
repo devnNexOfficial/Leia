@@ -1,5 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, Menu, X, Heart, Home, BookOpen, HelpCircle, Mail, Layers } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  Menu,
+  X,
+  Heart,
+  Home,
+  BookOpen,
+  HelpCircle,
+  Mail,
+  Layers,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/components/cart-context";
 import { CartDrawer } from "@/components/site/CartDrawer";

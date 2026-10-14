@@ -38,7 +38,6 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-[#F7A1B8] min-h-[520px] md:min-h-[580px] flex items-center">
-
       {/* ── Full-bleed background image (mobile + desktop) ── */}
       <motion.div
         initial={{ scale: 1.05, opacity: 0 }}
@@ -60,7 +59,6 @@ export function Hero() {
       {/* ── MAIN CONTENT CONTAINER ── */}
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 md:px-8 py-12 sm:py-10 md:py-24 w-full">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-5 sm:gap-8 md:gap-12">
-
           {/* Left Text Block */}
           <div className="w-full md:max-w-xl text-left">
             {/* Headline */}
@@ -88,7 +86,8 @@ export function Hero() {
               transition={{ ...spring, delay: 0.5 }}
               className="text-[#2D0D1E] text-[13px] sm:text-base md:text-lg mb-5 font-semibold max-w-xs sm:max-w-md leading-relaxed"
             >
-              Where authenticity meets elegance. Premium cosmetics, curated for every skin tone delivered straight to your door.
+              Where authenticity meets elegance. Premium cosmetics, curated for every skin tone
+              delivered straight to your door.
             </motion.p>
 
             {/* CTA Button */}
@@ -113,7 +112,6 @@ export function Hero() {
               </a>
             </motion.div>
           </div>
-
         </div>
       </div>
     </section>

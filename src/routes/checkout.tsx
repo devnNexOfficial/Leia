@@ -16,12 +16,16 @@ import {
   normalizePakistaniPhone,
 } from "@/lib/utils";
 
+import { siteUrl } from "@/lib/siteConfig";
+
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
       { title: "Checkout — Leia Cosmetics" },
       { name: "description", content: "Complete your order securely with Cash on Delivery." },
+      { name: "robots", content: "noindex, follow" },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/checkout` }],
   }),
   component: CheckoutPage,
 });

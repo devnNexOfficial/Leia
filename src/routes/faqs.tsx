@@ -15,6 +15,7 @@ import {
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/lib/supabase";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/faqs")({
   head: () => ({
@@ -25,7 +26,19 @@ export const Route = createFileRoute("/faqs")({
         content:
           "Find quick answers to common questions about orders, nationwide delivery, cash on delivery, and returns for LEIA cosmetics.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Frequently Asked Questions — LEIA Pakistan" },
+      {
+        property: "og:description",
+        content: "Find quick answers to common questions about orders, delivery, and payments.",
+      },
+      { property: "og:url", content: `${siteUrl}/faqs` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/faqs` }],
   }),
   component: FAQsPage,
 });
@@ -44,9 +57,10 @@ const DEFAULT_FAQS: FaqItem[] = [
     category: "Orders",
     question: "How do I place an order on LEIA?",
     answer:
-      "Browse our cosmetics catalog at leia.pk, select your desired products and shades, click 'Add to Cart', and proceed to checkout. We offer Cash on Delivery (COD) across all cities and towns in Pakistan.",
+      "Browse our cosmetics catalog at leiacosmetics.store, select your desired products and shades, click 'Add to Cart', and proceed to checkout. We offer Cash on Delivery (COD) across all cities and towns in Pakistan.",
     sort_order: 1,
   },
+
   {
     id: "f2",
     category: "Orders",

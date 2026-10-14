@@ -45,7 +45,7 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         (p) =>
           p.name.toLowerCase().includes(query.toLowerCase()) ||
           p.category.toLowerCase().includes(query.toLowerCase()) ||
-          p.brand.toLowerCase().includes(query.toLowerCase())
+          p.brand.toLowerCase().includes(query.toLowerCase()),
       )
     : [];
 
@@ -186,8 +186,12 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                   ) : (
                     <div className="text-center py-10">
                       <Sparkles className="size-10 text-[#D6336C] mx-auto mb-2" />
-                      <p className="text-sm font-bold text-gray-700">No matching cosmetics found for "{query}"</p>
-                      <p className="text-xs text-gray-400 mt-1">Try searching for "Lipstick", "Rivaj", or "Serum"</p>
+                      <p className="text-sm font-bold text-gray-700">
+                        No matching cosmetics found for "{query}"
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Try searching for "Lipstick", "Rivaj", or "Serum"
+                      </p>
                     </div>
                   )}
                 </div>

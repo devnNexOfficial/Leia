@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage } from "@/components/site/LegalPage";
+import { siteUrl } from "@/lib/siteConfig";
+
 export const Route = createFileRoute("/accessibility")({
   head: () => ({
     meta: [
@@ -10,6 +12,7 @@ export const Route = createFileRoute("/accessibility")({
           "Read LEIA's commitment to digital accessibility and user experience for all shoppers.",
       },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/accessibility` }],
   }),
   component: () => <LegalPage slug="accessibility" />,
 });

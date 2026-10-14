@@ -14,13 +14,8 @@ export function Reveal({
   index?: number;
   className?: string;
 }) {
-  return (
-    <div className={cn("transition-all duration-300", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("transition-all duration-300", className)}>{children}</div>;
 }
-
 
 type BounceButtonProps = HTMLMotionProps<"button"> & {
   variant?: "primary" | "outline" | "soft";
@@ -45,7 +40,8 @@ export function BounceButton({
         variant === "primary" && "bg-primary text-primary-foreground hover:bg-accent",
         variant === "outline" &&
           "border border-primary text-primary hover:border-accent hover:bg-accent hover:text-accent-foreground",
-        variant === "soft" && "bg-soft text-soft-foreground hover:bg-accent hover:text-accent-foreground",
+        variant === "soft" &&
+          "bg-soft text-soft-foreground hover:bg-accent hover:text-accent-foreground",
         className,
       )}
       {...props}

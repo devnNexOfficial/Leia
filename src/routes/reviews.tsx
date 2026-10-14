@@ -1,18 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import {
-  Star,
-  CheckCircle2,
-  MapPin,
-  MessageSquare,
-  Sparkles,
-  Plus,
-  X,
-  Filter,
-} from "lucide-react";
+import { Star, CheckCircle2, MapPin, MessageSquare, Sparkles, Plus, X, Filter } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/lib/supabase";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/reviews")({
   head: () => ({
@@ -23,7 +15,20 @@ export const Route = createFileRoute("/reviews")({
         content:
           "Read verified reviews, customer ratings, and authentic feedback on LEIA foundations, lipsticks, blushes, and skincare across Pakistan.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Customer Reviews & Ratings — LEIA" },
+      {
+        property: "og:description",
+        content:
+          "Read verified reviews, customer ratings, and authentic feedback on LEIA cosmetics across Pakistan.",
+      },
+      { property: "og:url", content: `${siteUrl}/reviews` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/reviews` }],
   }),
   component: ReviewsPage,
 });
@@ -180,9 +185,7 @@ function ReviewsPage() {
       is_featured: true,
     };
 
-    const { error: insertError } = await supabase
-      .from("customer_reviews")
-      .insert([newRev]);
+    const { error: insertError } = await supabase.from("customer_reviews").insert([newRev]);
 
     setSaving(false);
     if (insertError) {
@@ -224,7 +227,8 @@ function ReviewsPage() {
               Customer <span className="text-[#D6336C]">Reviews</span>
             </h1>
             <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-              Real experiences from beauty lovers across Pakistan who trust LEIA for their everyday skincare and makeup rituals.
+              Real experiences from beauty lovers across Pakistan who trust LEIA for their everyday
+              skincare and makeup rituals.
             </p>
 
             <div className="pt-2">
@@ -374,7 +378,9 @@ function ReviewsPage() {
                     <CheckCircle2 className="size-8" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900">Thank you for your review!</h3>
-                  <p className="text-xs text-gray-500">Your feedback helps beauty lovers across Pakistan shop with confidence.</p>
+                  <p className="text-xs text-gray-500">
+                    Your feedback helps beauty lovers across Pakistan shop with confidence.
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmitReview} className="p-6 space-y-4">

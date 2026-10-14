@@ -49,7 +49,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   const toggleWishlist = (productId: string) => {
     setWishlistIds((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
     );
   };
 

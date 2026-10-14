@@ -4,6 +4,7 @@ import { Sparkles, Heart, ShieldCheck, Truck, Quote } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/lib/supabase";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -14,7 +15,20 @@ export const Route = createFileRoute("/about")({
         content:
           "Discover the founding story, philosophy, clean ingredient commitments, and craftsmanship behind LEIA cosmetics.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Our Story & Brand Philosophy — LEIA Pakistan" },
+      {
+        property: "og:description",
+        content:
+          "Discover the founding story, philosophy, clean ingredient commitments, and craftsmanship behind LEIA cosmetics.",
+      },
+      { property: "og:url", content: `${siteUrl}/about` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/about` }],
   }),
   component: AboutPage,
 });

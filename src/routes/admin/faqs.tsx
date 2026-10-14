@@ -1,14 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Pencil,
-  Plus,
-  Trash2,
-  HelpCircle,
-  Search,
-  Eye,
-  EyeOff,
-  Layers,
-} from "lucide-react";
+import { Pencil, Plus, Trash2, HelpCircle, Search, Eye, EyeOff, Layers } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdminError, AdminLoading, EmptyState } from "@/components/admin/AdminStates";
 import { adminButton, adminCard, adminInput } from "@/components/admin/AdminLayout";
@@ -85,7 +76,10 @@ function AdminFaqsPage() {
     if (error) setError(error.message);
   };
 
-  const allCategories = ["All", ...Array.from(new Set([...DEFAULT_CATEGORIES, ...faqs.map((f) => f.category)]))];
+  const allCategories = [
+    "All",
+    ...Array.from(new Set([...DEFAULT_CATEGORIES, ...faqs.map((f) => f.category)])),
+  ];
 
   const filtered = faqs.filter((f) => {
     const matchesSearch =
@@ -295,10 +289,7 @@ function FaqModal({
     };
 
     if (faq?.id) {
-      const { error: updateErr } = await supabase
-        .from("faqs")
-        .update(payload)
-        .eq("id", faq.id);
+      const { error: updateErr } = await supabase.from("faqs").update(payload).eq("id", faq.id);
       if (updateErr) {
         setError(updateErr.message);
         setSaving(false);
@@ -408,7 +399,10 @@ function FaqModal({
               onChange={(e) => setIsPublished(e.target.checked)}
               className="size-4 rounded text-[#D6336C] focus:ring-[#D6336C]"
             />
-            <label htmlFor="faq-publish-toggle" className="text-xs font-bold text-slate-700 select-none">
+            <label
+              htmlFor="faq-publish-toggle"
+              className="text-xs font-bold text-slate-700 select-none"
+            >
               Publish immediately on /faqs
             </label>
           </div>

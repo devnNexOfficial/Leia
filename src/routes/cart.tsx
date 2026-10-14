@@ -18,6 +18,8 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { formatPKR } from "@/data/catalog";
 
+import { siteUrl } from "@/lib/siteConfig";
+
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
@@ -26,7 +28,9 @@ export const Route = createFileRoute("/cart")({
         name: "description",
         content: "Review your selected luxury beauty items and skincare essentials.",
       },
+      { name: "robots", content: "noindex, follow" },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/cart` }],
   }),
   component: CartPage,
 });

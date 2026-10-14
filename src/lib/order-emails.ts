@@ -25,7 +25,7 @@ export interface OrderEmailPayload {
  * NOTE: No API keys are stored or called from frontend client code.
  */
 export async function sendOrderNotifications(
-  order: OrderEmailPayload
+  order: OrderEmailPayload,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     if (!supabase) {
@@ -58,7 +58,7 @@ export async function sendOrderNotifications(
  */
 export async function sendNewsletterWelcomeEmail(
   subscriberEmail: string,
-  discountCode: string = "LEIA15"
+  discountCode: string = "LEIA15",
 ): Promise<{ success: boolean; error?: string }> {
   try {
     if (!supabase) return { success: false, error: "Supabase client not initialized" };
@@ -88,7 +88,7 @@ export interface ContactNotificationPayload {
  * Dispatches automated admin email notification when a customer submits the Contact form.
  */
 export async function sendContactNotification(
-  payload: ContactNotificationPayload
+  payload: ContactNotificationPayload,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     if (!supabase) return { success: false, error: "Supabase client not initialized" };
@@ -112,4 +112,3 @@ export async function sendContactNotification(
     };
   }
 }
-

@@ -78,4 +78,3 @@ export const formatPKR = (value: number): string =>
  */
 export const formatRupees = (value: number): string =>
   `Rs. ${Number(value || 0).toLocaleString("en-PK")}`;
-

@@ -7,7 +7,8 @@ import { useCart } from "@/components/cart-context";
 import { formatPKR, type Product } from "@/data/catalog";
 
 export function WishlistDrawer() {
-  const { isWishlistOpen, closeWishlist, wishlistProducts, toggleWishlist, wishlistCount } = useWishlist();
+  const { isWishlistOpen, closeWishlist, wishlistProducts, toggleWishlist, wishlistCount } =
+    useWishlist();
   const { addItem } = useCart();
 
   const handleMoveToCart = (product: Product) => {
@@ -62,7 +63,8 @@ export function WishlistDrawer() {
                   </div>
                   <h3 className="font-bold text-gray-900 text-base">Your Wishlist is Empty</h3>
                   <p className="text-xs text-gray-500 max-w-xs mt-1 mb-6">
-                    Tap the heart icon on any cosmetic item to save your favorite lipsticks, serums, and eye palettes.
+                    Tap the heart icon on any cosmetic item to save your favorite lipsticks, serums,
+                    and eye palettes.
                   </p>
                   <Link
                     to="/shop"

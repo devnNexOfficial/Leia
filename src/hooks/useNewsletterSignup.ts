@@ -34,7 +34,9 @@ export function useNewsletterSignup() {
     }
     setStatus("loading");
     setMessage("");
-    const { error } = await supabase.from("newsletter_subscribers").insert({ email: normalizedEmail });
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .insert({ email: normalizedEmail });
     if (!error) {
       setStatus("success");
       setMessage("🎉 Subscribed! Use code: LEIA15 for 15% OFF at checkout.");

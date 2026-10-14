@@ -2,19 +2,21 @@
 
 A modern, luxury e-commerce platform for premium Pakistani cosmetics. Elegant, girlie, and sophisticated—not childish.
 
-**Live**: [[leia.pk](https://leia.pk)](https://leia-nine.vercel.app/)
+**Live**: [www.leiacosmetics.store](https://www.leiacosmetics.store)
 
 ---
 
 ## 🎨 Brand Identity
 
 ### Color Palette
+
 - **Primary**: `#D6336C` — Headlines, buttons, bold accents
 - **Accent**: `#FF4081` — Hover states, interactive elements
 - **Soft**: `#FFB6C1` — Card backgrounds, section dividers
 - **Background**: `#FFF5F8` — Main page canvas (near-white)
 
 ### Design Philosophy
+
 ✓ Girlie elegance (not cutesy)  
 ✓ Luxury sophistication with breathing room  
 ✓ Clean, SaaS-inspired layout (not cluttered templates)  
@@ -26,6 +28,7 @@ A modern, luxury e-commerce platform for premium Pakistani cosmetics. Elegant, g
 ## 🛍️ Core Features
 
 ### Pages & Flows
+
 - ✅ **Home** — Hero section, trust strip, category cards, featured products
 - ✅ **Product Listing** — Clean grid, filters, sorting, quick search
 - ✅ **Product Detail** — Large imagery, variant swatches, quantity selector
@@ -34,13 +37,16 @@ A modern, luxury e-commerce platform for premium Pakistani cosmetics. Elegant, g
 - ✅ **Account** — Order history, saved details, profile management
 
 ### Product Variants
+
 - Shade selections (color swatches, not dropdowns)
 - Size options
 - Skin type filters
 - Tactile swatch interactions with spring animations
 
 ### Payment Methods
+
 🇵🇰 Pakistan-focused checkout:
+
 - 💵 **Cash on Delivery (COD)**
 - 📱 **JazzCash**
 - 📱 **Easypaisa**
@@ -52,14 +58,14 @@ A modern, luxury e-commerce platform for premium Pakistani cosmetics. Elegant, g
 
 All animations use **spring/elastic easing** (bouncy, premium feel—not stiff):
 
-| Element | Interaction |
-|---------|---|
-| **Buttons** | Scale 1→1.05 on hover, pop on click (spring overshoot) |
-| **Product Cards** | Lift + zoom on hover, staggered grid entrance |
-| **Swatches** | Bounce in selection, checkmark appears with spring |
-| **Add-to-Cart** | Item pops into cart icon, cart bounces to confirm |
-| **Page Load** | Hero elements fade-slide-up with staggered timing |
-| **Links/Icons** | Subtle bounce + underline on hover |
+| Element           | Interaction                                            |
+| ----------------- | ------------------------------------------------------ |
+| **Buttons**       | Scale 1→1.05 on hover, pop on click (spring overshoot) |
+| **Product Cards** | Lift + zoom on hover, staggered grid entrance          |
+| **Swatches**      | Bounce in selection, checkmark appears with spring     |
+| **Add-to-Cart**   | Item pops into cart icon, cart bounces to confirm      |
+| **Page Load**     | Hero elements fade-slide-up with staggered timing      |
+| **Links/Icons**   | Subtle bounce + underline on hover                     |
 
 **Timing**: 150–400ms (fast, responsive, premium)
 
@@ -68,21 +74,25 @@ All animations use **spring/elastic easing** (bouncy, premium feel—not stiff):
 ## 🏗️ Layout & Components
 
 ### Navigation
+
 - Logo left, category links center/right, cart icon right
 - Minimal, clean design (SaaS-inspired, not bloated)
 
 ### Hero Section
+
 - Large, centered headline + short subtext
 - Primary CTA button (`#D6336C`)
 - Trust/social-proof strip below (bestsellers, reviews, "as seen in")
 
 ### Cards & Spacing
+
 - Rounded corners: 8–10px (elegant, not pill-shaped)
 - Soft shadows, generous white space
 - Image-forward product cards
 - #FFB6C1 soft backgrounds for category/feature sections
 
 ### Footer (Polynae-inspired)
+
 ```
 ┌─────────────────────────────────────┐
 │ Newsletter Signup (10% off offer)   │
@@ -96,6 +106,7 @@ All animations use **spring/elastic easing** (bouncy, premium feel—not stiff):
 │ © 2024 LÉÏA | Privacy | Terms       │
 └─────────────────────────────────────┘
 ```
+
 Footer background: `#FFB6C1` for visual separation
 
 ---
@@ -103,10 +114,12 @@ Footer background: `#FFB6C1` for visual separation
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 16+ (install with [nvm](https://github.com/nvm-sh/nvm))
 - npm or yarn
 
 ### Installation
+
 ```bash
 git clone https://github.com/devNexOfficial/leia.pk
 cd leia-storefront
@@ -117,6 +130,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Build for Production
+
 ```bash
 npm run build
 npm run start
@@ -144,40 +158,44 @@ leia-storefront/
 
 ## 🛠️ Tech Stack
 
-| Layer | Tech |
-|-------|------|
-| **Frontend** | React 18, TypeScript, Tailwind CSS |
-| **Animations** | Framer Motion (spring easing) |
-| **State** | React Context + Zustand |
-| **Backend** | Node.js + Express (REST API) |
-| **Database** | PostgreSQL (Supabase) |
-| **Payments** | JazzCash, Easypaisa, COD APIs |
-| **Hosting** | Vercel (frontend), Railway/Render (backend) |
-| **CI/CD** | GitHub Actions |
+| Layer          | Tech                                        |
+| -------------- | ------------------------------------------- |
+| **Frontend**   | React 18, TypeScript, Tailwind CSS          |
+| **Animations** | Framer Motion (spring easing)               |
+| **State**      | React Context + Zustand                     |
+| **Backend**    | Node.js + Express (REST API)                |
+| **Database**   | PostgreSQL (Supabase)                       |
+| **Payments**   | JazzCash, Easypaisa, COD APIs               |
+| **Hosting**    | Vercel (frontend), Railway/Render (backend) |
+| **CI/CD**      | GitHub Actions                              |
 
 ---
 
 ## 🎯 Development Roadmap
 
 ### Phase 1 (Current) ✅
+
 - [x] Homepage design & layout
 - [x] Product listing grid
 - [x] Basic animations (bounce, hover)
 - [x] Footer with newsletter signup
 
 ### Phase 2
+
 - [ ] Product detail page + variant selection
 - [ ] Shopping cart with persistent storage
 - [ ] Checkout flow UI
 - [ ] Payment gateway integration
 
 ### Phase 3
+
 - [ ] Customer accounts & order history
 - [ ] Admin dashboard (product management)
 - [ ] Email notifications (order confirmations, shipping)
 - [ ] Advanced filtering & search
 
 ### Phase 4
+
 - [ ] Product reviews & ratings
 - [ ] Wishlist functionality
 - [ ] Loyalty/rewards program
@@ -196,6 +214,7 @@ We love contributions! Here's how:
 5. Open a Pull Request
 
 **Style Guide**:
+
 - Use TypeScript for all new code
 - Follow Tailwind CSS conventions
 - Keep components small & reusable
@@ -206,13 +225,13 @@ We love contributions! Here's how:
 
 ## 📱 Browser Support
 
-| Browser | Version |
-|---------|---------|
-| Chrome | Latest |
-| Firefox | Latest |
-| Safari | Latest |
+| Browser       | Version |
+| ------------- | ------- |
+| Chrome        | Latest  |
+| Firefox       | Latest  |
+| Safari        | Latest  |
 | Mobile Safari | iOS 14+ |
-| Chrome Mobile | Latest |
+| Chrome Mobile | Latest  |
 
 ---
 
@@ -220,9 +239,9 @@ We love contributions! Here's how:
 
 - All payment data encrypted (PCI-DSS compliant)
 - HTTPS-only (SSL/TLS)
-- Privacy Policy: [leia.pk/privacy](https://leia.pk/privacy)
-- Terms of Service: [leia.pk/terms](https://leia.pk/terms)
-- Cookie Policy: [leia.pk/cookies](https://leia.pk/cookies)
+- Privacy Policy: [leiacosmetics.store/privacy-policy](https://www.leiacosmetics.store/privacy-policy)
+- Terms of Service: [leiacosmetics.store/terms-of-service](https://www.leiacosmetics.store/terms-of-service)
+- Cookie Policy: [leiacosmetics.store/cookie-policy](https://www.leiacosmetics.store/cookie-policy)
 
 ---
 
@@ -250,7 +269,6 @@ This project is proprietary. All rights reserved © 2024 LÉÏA Pakistan.
 - **Marketing**: [Team]
 
 ---
-
 
 **Last Updated**: September 2026  
 **Status**: 🟢 Active Development

@@ -9,16 +9,11 @@ import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
 export function NewArrivalsSection() {
   const { addItem } = useCart();
   const { products } = useStorefrontCatalog();
-  const newArrivals = useMemo(
-    () => products.filter((product) => product.isNew),
-    [products]
-  );
+  const newArrivals = useMemo(() => products.filter((product) => product.isNew), [products]);
   const allProducts = useMemo(
     () =>
-      newArrivals.length >= 3
-        ? newArrivals
-        : [...newArrivals, ...newArrivals, ...newArrivals],
-    [newArrivals]
+      newArrivals.length >= 3 ? newArrivals : [...newArrivals, ...newArrivals, ...newArrivals],
+    [newArrivals],
   );
   const [current, setCurrent] = useState(0);
   const total = allProducts.length;
@@ -35,7 +30,7 @@ export function NewArrivalsSection() {
   const next = () => setCurrent((c) => (c + 1) % total);
 
   const getPos = (i: number) => {
-    const diff = ((i - current) % total + total) % total;
+    const diff = (((i - current) % total) + total) % total;
     if (diff === 0) return "center";
     if (diff === 1) return "right";
     if (diff === total - 1) return "left";
@@ -90,8 +85,8 @@ export function NewArrivalsSection() {
                     isCenter
                       ? "z-20 scale-110 opacity-100 translate-x-0"
                       : isLeft
-                      ? "z-10 scale-75 opacity-40 -translate-x-[60%] sm:-translate-x-[75%] md:-translate-x-[110%] blur-[0.5px]"
-                      : "z-10 scale-75 opacity-40 translate-x-[60%] sm:translate-x-[75%] md:translate-x-[110%] blur-[0.5px]"
+                        ? "z-10 scale-75 opacity-40 -translate-x-[60%] sm:-translate-x-[75%] md:-translate-x-[110%] blur-[0.5px]"
+                        : "z-10 scale-75 opacity-40 translate-x-[60%] sm:translate-x-[75%] md:translate-x-[110%] blur-[0.5px]"
                   }`}
                   onClick={() => setCurrent(i)}
                 >
@@ -149,7 +144,7 @@ export function NewArrivalsSection() {
                 whileHover={{ scale: 1.07, y: -3, backgroundColor: "#D6336C" }}
                 whileTap={{ scale: 0.93 }}
                 transition={{ type: "spring", stiffness: 400, damping: 16 }}
-              onClick={() => addItem(centerProduct)}
+                onClick={() => addItem(centerProduct)}
                 className="bg-[#1A0A10] text-white text-xs font-black uppercase tracking-widest px-8 py-3.5 rounded-full shadow-md"
               >
                 SHOP NOW

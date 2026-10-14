@@ -14,6 +14,7 @@ import {
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/lib/supabase";
+import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -24,7 +25,20 @@ export const Route = createFileRoute("/blog")({
         content:
           "Explore expertly curated skincare routines, foundation matching guides, makeup trends, and behind-the-scenes beauty tutorials from LEIA.",
       },
+      { property: "og:site_name", content: siteConfig.siteName },
+      { property: "og:title", content: "Beauty Journal & Makeup Tips — LEIA" },
+      {
+        property: "og:description",
+        content:
+          "Explore expertly curated skincare routines, foundation matching guides, makeup trends, and behind-the-scenes beauty tutorials from LEIA.",
+      },
+      { property: "og:url", content: `${siteUrl}/blog` },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: defaultOgImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: siteConfig.social.twitter },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/blog` }],
   }),
   component: BlogPage,
 });
@@ -185,7 +199,8 @@ function BlogPage() {
               Stories, Rituals & <span className="text-[#D6336C]">Guides</span>
             </h1>
             <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-              Step into our beauty journal for everyday skincare secrets, tutorials, and masterclasses from makeup artists.
+              Step into our beauty journal for everyday skincare secrets, tutorials, and
+              masterclasses from makeup artists.
             </p>
 
             {/* Search Bar */}
@@ -231,7 +246,8 @@ function BlogPage() {
               <BookOpen className="size-12 text-[#D6336C] mx-auto mb-3 opacity-60" />
               <h3 className="text-lg font-bold text-gray-900">No articles found</h3>
               <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
-                We couldn't find any articles matching your search query. Try another keyword or category.
+                We couldn't find any articles matching your search query. Try another keyword or
+                category.
               </p>
             </div>
           ) : (
