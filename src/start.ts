@@ -24,6 +24,16 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
+import { handleMetaCapi } from "./server/meta-capi";
+
+const metaCapiMiddleware = createMiddleware().server(async ({ request, next }) => {
+  const url = new URL(request.url);
+  if (url.pathname === "/api/meta-capi") {
+    return await handleMetaCapi(request);
+  }
+  return await next();
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
+  requestMiddleware: [errorMiddleware, csrfMiddleware, metaCapiMiddleware],
 }));

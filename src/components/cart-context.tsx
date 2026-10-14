@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { Product, Shade } from "@/data/catalog";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 
 export type CartItem = {
   id: string; // unique cart line item id e.g. `${product.id}-${shadeName}`
@@ -110,6 +111,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const targetShade = shade || product.shades[0];
       if (product.stockCount === 0 || (targetShade && targetShade.stockCount === 0)) return;
       const itemKey = `${product.id}-${targetShade?.id || targetShade?.name || "default"}`;
+
+      const itemPrice = targetShade?.priceOverride ?? product.price;
+      trackMetaEvent("AddToCart", {
+        content_ids: [product.id],
+        content_type: "product",
+        value: itemPrice * quantity,
+        currency: "PKR",
+        contents: [
+          {
+            id: product.id,
+            quantity,
+            item_price: itemPrice,
+          },
+        ],
+      });
 
       setItems((prev) => {
         let updated: CartItem[];

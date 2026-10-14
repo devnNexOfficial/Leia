@@ -13,15 +13,16 @@ import {
   ThumbsUp,
   Truck,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
 import { BounceButton, Reveal, spring } from "../../components/motion";
 import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
-import { formatPKR, type Review, type Shade } from "@/data/catalog";
-import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
+import { formatPKR, type Review, type Shade, type Product } from "@/data/catalog";
+import { useStorefrontCatalog, fetchSingleProduct } from "@/components/storefront-catalog-context";
 import { siteConfig, siteUrl, defaultOgImage, getCanonicalUrl } from "@/lib/siteConfig";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 
 export const Route = createFileRoute("/product/$productId")({
   head: () => ({
@@ -49,22 +50,69 @@ export const Route = createFileRoute("/product/$productId")({
 });
 
 function ProductDetailPage() {
+  const { productId } = useParams({ from: "/product/$productId" });
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <ProductDetailContent />
+      <ProductDetailContent key={productId} />
       <Footer />
     </div>
   );
 }
 
 function ProductDetailContent() {
-  const { productId } = useParams({ from: "/product/$productId" });
-  const { products, loading } = useStorefrontCatalog();
-  const product = useMemo(
-    () => products.find((item) => item.id === productId),
-    [products, productId],
-  );
+  const { productId: rawProductId } = useParams({ from: "/product/$productId" });
+  const productId = useMemo(() => {
+    if (!rawProductId) return "";
+    try {
+      return decodeURIComponent(rawProductId).trim();
+    } catch {
+      return rawProductId.trim();
+    }
+  }, [rawProductId]);
+
+  const { products, loading: catalogLoading, refresh: refreshCatalog } = useStorefrontCatalog();
+
+  // Try matching case-insensitively from loaded catalog
+  const catalogProduct = useMemo(() => {
+    if (!productId) return undefined;
+    const target = productId.toLowerCase();
+    return products.find((item) => item.id.toLowerCase() === target);
+  }, [products, productId]);
+
+  // Standalone direct single-product fetch fallback
+  const [standaloneProduct, setStandaloneProduct] = useState<Product | null>(null);
+  const [standaloneLoading, setStandaloneLoading] = useState(false);
+  const [fetchAttempt, setFetchAttempt] = useState(0);
+
+  useEffect(() => {
+    if (catalogProduct || !productId) {
+      setStandaloneLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    setStandaloneLoading(true);
+
+    fetchSingleProduct(productId)
+      .then((item) => {
+        if (!isMounted) return;
+        setStandaloneProduct(item);
+        setStandaloneLoading(false);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.warn("Direct product fetch failed:", err);
+        setStandaloneLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productId, catalogProduct, fetchAttempt]);
+
+  const product = catalogProduct || standaloneProduct;
+  const loading = !product && (catalogLoading || standaloneLoading);
   const { addItem } = useCart();
 
   // ── ALL HOOKS MUST BE AT THE TOP — before any early returns ──
@@ -83,10 +131,21 @@ function ProductDetailContent() {
   const [newComment, setNewComment] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({});
+  const hasTrackedViewContent = useRef<string | null>(null);
 
   // Effects — also must be before early returns
   useEffect(() => {
     if (product) {
+      if (hasTrackedViewContent.current !== product.id) {
+        hasTrackedViewContent.current = product.id;
+        trackMetaEvent("ViewContent", {
+          content_ids: [product.id],
+          content_type: "product",
+          value: product.price,
+          currency: "PKR",
+        });
+      }
+
       document.title = `${product.name} — LEIA Cosmetics`;
       const metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc && product.shortDescription) {
@@ -215,13 +274,21 @@ function ProductDetailContent() {
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <BounceButton
+                variant="primary"
+                onClick={() => {
+                  setFetchAttempt((c) => c + 1);
+                  refreshCatalog();
+                }}
+                className="w-full sm:w-auto px-6 py-3 text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2"
+              >
+                <RefreshCw className="size-3.5" />
+                Retry Loading
+              </BounceButton>
               <Link to="/shop" className="w-full sm:w-auto">
-                <BounceButton
-                  variant="primary"
-                  className="w-full sm:w-auto px-6 py-3 text-xs font-extrabold uppercase tracking-wider"
-                >
+                <button className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-200 bg-white font-bold text-xs text-gray-700 hover:border-[#D6336C] hover:text-[#D6336C] transition-all shadow-2xs">
                   Explore Shop Catalog
-                </BounceButton>
+                </button>
               </Link>
               <Link to="/" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-200 bg-white font-bold text-xs text-gray-700 hover:border-[#D6336C] hover:text-[#D6336C] transition-all shadow-2xs">

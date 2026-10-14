@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Banknote, Check, ChevronLeft, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 import { BounceButton, Reveal } from "../components/motion";
 import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
@@ -63,6 +64,7 @@ function CheckoutContent() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasTrackedInitiateCheckout = useRef(false);
 
   // Restore saved delivery information if previously saved
   useEffect(() => {
@@ -89,6 +91,24 @@ function CheckoutContent() {
   const FREE_SHIPPING_THRESHOLD = 5000;
   const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 250;
   const total = subtotal + shippingFee;
+
+  // Track InitiateCheckout once when checkout page opens with items
+  useEffect(() => {
+    if (items.length > 0 && !hasTrackedInitiateCheckout.current) {
+      hasTrackedInitiateCheckout.current = true;
+      trackMetaEvent("InitiateCheckout", {
+        value: total,
+        currency: "PKR",
+        num_items: count,
+        content_ids: items.map((i) => i.productId),
+        contents: items.map((i) => ({
+          id: i.productId,
+          quantity: i.quantity,
+          item_price: i.price,
+        })),
+      });
+    }
+  }, [items, total, count]);
 
   const paymentOptions = [
     {
@@ -133,6 +153,10 @@ function CheckoutContent() {
     const cleanFirstName = firstName.trim();
     const cleanLastName = lastName.trim();
 
+    // Snapshot items and count before cart is cleared by placeOrder
+    const purchasedItems = [...items];
+    const purchasedCount = count;
+
     try {
       const order = await submitStorefrontOrder({
         customerName: `${cleanFirstName} ${cleanLastName}`,
@@ -141,7 +165,7 @@ function CheckoutContent() {
         address: `${address.trim()}, ${city}${postalCode ? ", " + postalCode.trim() : ""}`,
         city,
         paymentMethod,
-        items,
+        items: purchasedItems,
       });
       placeOrder({
         customerName: `${cleanFirstName} ${cleanLastName}`,
@@ -150,8 +174,40 @@ function CheckoutContent() {
         city,
         paymentMethod,
         orderId: order.order_number,
-        shippingFee: Number(order.shipping_fee),
+        shippingFee: Number(order.shipping_fee) || 0,
       });
+
+      // Track Purchase event with deduplication & protection against duplicate firing
+      const purchaseTrackKey = `meta_purchase_tracked_${order.order_number}`;
+      if (typeof window !== "undefined" && !sessionStorage.getItem(purchaseTrackKey)) {
+        sessionStorage.setItem(purchaseTrackKey, "true");
+        const rawOrderTotal = Number(order.total);
+        const safePurchaseValue = !isNaN(rawOrderTotal) && rawOrderTotal > 0 ? rawOrderTotal : (Number(total) || 0);
+
+        trackMetaEvent(
+          "Purchase",
+          {
+            value: safePurchaseValue,
+            currency: "PKR",
+            content_ids: purchasedItems.map((i) => i.productId),
+            contents: purchasedItems.map((i) => ({
+              id: i.productId,
+              quantity: i.quantity,
+              item_price: i.price,
+            })),
+            num_items: purchasedCount,
+            order_id: order.order_number,
+          },
+          {
+            email: email.trim(),
+            phone: standardPhone,
+            first_name: cleanFirstName,
+            last_name: cleanLastName,
+            city,
+          },
+          `purchase_${order.order_number}`,
+        );
+      }
 
       // Save or clear customer details based on checkbox
       if (typeof window !== "undefined") {

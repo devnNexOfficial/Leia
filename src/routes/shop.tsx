@@ -13,6 +13,7 @@ import {
   TrendingUp,
   X,
   Heart,
+  ArrowRight,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -387,41 +388,39 @@ function ShopContent() {
             </motion.div>
 
             {/* ── Pagination / Load More Controls ── */}
-            <div className="mt-12 flex flex-col items-center justify-center space-y-4">
-              <div className="flex flex-col items-center gap-2 w-full max-w-xs text-center">
-                <span className="text-xs font-bold text-gray-500">
-                  Showing{" "}
-                  <span className="text-[#D6336C] font-black">{visibleProducts.length}</span> of{" "}
-                  <span className="text-gray-900 font-black">{filteredProducts.length}</span>{" "}
-                  products
-                </span>
-                <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden border border-gray-200/50">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-[#FF80AA] to-[#D6336C] rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{
-                      width: `${Math.min(100, (visibleProducts.length / filteredProducts.length) * 100)}%`,
-                    }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  />
+            {visibleCount < filteredProducts.length && (
+              <div className="mt-12 flex flex-col items-center justify-center space-y-4">
+                <div className="flex flex-col items-center gap-2 w-full max-w-xs text-center">
+                  <span className="text-xs font-bold text-gray-500">
+                    Showing{" "}
+                    <span className="text-[#D6336C] font-black">{visibleProducts.length}</span> of{" "}
+                    <span className="text-gray-900 font-black">{filteredProducts.length}</span>{" "}
+                    products
+                  </span>
+                  <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden border border-gray-200/50">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-[#FF80AA] to-[#D6336C] rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${Math.min(100, (visibleProducts.length / filteredProducts.length) * 100)}%`,
+                      }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {visibleCount < filteredProducts.length ? (
-                <BounceButton
+                <motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 18 }}
                   onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
-                  variant="outline"
-                  className="w-full sm:w-auto px-8 py-3 rounded-2xl bg-white border border-[#F5C6D5] text-[#D6336C] font-extrabold text-xs uppercase tracking-wider hover:bg-[#FFF0F5] hover:border-[#D6336C] transition-all shadow-xs"
+                  className="inline-flex items-center gap-2.5 px-9 py-3.5 rounded-full bg-[#1A0A10] text-white text-xs font-black uppercase tracking-widest hover:bg-[#D6336C] hover:shadow-lg hover:shadow-[#D6336C]/25 transition-all duration-300 shadow-md cursor-pointer"
                 >
-                  Load More Products ({filteredProducts.length - visibleProducts.length} remaining)
-                </BounceButton>
-              ) : (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFF5F8] border border-[#F5C6D5]/60 text-xs font-bold text-gray-500">
-                  <Sparkles className="size-3.5 text-[#D6336C]" />
-                  <span>You've viewed all {filteredProducts.length} items</span>
-                </div>
-              )}
-            </div>
+                  <span>EXPLORE MORE</span>
+                  <ArrowRight className="size-4" />
+                </motion.button>
+              </div>
+            )}
           </>
         )}
       </section>

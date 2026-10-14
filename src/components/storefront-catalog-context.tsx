@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { categories as fallbackCategories, type Category, type Product } from "@/data/catalog";
 import { supabase } from "@/lib/supabase";
 
-type DatabaseProduct = {
+export type DatabaseProduct = {
   id: string;
   name: string;
   description: string | null;
@@ -27,7 +27,7 @@ type DatabaseProduct = {
   }[];
 };
 
-type DatabaseCategory = {
+export type DatabaseCategory = {
   id: string;
   name: string;
   image_url: string | null;
@@ -36,11 +36,12 @@ type DatabaseCategory = {
   created_at: string;
 };
 
-type StorefrontCatalog = {
+export type StorefrontCatalog = {
   products: Product[];
   categories: Category[];
   loading: boolean;
   error: string | null;
+  refresh: () => Promise<void>;
 };
 
 const StorefrontCatalogContext = createContext<StorefrontCatalog | null>(null);
@@ -49,7 +50,10 @@ const swatchColors = ["#D6336C", "#B4566E", "#D9A2A2", "#C05C79", "#9B6B7A", "#E
 const fallbackImage =
   "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=900&q=80";
 
-function mapProduct(product: DatabaseProduct): Product {
+const CACHE_KEY_PRODUCTS = "leia_cached_storefront_products_v1";
+const CACHE_KEY_CATEGORIES = "leia_cached_storefront_categories_v1";
+
+export function mapProduct(product: DatabaseProduct): Product {
   const variants = product.product_variants ?? [];
   return {
     id: product.id,
@@ -86,7 +90,7 @@ function mapProduct(product: DatabaseProduct): Product {
   };
 }
 
-function mapCategory(category: DatabaseCategory, products: Product[]): Category {
+export function mapCategory(category: DatabaseCategory, products: Product[]): Category {
   const fallback = fallbackCategories.find(
     (item) => item.name.toLowerCase() === category.name.toLowerCase(),
   );
@@ -102,13 +106,78 @@ function mapCategory(category: DatabaseCategory, products: Product[]): Category 
   };
 }
 
+export async function fetchSingleProduct(productId: string): Promise<Product | null> {
+  const client = supabase;
+  if (!client || !productId) return null;
+
+  const cleanId = productId.trim();
+  try {
+    const { data, error } = await client
+      .from("products")
+      .select(
+        "id,name,description,price,compare_at_price,stock_count,image_url,image_urls,ingredients,directions,created_at,is_featured,is_new_arrival,new_arrival_order,categories(name),product_variants(id,name,stock_count,price_override,image_url)",
+      )
+      .ilike("id", cleanId)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return mapProduct(data as unknown as DatabaseProduct);
+  } catch (err) {
+    console.error("fetchSingleProduct error:", err);
+    return null;
+  }
+}
+
 export function StorefrontCatalogProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(CACHE_KEY_PRODUCTS);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {
+        // ignore parse error
+      }
+    }
+    return [];
+  });
+
+  const [categories, setCategories] = useState<Category[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(CACHE_KEY_CATEGORIES);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return fallbackCategories;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    // If we already have cached products, don't block the screen with full spinner
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(CACHE_KEY_PRODUCTS);
+        if (cached && JSON.parse(cached)?.length > 0) return false;
+      } catch {
+        // ignore
+      }
+    }
+    return true;
+  });
+
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = async (retryCount = 0) => {
     const client = supabase;
     if (!client) {
       setError("Store data is unavailable.");
@@ -116,7 +185,7 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
       return;
     }
 
-    const load = async () => {
+    try {
       const [productsResult, categoriesResult] = await Promise.all([
         client
           .from("products")
@@ -133,36 +202,71 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
           .order("created_at", { ascending: true }),
       ]);
 
-      if (productsResult.error || categoriesResult.error) {
-        setError(
-          productsResult.error?.message ??
-            categoriesResult.error?.message ??
-            "Could not load store data.",
-        );
+      if (productsResult.error) {
+        console.warn(`[StorefrontCatalog] Products fetch attempt ${retryCount + 1} failed:`, productsResult.error.message);
+        if (retryCount < 2) {
+          setTimeout(() => {
+            load(retryCount + 1);
+          }, (retryCount + 1) * 1000);
+          return;
+        }
+        setError(productsResult.error.message);
         setLoading(false);
         return;
       }
 
-      const mappedProducts = ((productsResult.data ?? []) as unknown as DatabaseProduct[]).map(
-        mapProduct,
-      );
+      const rawProducts = (productsResult.data ?? []) as unknown as DatabaseProduct[];
+      const mappedProducts = rawProducts.map(mapProduct);
       setProducts(mappedProducts);
-      setCategories(
-        ((categoriesResult.data ?? []) as DatabaseCategory[]).map((c) =>
-          mapCategory(c, mappedProducts),
-        ),
-      );
+
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(CACHE_KEY_PRODUCTS, JSON.stringify(mappedProducts));
+        } catch {
+          // ignore storage quota
+        }
+      }
+
+      if (categoriesResult.data && !categoriesResult.error) {
+        const rawCats = categoriesResult.data as DatabaseCategory[];
+        const mappedCats = rawCats.map((c) => mapCategory(c, mappedProducts));
+        setCategories(mappedCats);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(CACHE_KEY_CATEGORIES, JSON.stringify(mappedCats));
+          } catch {
+            // ignore
+          }
+        }
+      } else if (categories.length === 0) {
+        setCategories(fallbackCategories);
+      }
+
       setError(null);
       setLoading(false);
-    };
+    } catch (err: any) {
+      console.warn(`[StorefrontCatalog] Exception loading catalog (attempt ${retryCount + 1}):`, err);
+      if (retryCount < 2) {
+        setTimeout(() => {
+          load(retryCount + 1);
+        }, (retryCount + 1) * 1000);
+        return;
+      }
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     load();
+
+    const client = supabase;
+    if (!client) return;
 
     const channel = client
       .channel("storefront-catalog")
-      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "categories" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "categories" }, () => load())
       .subscribe();
 
     return () => {
@@ -171,7 +275,13 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
   }, []);
 
   const value = useMemo(
-    () => ({ products, categories, loading, error }),
+    () => ({
+      products,
+      categories,
+      loading,
+      error,
+      refresh: () => load(),
+    }),
     [products, categories, loading, error],
   );
 

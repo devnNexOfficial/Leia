@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useNewsletterSignup } from "@/hooks/useNewsletterSignup";
 
+import { trackMetaEvent } from "@/lib/meta-pixel";
+
 const columns = [
   {
     title: "COMPANY",
@@ -56,6 +58,11 @@ export function Footer() {
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => {
+                            if (link.href.includes("wa.me")) {
+                              trackMetaEvent("Contact");
+                            }
+                          }}
                           className="text-xs text-white/70 hover:text-white transition-colors"
                         >
                           {link.name}

@@ -15,6 +15,7 @@ import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/lib/supabase";
 import { sendContactNotification } from "@/lib/order-emails";
 import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -185,6 +186,11 @@ function ContactPage() {
               <a
                 key={label}
                 href={href}
+                onClick={() => {
+                  if (href.includes("wa.me")) {
+                    trackMetaEvent("Contact");
+                  }
+                }}
                 className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:border-[#D6336C]/30 hover:shadow-md transition-all group"
               >
                 <div

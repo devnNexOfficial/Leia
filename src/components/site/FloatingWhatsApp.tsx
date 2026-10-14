@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { useState } from "react";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 
 export function FloatingWhatsApp() {
   const [isHovered, setIsHovered] = useState(false);
@@ -26,6 +27,7 @@ export function FloatingWhatsApp() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
+        onClick={() => trackMetaEvent("Contact")}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         whileHover={{ scale: 1.12, rotate: 5 }}

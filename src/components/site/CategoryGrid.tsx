@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "@tanstack/react-router";
-import { Star, Heart, ShoppingBag, Search } from "lucide-react";
+import { Star, Heart, ShoppingBag, Search, ArrowRight } from "lucide-react";
 import { formatPKR } from "@/data/catalog";
 import { useCart } from "@/components/cart-context";
 import { useWishlist } from "@/components/wishlist-context";
@@ -30,6 +30,11 @@ export function CategoryGrid() {
           )
         : [],
     [products, active],
+  );
+
+  const displayedProducts = useMemo(
+    () => filteredProducts.slice(0, 8),
+    [filteredProducts],
   );
 
   const handleCategoryClick = (slug: string) => {
@@ -168,8 +173,9 @@ export function CategoryGrid() {
                   <p className="font-semibold">No products found in this category yet.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                  {filteredProducts.map((product, pi) => (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+                  {displayedProducts.map((product, pi) => (
                     <motion.div
                       key={product.id}
                       initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -226,8 +232,8 @@ export function CategoryGrid() {
                       </motion.button>
 
                       {/* Image */}
-                      <Link to="/product/$productId" params={{ productId: product.id }}>
-                        <div className="relative bg-[#FFF5F8] h-44 md:h-52 overflow-hidden">
+                      <Link to="/product/$productId" params={{ productId: product.id }} className="block relative">
+                        <div className="relative bg-[#FFF5F8] aspect-square overflow-hidden">
                           <img
                             src={product.image}
                             alt={product.name}
@@ -321,7 +327,27 @@ export function CategoryGrid() {
                     </motion.div>
                   ))}
                 </div>
-              )}
+
+                {filteredProducts.length > 0 && (
+                  <div className="mt-10 flex justify-center">
+                    <Link
+                      to="/shop"
+                      search={{ category: activeCat.name }}
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                        className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#1A0A10] text-white text-xs font-black uppercase tracking-widest hover:bg-[#D6336C] transition-all shadow-md hover:shadow-xl cursor-pointer"
+                      >
+                        <span>Explore More</span>
+                        <ArrowRight className="size-4" />
+                      </motion.button>
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
             </motion.div>
           )}
         </AnimatePresence>
