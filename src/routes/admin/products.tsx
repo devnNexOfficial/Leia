@@ -30,18 +30,35 @@ function Products() {
   const load = async () => {
     if (!supabase) return;
     setLoading(true);
-    const [p, c] = await Promise.all([
+    const [p, c, w] = await Promise.all([
       supabase
         .from("products")
         .select("*,categories(name),product_variants(*)")
         .order("created_at", { ascending: false }),
       supabase.from("categories").select("*").order("name"),
+      supabase.from("product_wholesale").select("product_id, wholesale_price"),
     ]);
 
     if (p.error || c.error) {
       setError(p.error?.message ?? c.error?.message ?? "Could not load products.");
     } else {
-      setProducts((p.data ?? []) as AdminProduct[]);
+      const wholesaleMap = new Map<string, number | null>();
+      if (w.data && !w.error) {
+        for (const row of w.data) {
+          if (row.product_id) {
+            wholesaleMap.set(
+              row.product_id,
+              row.wholesale_price != null ? Number(row.wholesale_price) : null,
+            );
+          }
+        }
+      }
+      const rawProducts = (p.data ?? []) as AdminProduct[];
+      const mergedProducts = rawProducts.map((prod) => ({
+        ...prod,
+        wholesale_price: wholesaleMap.has(prod.id) ? wholesaleMap.get(prod.id) : null,
+      }));
+      setProducts(mergedProducts);
       setCategories((c.data ?? []) as AdminCategory[]);
     }
     setLoading(false);
@@ -56,6 +73,7 @@ function Products() {
       .channel("admin-products")
       .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
       .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "product_wholesale" }, load)
       .subscribe();
 
     return () => {
@@ -89,12 +107,13 @@ function Products() {
         <EmptyState>No products in Supabase yet.</EmptyState>
       ) : (
         <div className={`${adminCard} overflow-x-auto`}>
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-[780px] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-5 py-3">Product</th>
                 <th className="px-5 py-3">Category</th>
                 <th className="px-5 py-3">Price</th>
+                <th className="px-5 py-3">Wholesale</th>
                 <th className="px-5 py-3">Stock</th>
                 <th className="px-5 py-3">Actions</th>
               </tr>
@@ -120,6 +139,13 @@ function Products() {
                   </td>
                   <td className="px-5 py-3">{p.categories?.name ?? "—"}</td>
                   <td className="px-5 py-3">Rs. {Number(p.price).toLocaleString()}</td>
+                  <td className="px-5 py-3">
+                    {p.wholesale_price != null &&
+                    p.wholesale_price !== "" &&
+                    !isNaN(Number(p.wholesale_price))
+                      ? `Rs. ${Number(p.wholesale_price).toLocaleString()}`
+                      : "—"}
+                  </td>
                   <td className="px-5 py-3">
                     {p.product_variants?.length
                       ? p.product_variants.reduce((n, v) => n + v.stock_count, 0)
@@ -172,6 +198,9 @@ function ProductForm({
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(String(product?.price ?? ""));
   const [compare, setCompare] = useState(String(product?.compare_at_price ?? ""));
+  const [wholesalePrice, setWholesalePrice] = useState(
+    product?.wholesale_price != null ? String(product.wholesale_price) : "",
+  );
   const [stock, setStock] = useState(String(product?.stock_count ?? 0));
   const [categoryId, setCategoryId] = useState(product?.category_id ?? "");
   const [images, setImages] = useState<string[]>(
@@ -246,6 +275,18 @@ function ProductForm({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const trimmedWholesale = wholesalePrice.trim();
+    let parsedWholesale: number | null = null;
+    if (trimmedWholesale !== "") {
+      const num = Number(trimmedWholesale);
+      if (isNaN(num) || num < 0) {
+        setError("Wholesale price must be a valid number greater than or equal to 0.");
+        return;
+      }
+      parsedWholesale = num;
+    }
+
     const values = {
       name,
       description: description || null,
@@ -270,6 +311,31 @@ function ProductForm({
     if (result.error || !result.data) {
       setError(result.error?.message ?? "Could not save product.");
       return;
+    }
+
+    const productId = result.data.id;
+
+    // Upsert or delete from admin-only product_wholesale table
+    if (parsedWholesale !== null) {
+      const { error: wError } = await supabase!.from("product_wholesale").upsert(
+        {
+          product_id: productId,
+          wholesale_price: parsedWholesale,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "product_id" },
+      );
+      if (wError) {
+        console.warn("Could not save wholesale price:", wError.message);
+      }
+    } else {
+      const { error: wDelError } = await supabase!
+        .from("product_wholesale")
+        .delete()
+        .eq("product_id", productId);
+      if (wDelError) {
+        console.warn("Could not delete wholesale price row:", wDelError.message);
+      }
     }
 
     if (product) {
@@ -320,6 +386,13 @@ function ProductForm({
           <Field label="Name" value={name} set={setName} wide required />
           <Field label="Price (PKR)" value={price} set={setPrice} number required />
           <Field label="Compare-at price" value={compare} set={setCompare} number />
+          <Field
+            label="Wholesale price (PKR)"
+            value={wholesalePrice}
+            set={setWholesalePrice}
+            number
+            helperText="Visible only in admin. Not shown to customers."
+          />
 
           <label className="text-sm font-medium">
             Category
@@ -530,6 +603,7 @@ function Field({
   number,
   wide,
   required,
+  helperText,
 }: {
   label: string;
   value: string;
@@ -537,6 +611,7 @@ function Field({
   number?: boolean;
   wide?: boolean;
   required?: boolean;
+  helperText?: string;
 }) {
   return (
     <label className={`text-sm font-medium ${wide ? "sm:col-span-2" : ""}`}>
@@ -545,10 +620,14 @@ function Field({
         className={`${adminInput} mt-1`}
         type={number ? "number" : "text"}
         min={number ? "0" : undefined}
+        step={number ? "any" : undefined}
         value={value}
         onChange={(e) => set(e.target.value)}
         required={required}
       />
+      {helperText && (
+        <span className="mt-1 block text-xs font-normal text-slate-500">{helperText}</span>
+      )}
     </label>
   );
 }

@@ -1,9 +1,16 @@
 import { motion } from "motion/react";
 import { useState } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { trackMetaEvent } from "@/lib/meta-pixel";
 
 export function FloatingWhatsApp() {
   const [isHovered, setIsHovered] = useState(false);
+  const { pathname } = useLocation();
+
+  // Hide WhatsApp button on all admin routes
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">

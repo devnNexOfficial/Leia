@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -240,8 +241,7 @@ function GtmRouteTracker() {
 
 function MetaPageViewTracker() {
   const isEnabled =
-    typeof import.meta !== "undefined" &&
-    import.meta.env?.VITE_ENABLE_PAGEVIEW_TRACKING === "true";
+    typeof import.meta !== "undefined" && import.meta.env?.VITE_ENABLE_PAGEVIEW_TRACKING === "true";
 
   if (!isEnabled) {
     return null;
@@ -291,6 +291,8 @@ function MetaPageViewTrackerActive() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith("/admin");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -301,7 +303,7 @@ function RootComponent() {
             <MetaPageViewTracker />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
-            <FloatingWhatsApp />
+            {!isAdmin && <FloatingWhatsApp />}
             <CookieConsentBanner />
           </CartProvider>
         </WishlistProvider>

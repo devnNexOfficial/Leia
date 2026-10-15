@@ -20,6 +20,7 @@ export type AdminProduct = {
   name: string;
   description: string | null;
   price: number;
+  wholesale_price?: number | null;
   image_url: string | null;
   image_urls?: string[];
   compare_at_price?: number | null;
