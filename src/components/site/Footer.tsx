@@ -83,12 +83,9 @@ export function Footer() {
 
             {/* Newsletter Box Column (Spans 2 cols on lg) */}
             <div className="col-span-2 md:col-span-2 lg:col-span-2">
-              <h4 className="text-[11px] font-black tracking-widest text-white/90 uppercase mb-2">
+              <h4 className="text-[11px] font-black tracking-widest text-white/90 uppercase mb-4">
                 NEWSLETTER
               </h4>
-              <p className="text-xs text-white/80 font-medium mb-4">
-                ✦ Get 15% off your first order
-              </p>
 
               {subscribed ? (
                 <div className="bg-white/20 backdrop-blur-md rounded-full px-5 py-2.5 text-xs text-white border border-white/30 font-semibold">

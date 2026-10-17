@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { Star, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -76,6 +76,8 @@ const DEFAULT_REVIEWS: DisplayReview[] = [
 export function ReviewsSection() {
   const [reviewsList, setReviewsList] = useState<DisplayReview[]>(DEFAULT_REVIEWS);
   const [hovered, setHovered] = useState<string | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const mobileTrackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchFeaturedReviews = async () => {
@@ -111,10 +113,221 @@ export function ReviewsSection() {
     void fetchFeaturedReviews();
   }, []);
 
+  // Mobile Auto-Scroll Hook (below 768px only)
+  useEffect(() => {
+    const track = mobileTrackRef.current;
+    const section = sectionRef.current;
+    if (!track || !section) return;
+
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let prefersReducedMotion = reducedMotionQuery.matches;
+
+    const mobileQuery = window.matchMedia("(max-width: 767.98px)");
+    let isMobile = mobileQuery.matches;
+
+    let isIntersecting = true;
+    let isTouching = false;
+    let isPaused = false;
+    let resumeTimeout: ReturnType<typeof setTimeout> | null = null;
+    let rafId: number | null = null;
+    let lastTime: number | null = null;
+    let pos = track.scrollLeft;
+    let loopWidth = 0;
+
+    const computeLoopWidth = () => {
+      const count = reviewsList.length;
+      if (count === 0 || track.children.length < count * 2) return;
+      const firstCard = track.children[0] as HTMLElement | undefined;
+      const dupCard = track.children[count] as HTMLElement | undefined;
+      if (firstCard && dupCard) {
+        loopWidth = dupCard.offsetLeft - firstCard.offsetLeft;
+      }
+    };
+
+    computeLoopWidth();
+
+    const scheduleResume = (delay = 2000) => {
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        if (!isTouching && isIntersecting && isMobile && !prefersReducedMotion) {
+          if (loopWidth > 0 && track.scrollLeft >= loopWidth) {
+            pos = track.scrollLeft - loopWidth;
+            track.scrollLeft = pos;
+          } else {
+            pos = track.scrollLeft;
+          }
+          lastTime = performance.now();
+          isPaused = false;
+        }
+      }, delay);
+    };
+
+    const handlePointerDown = () => {
+      isTouching = true;
+      isPaused = true;
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      pos = track.scrollLeft;
+    };
+
+    const handlePointerUp = () => {
+      isTouching = false;
+      scheduleResume(2000);
+    };
+
+    const handleWheel = () => {
+      isPaused = true;
+      pos = track.scrollLeft;
+      scheduleResume(2000);
+    };
+
+    const handleScroll = () => {
+      // If paused or touching, this is user scrolling (including momentum)
+      if (isPaused || isTouching) {
+        pos = track.scrollLeft;
+        // Keep within bounds if user swiped far
+        if (loopWidth > 0) {
+          if (pos >= loopWidth * 1.8) {
+            pos -= loopWidth;
+            track.scrollLeft = pos;
+          }
+        }
+        scheduleResume(2000);
+      }
+    };
+
+    const handleScrollEnd = () => {
+      if (!isTouching) {
+        scheduleResume(1500);
+      }
+    };
+
+    track.addEventListener("pointerdown", handlePointerDown, { passive: true });
+    window.addEventListener("pointerup", handlePointerUp, { passive: true });
+    window.addEventListener("pointercancel", handlePointerUp, { passive: true });
+    track.addEventListener("wheel", handleWheel, { passive: true });
+    track.addEventListener("scroll", handleScroll, { passive: true });
+    track.addEventListener("scrollend", handleScrollEnd, { passive: true });
+
+    // Pause when section is not visible on screen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        if (!entry.isIntersecting) {
+          isPaused = true;
+        } else if (!isTouching && isMobile && !prefersReducedMotion) {
+          pos = track.scrollLeft;
+          lastTime = performance.now();
+          isPaused = false;
+        }
+      },
+      { threshold: 0.05 },
+    );
+    observer.observe(section);
+
+    // Pause when tab is hidden
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isPaused = true;
+      } else if (isIntersecting && !isTouching && isMobile && !prefersReducedMotion) {
+        pos = track.scrollLeft;
+        lastTime = performance.now();
+        isPaused = false;
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Pause if prefers-reduced-motion is toggled
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      prefersReducedMotion = e.matches;
+      if (prefersReducedMotion) {
+        isPaused = true;
+      } else if (isIntersecting && !isTouching && isMobile) {
+        pos = track.scrollLeft;
+        lastTime = performance.now();
+        isPaused = false;
+      }
+    };
+    reducedMotionQuery.addEventListener("change", handleMotionChange);
+
+    // Pause if resized to desktop, resume if resized back to mobile
+    const handleResize = () => {
+      const currentlyMobile = window.innerWidth < 768;
+      isMobile = currentlyMobile;
+      computeLoopWidth();
+      if (!isMobile) {
+        isPaused = true;
+      } else if (isIntersecting && !isTouching && !prefersReducedMotion) {
+        pos = track.scrollLeft;
+        lastTime = performance.now();
+        isPaused = false;
+      }
+    };
+    window.addEventListener("resize", handleResize);
+
+    // Animation frame loop: ~30px per 1000ms (~0.5px per 16.67ms frame)
+    const SPEED_PX_PER_MS = 0.03;
+
+    const tick = (now: number) => {
+      rafId = requestAnimationFrame(tick);
+
+      if (!lastTime) {
+        lastTime = now;
+        return;
+      }
+
+      const dt = now - lastTime;
+      lastTime = now;
+
+      if (
+        isPaused ||
+        isTouching ||
+        !isMobile ||
+        !isIntersecting ||
+        prefersReducedMotion ||
+        dt > 100
+      ) {
+        return;
+      }
+
+      if (loopWidth <= 0) {
+        computeLoopWidth();
+        if (loopWidth <= 0) return;
+      }
+
+      pos += SPEED_PX_PER_MS * dt;
+
+      if (pos >= loopWidth) {
+        pos -= loopWidth;
+      }
+
+      track.scrollLeft = pos;
+    };
+
+    if (isMobile && !prefersReducedMotion) {
+      lastTime = performance.now();
+      rafId = requestAnimationFrame(tick);
+    }
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      track.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
+      track.removeEventListener("wheel", handleWheel);
+      track.removeEventListener("scroll", handleScroll);
+      track.removeEventListener("scrollend", handleScrollEnd);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      reducedMotionQuery.removeEventListener("change", handleMotionChange);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [reviewsList]);
+
   const marqueeReviews = [...reviewsList, ...reviewsList, ...reviewsList];
 
   return (
-    <section className="py-12 md:py-16 bg-white overflow-hidden">
+    <section ref={sectionRef} className="py-12 md:py-16 bg-white overflow-hidden">
       <div className="mx-auto max-w-7xl px-5 md:px-8 mb-10">
         {/* Header */}
         <motion.div
@@ -186,9 +399,127 @@ export function ReviewsSection() {
         </motion.div>
       </div>
 
-      {/* Infinite Marquee Auto-Scroll Container */}
-      <div className="relative w-full overflow-hidden no-scrollbar py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-        <div className="flex gap-5 animate-marquee hover:[animation-play-state:paused]">
+      {/* Mobile: Native horizontal auto-scroll track with manual swipe support (below 768px) */}
+      <div className="relative w-full overflow-x-hidden md:hidden">
+        <div
+          ref={mobileTrackRef}
+          className="flex gap-3.5 overflow-x-auto [-webkit-overflow-scrolling:touch] no-scrollbar px-4 py-4 items-stretch"
+          style={{
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          {/* First set of reviews */}
+          {reviewsList.map((rev) => (
+            <div
+              key={`orig-${rev.id}`}
+              className="shrink-0 flex-[0_0_85vw] max-w-[340px] bg-[#FFF5F8] border border-[#F5C6D5] rounded-2xl p-5 flex flex-col justify-between cursor-default select-none shadow-xs"
+              style={{
+                flex: "0 0 85vw",
+                maxWidth: "340px",
+              }}
+            >
+              <div>
+                {/* Stars */}
+                <div className="flex text-amber-400 mb-3 gap-0.5">
+                  {[...Array(rev.rating)].map((_, i) => (
+                    <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+
+                {/* Text */}
+                <p className="text-sm text-gray-700 leading-relaxed mb-4">"{rev.text}"</p>
+
+                {/* Product + shade */}
+                {rev.product && (
+                  <div className="bg-white rounded-xl px-3.5 py-2 border border-[#F5C6D5] mb-4 shadow-2xs">
+                    <p className="text-[10px] font-black text-[#D6336C] uppercase tracking-wider">
+                      {rev.product}
+                    </p>
+                    {rev.shade && <p className="text-[10px] text-gray-400">Shade: {rev.shade}</p>}
+                  </div>
+                )}
+              </div>
+
+              {/* Author */}
+              <div className="flex items-center gap-3 pt-1">
+                <div
+                  className="size-9 rounded-full flex items-center justify-center text-white text-sm font-black shadow-xs shrink-0"
+                  style={{ backgroundColor: rev.avatar }}
+                >
+                  {rev.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">{rev.name}</p>
+                  <p className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                    <span>{rev.location}</span> · <span>{rev.date}</span> ·{" "}
+                    <span className="inline-flex items-center gap-0.5 text-emerald-700 font-bold">
+                      <CheckCircle2 className="size-3 text-emerald-600" /> Verified
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Duplicate set for seamless infinite loop (aria-hidden) */}
+          {reviewsList.map((rev) => (
+            <div
+              key={`dup-${rev.id}`}
+              aria-hidden="true"
+              className="shrink-0 flex-[0_0_85vw] max-w-[340px] bg-[#FFF5F8] border border-[#F5C6D5] rounded-2xl p-5 flex flex-col justify-between cursor-default select-none shadow-xs"
+              style={{
+                flex: "0 0 85vw",
+                maxWidth: "340px",
+              }}
+            >
+              <div>
+                {/* Stars */}
+                <div className="flex text-amber-400 mb-3 gap-0.5">
+                  {[...Array(rev.rating)].map((_, i) => (
+                    <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+
+                {/* Text */}
+                <p className="text-sm text-gray-700 leading-relaxed mb-4">"{rev.text}"</p>
+
+                {/* Product + shade */}
+                {rev.product && (
+                  <div className="bg-white rounded-xl px-3.5 py-2 border border-[#F5C6D5] mb-4 shadow-2xs">
+                    <p className="text-[10px] font-black text-[#D6336C] uppercase tracking-wider">
+                      {rev.product}
+                    </p>
+                    {rev.shade && <p className="text-[10px] text-gray-400">Shade: {rev.shade}</p>}
+                  </div>
+                )}
+              </div>
+
+              {/* Author */}
+              <div className="flex items-center gap-3 pt-1">
+                <div
+                  className="size-9 rounded-full flex items-center justify-center text-white text-sm font-black shadow-xs shrink-0"
+                  style={{ backgroundColor: rev.avatar }}
+                >
+                  {rev.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">{rev.name}</p>
+                  <p className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                    <span>{rev.location}</span> · <span>{rev.date}</span> ·{" "}
+                    <span className="inline-flex items-center gap-0.5 text-emerald-700 font-bold">
+                      <CheckCircle2 className="size-3 text-emerald-600" /> Verified
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: Infinite Marquee Auto-Scroll Container (768px and above) */}
+      <div className="hidden md:block relative w-full overflow-hidden no-scrollbar py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+        <div className="flex gap-5 animate-marquee hover:[animation-play-state:paused] active:[animation-play-state:paused]">
           {marqueeReviews.map((rev, index) => (
             <motion.div
               key={`${rev.id}-${index}`}
