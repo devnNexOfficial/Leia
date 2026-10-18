@@ -228,13 +228,18 @@ function ProductDetailContent() {
   // ── Early returns AFTER all hooks ──
   if (loading) {
     return (
-      <main className="mx-auto max-w-7xl px-6 py-16 flex flex-col items-center justify-center min-h-[50vh]">
-        <div className="flex size-14 items-center justify-center rounded-full bg-[#FFF0F5] text-[#D6336C] animate-pulse border border-[#F5C6D5]">
-          <Sparkles className="size-7" />
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8 md:py-12 min-h-[85vh] animate-pulse">
+        <div className="h-4 w-48 bg-pink-100/70 rounded mb-8" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14">
+          <div className="aspect-square w-full max-w-[500px] bg-pink-100/50 rounded-3xl border border-[#F5C6D5]/40 mx-auto" />
+          <div className="space-y-4 pt-2">
+            <div className="h-4 w-24 bg-pink-100/60 rounded-full" />
+            <div className="h-8 w-3/4 bg-pink-100/70 rounded-xl" />
+            <div className="h-6 w-1/3 bg-pink-100/60 rounded-lg" />
+            <div className="h-24 w-full bg-pink-50/70 rounded-2xl border border-pink-100/40" />
+            <div className="h-12 w-full bg-pink-100/70 rounded-xl mt-6" />
+          </div>
         </div>
-        <p className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-400">
-          Loading Product Details...
-        </p>
       </main>
     );
   }
@@ -455,6 +460,10 @@ function ProductDetailContent() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0.8 }}
                 transition={spring}
+                width={600}
+                height={600}
+                fetchPriority="high"
+                decoding="async"
                 className="h-[420px] w-full object-cover sm:h-[500px]"
               />
             </AnimatePresence>
@@ -495,6 +504,8 @@ function ProductDetailContent() {
                     alt={`${product.name} thumbnail ${idx + 1}`}
                     loading="lazy"
                     decoding="async"
+                    width={80}
+                    height={80}
                     className="h-full w-full object-cover"
                   />
                 </motion.button>

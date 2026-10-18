@@ -68,7 +68,10 @@ async function fetchCatalogData() {
         categories: categoriesRes.data || [],
       };
     } catch (err) {
-      console.warn("⚠️ [Sitemap]: Could not query Supabase directly, using fallback list:", err.message);
+      console.warn(
+        "⚠️ [Sitemap]: Could not query Supabase directly, using fallback list:",
+        err.message,
+      );
     }
   }
 
@@ -124,8 +127,16 @@ async function generateSitemap() {
   }
 
   // 2. Category Pages (/shop?category=...)
-  const fallbackCategoryNames = ["Skin Care", "Makeup / Color Cosmetics", "Haircare", "Fragrance", "Tools & Accessories", "Bath & Body"];
-  const categoryNames = categories.length > 0 ? categories.map((c) => c.name) : fallbackCategoryNames;
+  const fallbackCategoryNames = [
+    "Skin Care",
+    "Makeup / Color Cosmetics",
+    "Haircare",
+    "Fragrance",
+    "Tools & Accessories",
+    "Bath & Body",
+  ];
+  const categoryNames =
+    categories.length > 0 ? categories.map((c) => c.name) : fallbackCategoryNames;
 
   for (const catName of categoryNames) {
     const encoded = encodeURIComponent(catName);
@@ -168,7 +179,9 @@ async function generateSitemap() {
   const outputPath = path.join(rootDir, "public", "sitemap.xml");
   fs.writeFileSync(outputPath, xml, "utf8");
 
-  console.log(`✅ [Sitemap]: Generated successfully at ${outputPath} (${urls.length} URLs included)`);
+  console.log(
+    `✅ [Sitemap]: Generated successfully at ${outputPath} (${urls.length} URLs included)`,
+  );
   return urls;
 }
 

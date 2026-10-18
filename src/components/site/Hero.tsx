@@ -1,6 +1,6 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
-import heroKylie from "@/assets/hero-kylie.png";
+import heroKylie from "@/assets/hero-kylie.webp";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -50,6 +50,8 @@ export function Hero() {
           alt="LEIA Beauty Model"
           loading="eager"
           fetchPriority="high"
+          width={1024}
+          height={409}
           className="w-full h-full object-cover object-[70%_15%] md:object-right-top"
         />
         {/* Gradient overlay for text readability (fades out to transparent before model image) */}

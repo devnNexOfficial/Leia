@@ -8,7 +8,7 @@ import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
 
 export function NewArrivalsSection() {
   const { addItem } = useCart();
-  const { products } = useStorefrontCatalog();
+  const { products, loading } = useStorefrontCatalog();
   const newArrivals = useMemo(() => products.filter((product) => product.isNew), [products]);
   const allProducts = useMemo(
     () =>
@@ -16,6 +16,7 @@ export function NewArrivalsSection() {
     [newArrivals],
   );
   const [current, setCurrent] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const total = allProducts.length;
 
   useEffect(() => {
@@ -23,6 +24,15 @@ export function NewArrivalsSection() {
     const t = setInterval(() => setCurrent((c) => (c + 1) % total), 3500);
     return () => clearInterval(t);
   }, [total]);
+
+  if (loading && newArrivals.length === 0) {
+    return (
+      <section
+        className="py-12 md:py-20 px-4 min-h-[460px] bg-white animate-pulse"
+        aria-hidden="true"
+      />
+    );
+  }
 
   if (newArrivals.length === 0) return null;
 
@@ -35,6 +45,24 @@ export function NewArrivalsSection() {
     if (diff === 1) return "right";
     if (diff === total - 1) return "left";
     return "hidden";
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        next();
+      } else {
+        prev();
+      }
+    }
+    setTouchStartX(null);
   };
 
   const centerProduct = allProducts[current];
@@ -70,7 +98,11 @@ export function NewArrivalsSection() {
           </button>
 
           {/* Floating Products Container */}
-          <div className="relative w-full max-w-4xl h-[200px] sm:h-[240px] md:h-[380px] flex items-center justify-center">
+          <div
+            className="relative w-full max-w-4xl h-[200px] sm:h-[240px] md:h-[380px] flex items-center justify-center touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             {allProducts.map((product, i) => {
               const pos = getPos(i);
               if (pos === "hidden") return null;
@@ -81,12 +113,12 @@ export function NewArrivalsSection() {
               return (
                 <div
                   key={`${product.id}-${i}`}
-                  className={`absolute top-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out cursor-pointer ${
+                  className={`absolute top-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out cursor-pointer w-[160px] md:w-auto ${
                     isCenter
-                      ? "z-20 scale-110 opacity-100 translate-x-0"
+                      ? "z-20 scale-110 opacity-100 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0"
                       : isLeft
-                        ? "z-10 scale-75 opacity-40 -translate-x-[60%] sm:-translate-x-[75%] md:-translate-x-[110%] blur-[0.5px]"
-                        : "z-10 scale-75 opacity-40 translate-x-[60%] sm:translate-x-[75%] md:translate-x-[110%] blur-[0.5px]"
+                        ? "z-10 scale-75 opacity-40 left-1/2 -translate-x-[calc(50%+28vw)] sm:-translate-x-[calc(50%+130px)] md:left-auto md:-translate-x-[110%] blur-[0.5px]"
+                        : "z-10 scale-75 opacity-40 left-1/2 translate-x-[calc(-50%+28vw)] sm:translate-x-[calc(-50%+130px)] md:left-auto md:translate-x-[110%] blur-[0.5px]"
                   }`}
                   onClick={() => setCurrent(i)}
                 >
@@ -97,6 +129,8 @@ export function NewArrivalsSection() {
                       alt={product.name}
                       loading="lazy"
                       decoding="async"
+                      width={300}
+                      height={224}
                       className="h-32 sm:h-44 md:h-56 max-w-[160px] sm:max-w-[240px] md:max-w-[300px] object-contain filter drop-shadow-xl"
                     />
 

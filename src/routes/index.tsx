@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { Navbar } from "@/components/site/Navbar";
@@ -5,10 +6,20 @@ import { Hero } from "@/components/site/Hero";
 import { PressMarquee } from "@/components/site/PressMarquee";
 import { CategoryGrid } from "@/components/site/CategoryGrid";
 import { NewArrivalsSection } from "@/components/site/NewArrivalsSection";
-import { ReviewsSection } from "@/components/site/ReviewsSection";
-import { VideoShowcaseSection } from "@/components/site/VideoShowcaseSection";
-import { FaqSection } from "@/components/site/FaqSection";
 import { Footer } from "@/components/site/Footer";
+import heroKylie from "@/assets/hero-kylie.webp";
+
+const ReviewsSection = lazy(() =>
+  import("@/components/site/ReviewsSection").then((m) => ({ default: m.ReviewsSection })),
+);
+const VideoShowcaseSection = lazy(() =>
+  import("@/components/site/VideoShowcaseSection").then((m) => ({
+    default: m.VideoShowcaseSection,
+  })),
+);
+const FaqSection = lazy(() =>
+  import("@/components/site/FaqSection").then((m) => ({ default: m.FaqSection })),
+);
 
 import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 
@@ -40,7 +51,15 @@ export const Route = createFileRoute("/")({
           "Pakistani cosmetics, luxury cosmetics Pakistan, online makeup Pakistan, ladies cosmetics, beauty products Pakistan, skincare",
       },
     ],
-    links: [{ rel: "canonical", href: siteUrl }],
+    links: [
+      {
+        rel: "preload",
+        as: "image",
+        href: heroKylie,
+        type: "image/webp",
+      },
+      { rel: "canonical", href: siteUrl },
+    ],
   }),
   component: Index,
 });
@@ -64,11 +83,17 @@ function Index() {
         {/* 5. Shop by category — Lips, Eyes, Face, Skincare */}
         <CategoryGrid />
         {/* 8. Customer reviews */}
-        <ReviewsSection />
+        <Suspense fallback={<div className="min-h-[440px] w-full" aria-hidden="true" />}>
+          <ReviewsSection />
+        </Suspense>
         {/* 9. Interactive Video Reels Showcase */}
-        <VideoShowcaseSection />
+        <Suspense fallback={<div className="min-h-[480px] w-full" aria-hidden="true" />}>
+          <VideoShowcaseSection />
+        </Suspense>
         {/* 10. FAQ */}
-        <FaqSection />
+        <Suspense fallback={<div className="min-h-[380px] w-full" aria-hidden="true" />}>
+          <FaqSection />
+        </Suspense>
       </main>
 
       {/* Footer */}

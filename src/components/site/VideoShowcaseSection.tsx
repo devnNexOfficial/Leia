@@ -163,6 +163,8 @@ export function VideoShowcaseSection() {
                   alt={reel.title}
                   loading="lazy"
                   decoding="async"
+                  width={340}
+                  height={440}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                 />
               ) : (
@@ -261,6 +263,7 @@ export function VideoShowcaseSection() {
                     src={activeVideo.source.embedUrl}
                     autoPlay
                     loop
+                    preload="none"
                     muted={isMuted}
                     playsInline
                     className="w-full h-full object-cover"

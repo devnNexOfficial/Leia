@@ -468,6 +468,8 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
             alt={product.name}
             loading="lazy"
             decoding="async"
+            width={300}
+            height={300}
             className={`h-full w-full object-cover transition-all duration-300 ease-out group-hover:scale-105 ${
               product.hoverImage ? "opacity-100 group-hover:opacity-0" : ""
             }`}
@@ -478,6 +480,8 @@ function ShopProductCard({ product, index }: { product: Product; index: number }
               alt={`${product.name} alternate view`}
               loading="lazy"
               decoding="async"
+              width={300}
+              height={300}
               className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out group-hover:scale-105"
             />
           )}

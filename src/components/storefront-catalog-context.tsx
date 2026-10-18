@@ -52,6 +52,12 @@ const fallbackImage =
 
 const CACHE_KEY_PRODUCTS = "leia_cached_storefront_products_v1";
 const CACHE_KEY_CATEGORIES = "leia_cached_storefront_categories_v1";
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes fresh window
+
+let inMemoryProductsCache: Product[] | null = null;
+let inMemoryCategoriesCache: Category[] | null = null;
+let lastFetchTimestamp = 0;
+const singleProductCache = new Map<string, { product: Product; fetchedAt: number }>();
 
 export function mapProduct(product: DatabaseProduct): Product {
   const variants = product.product_variants ?? [];
@@ -110,7 +116,12 @@ export async function fetchSingleProduct(productId: string): Promise<Product | n
   const client = supabase;
   if (!client || !productId) return null;
 
-  const cleanId = productId.trim();
+  const cleanId = productId.trim().toLowerCase();
+  const cached = singleProductCache.get(cleanId);
+  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
+    return cached.product;
+  }
+
   try {
     const { data, error } = await client
       .from("products")
@@ -124,21 +135,29 @@ export async function fetchSingleProduct(productId: string): Promise<Product | n
       return null;
     }
 
-    return mapProduct(data as unknown as DatabaseProduct);
+    const mapped = mapProduct(data as unknown as DatabaseProduct);
+    singleProductCache.set(cleanId, { product: mapped, fetchedAt: Date.now() });
+    return mapped;
   } catch (err) {
-    console.error("fetchSingleProduct error:", err);
+    console.warn("fetchSingleProduct error:", err);
     return null;
   }
 }
 
 export function StorefrontCatalogProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(() => {
+    if (inMemoryProductsCache && inMemoryProductsCache.length > 0) {
+      return inMemoryProductsCache;
+    }
     if (typeof window !== "undefined") {
       try {
         const cached = localStorage.getItem(CACHE_KEY_PRODUCTS);
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            inMemoryProductsCache = parsed;
+            return parsed;
+          }
         }
       } catch {
         // ignore parse error
@@ -148,12 +167,18 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
   });
 
   const [categories, setCategories] = useState<Category[]>(() => {
+    if (inMemoryCategoriesCache && inMemoryCategoriesCache.length > 0) {
+      return inMemoryCategoriesCache;
+    }
     if (typeof window !== "undefined") {
       try {
         const cached = localStorage.getItem(CACHE_KEY_CATEGORIES);
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            inMemoryCategoriesCache = parsed;
+            return parsed;
+          }
         }
       } catch {
         // ignore
@@ -163,7 +188,7 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
   });
 
   const [loading, setLoading] = useState(() => {
-    // If we already have cached products, don't block the screen with full spinner
+    if (inMemoryProductsCache && inMemoryProductsCache.length > 0) return false;
     if (typeof window !== "undefined") {
       try {
         const cached = localStorage.getItem(CACHE_KEY_PRODUCTS);
@@ -177,7 +202,18 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
 
   const [error, setError] = useState<string | null>(null);
 
-  const load = async (retryCount = 0) => {
+  const load = async (retryCount = 0, force = false) => {
+    // Stale-while-revalidate: Skip refetch if already fresh in memory unless forced
+    if (
+      !force &&
+      inMemoryProductsCache &&
+      inMemoryProductsCache.length > 0 &&
+      Date.now() - lastFetchTimestamp < CACHE_TTL_MS
+    ) {
+      setLoading(false);
+      return;
+    }
+
     const client = supabase;
     if (!client) {
       setError("Store data is unavailable.");
@@ -203,11 +239,17 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
       ]);
 
       if (productsResult.error) {
-        console.warn(`[StorefrontCatalog] Products fetch attempt ${retryCount + 1} failed:`, productsResult.error.message);
+        console.warn(
+          `[StorefrontCatalog] Products fetch attempt ${retryCount + 1} failed:`,
+          productsResult.error.message,
+        );
         if (retryCount < 2) {
-          setTimeout(() => {
-            load(retryCount + 1);
-          }, (retryCount + 1) * 1000);
+          setTimeout(
+            () => {
+              load(retryCount + 1, force);
+            },
+            (retryCount + 1) * 1000,
+          );
           return;
         }
         setError(productsResult.error.message);
@@ -218,6 +260,8 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
       const rawProducts = (productsResult.data ?? []) as unknown as DatabaseProduct[];
       const mappedProducts = rawProducts.map(mapProduct);
       setProducts(mappedProducts);
+      inMemoryProductsCache = mappedProducts;
+      lastFetchTimestamp = Date.now();
 
       if (typeof window !== "undefined") {
         try {
@@ -231,6 +275,7 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
         const rawCats = categoriesResult.data as DatabaseCategory[];
         const mappedCats = rawCats.map((c) => mapCategory(c, mappedProducts));
         setCategories(mappedCats);
+        inMemoryCategoriesCache = mappedCats;
         if (typeof window !== "undefined") {
           try {
             localStorage.setItem(CACHE_KEY_CATEGORIES, JSON.stringify(mappedCats));
@@ -244,12 +289,18 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
 
       setError(null);
       setLoading(false);
-    } catch (err: any) {
-      console.warn(`[StorefrontCatalog] Exception loading catalog (attempt ${retryCount + 1}):`, err);
+    } catch (err: unknown) {
+      console.warn(
+        `[StorefrontCatalog] Exception loading catalog (attempt ${retryCount + 1}):`,
+        err,
+      );
       if (retryCount < 2) {
-        setTimeout(() => {
-          load(retryCount + 1);
-        }, (retryCount + 1) * 1000);
+        setTimeout(
+          () => {
+            load(retryCount + 1, force);
+          },
+          (retryCount + 1) * 1000,
+        );
         return;
       }
       setLoading(false);
@@ -264,9 +315,15 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
 
     const channel = client
       .channel("storefront-catalog")
-      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => load())
-      .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, () => load())
-      .on("postgres_changes", { event: "*", schema: "public", table: "categories" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () =>
+        load(0, true),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, () =>
+        load(0, true),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "categories" }, () =>
+        load(0, true),
+      )
       .subscribe();
 
     return () => {
@@ -280,7 +337,7 @@ export function StorefrontCatalogProvider({ children }: { children: ReactNode })
       categories,
       loading,
       error,
-      refresh: () => load(),
+      refresh: () => load(0, true),
     }),
     [products, categories, loading, error],
   );

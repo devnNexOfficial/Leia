@@ -111,11 +111,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: defaultOgImage },
     ],
     links: [
+      { rel: "preconnect", href: "https://jalhdmqsniibmsmsvfjp.supabase.co" },
+      { rel: "dns-prefetch", href: "https://jalhdmqsniibmsmsvfjp.supabase.co" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,700..900;1,6..96,700..900&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,700;6..96,800&family=Inter:wght@400;500;600;700;800;900&display=swap",
       },
       {
         rel: "stylesheet",
@@ -128,11 +130,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
-        children: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${GTM_ID}');`,
+        children: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});function loadGtm(){if(w['__gtm_loaded__'])return;w['__gtm_loaded__']=true;var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}if('requestIdleCallback' in w){w.requestIdleCallback(loadGtm,{timeout:1000});}else{w.addEventListener('load',function(){setTimeout(loadGtm,1000);});}w.addEventListener('pointerdown',loadGtm,{once:true,passive:true});w.addEventListener('scroll',loadGtm,{once:true,passive:true});})(window,document,'script','dataLayer','${GTM_ID}');`,
       },
     ],
   }),

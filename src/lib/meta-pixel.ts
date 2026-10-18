@@ -1,10 +1,5 @@
 export type MetaEventName =
-  | "PageView"
-  | "ViewContent"
-  | "AddToCart"
-  | "InitiateCheckout"
-  | "Purchase"
-  | "Contact";
+  "PageView" | "ViewContent" | "AddToCart" | "InitiateCheckout" | "Purchase" | "Contact";
 
 export interface MetaContentItem {
   id: string;
@@ -72,7 +67,10 @@ function flushBrowserPixelQueue() {
   } else {
     // Check and drop any expired events while fbq is still not available
     const now = Date.now();
-    while (browserPixelQueue.length > 0 && now - browserPixelQueue[0].enqueuedAt > MAX_QUEUE_AGE_MS) {
+    while (
+      browserPixelQueue.length > 0 &&
+      now - browserPixelQueue[0].enqueuedAt > MAX_QUEUE_AGE_MS
+    ) {
       const expired = browserPixelQueue.shift();
       if (expired) {
         console.warn(

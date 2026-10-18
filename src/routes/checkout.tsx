@@ -192,7 +192,8 @@ function CheckoutContent() {
       if (typeof window !== "undefined" && !sessionStorage.getItem(purchaseTrackKey)) {
         sessionStorage.setItem(purchaseTrackKey, "true");
         const rawOrderTotal = Number(order.total);
-        const safePurchaseValue = !isNaN(rawOrderTotal) && rawOrderTotal > 0 ? rawOrderTotal : (Number(total) || 0);
+        const safePurchaseValue =
+          !isNaN(rawOrderTotal) && rawOrderTotal > 0 ? rawOrderTotal : Number(total) || 0;
 
         trackMetaEvent(
           "Purchase",

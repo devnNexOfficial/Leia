@@ -1,6 +1,6 @@
-import catSkincare from "@/assets/cat-skincare.jpg";
-import catEyes from "@/assets/cat-eyes.jpg";
-import catFace from "@/assets/cat-face.jpg";
+import catSkincare from "@/assets/cat-skincare.webp";
+import catEyes from "@/assets/cat-eyes.webp";
+import catFace from "@/assets/cat-face.webp";
 
 export type Category = {
   slug: string;

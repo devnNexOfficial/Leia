@@ -163,7 +163,16 @@ function getFileEnv(key: string): string | undefined {
   cachedFileEnv = {};
   try {
     if (typeof process !== "undefined" && typeof process.cwd === "function") {
-      const proc = (globalThis as unknown as { process?: { getBuiltinModule?: (m: string) => { existsSync: (p: string) => boolean; readFileSync: (p: string, enc: string) => string } } }).process;
+      const proc = (
+        globalThis as unknown as {
+          process?: {
+            getBuiltinModule?: (m: string) => {
+              existsSync: (p: string) => boolean;
+              readFileSync: (p: string, enc: string) => string;
+            };
+          };
+        }
+      ).process;
       const fs = proc?.getBuiltinModule ? proc.getBuiltinModule("fs") : undefined;
       if (fs && typeof fs.readFileSync === "function") {
         for (const file of [".env.local", ".env"]) {
@@ -336,7 +345,9 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
   const testEventCode = getServerEnv("META_TEST_EVENT_CODE", env);
 
   if (!accessToken) {
-    console.warn("[Meta CAPI] Server access token not configured (META_CAPI_ACCESS_TOKEN is unset)");
+    console.warn(
+      "[Meta CAPI] Server access token not configured (META_CAPI_ACCESS_TOKEN is unset)",
+    );
     return new Response(JSON.stringify({ ok: false }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

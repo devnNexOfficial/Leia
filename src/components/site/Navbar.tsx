@@ -11,13 +11,20 @@ import {
   Mail,
   Layers,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useCart } from "@/components/cart-context";
-import { CartDrawer } from "@/components/site/CartDrawer";
 import { useWishlist } from "@/components/wishlist-context";
-import { SearchModal } from "@/components/site/SearchModal";
-import { WishlistDrawer } from "@/components/site/WishlistDrawer";
 import { useStorefrontCatalog } from "@/components/storefront-catalog-context";
+
+const CartDrawer = lazy(() =>
+  import("@/components/site/CartDrawer").then((m) => ({ default: m.CartDrawer })),
+);
+const SearchModal = lazy(() =>
+  import("@/components/site/SearchModal").then((m) => ({ default: m.SearchModal })),
+);
+const WishlistDrawer = lazy(() =>
+  import("@/components/site/WishlistDrawer").then((m) => ({ default: m.WishlistDrawer })),
+);
 
 export function Navbar() {
   const { count, openDrawer } = useCart();
@@ -213,9 +220,11 @@ export function Navbar() {
       </header>
 
       {/* Action Modals & Drawers */}
-      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-      <WishlistDrawer />
-      <CartDrawer />
+      <Suspense fallback={null}>
+        {searchOpen && <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />}
+        <WishlistDrawer />
+        <CartDrawer />
+      </Suspense>
     </>
   );
 }
