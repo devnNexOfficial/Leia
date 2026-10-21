@@ -23,6 +23,7 @@ export async function submitStorefrontOrder(input: {
     throw new Error("Checkout is currently unavailable (Database connection not configured).");
 
   const standardPhone = normalizePakistaniPhone(input.phone);
+  const cleanEmail = input.email ? input.email.trim().toLowerCase() : "";
   const paymentMethod = input.paymentMethod === "Cash on Delivery" ? "COD" : input.paymentMethod;
   let finalOrder: StorefrontOrder | null = null;
 
@@ -30,7 +31,7 @@ export async function submitStorefrontOrder(input: {
   try {
     const { data, error } = await supabase.rpc("place_storefront_order", {
       p_customer_name: input.customerName.trim(),
-      p_customer_email: input.email.trim() || null,
+      p_customer_email: cleanEmail || null,
       p_customer_phone: standardPhone || null,
       p_shipping_address: input.address.trim(),
       p_city: input.city.trim(),
@@ -81,7 +82,7 @@ export async function submitStorefrontOrder(input: {
       .insert({
         order_number: orderNumber,
         customer_name: input.customerName.trim(),
-        customer_email: input.email.trim() || null,
+        customer_email: cleanEmail || null,
         customer_phone: standardPhone || null,
         shipping_address: input.address.trim(),
         city: input.city.trim(),

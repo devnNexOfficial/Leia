@@ -36,7 +36,7 @@ function Products() {
         .select("*,categories(name),product_variants(*)")
         .order("created_at", { ascending: false }),
       supabase.from("categories").select("*").order("name"),
-      supabase.from("product_wholesale").select("product_id, wholesale_price"),
+      supabase.from("product_wholesale_prices").select("product_id, wholesale_price"),
     ]);
 
     if (p.error || c.error) {
@@ -73,7 +73,7 @@ function Products() {
       .channel("admin-products")
       .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
       .on("postgres_changes", { event: "*", schema: "public", table: "product_variants" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "product_wholesale" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "product_wholesale_prices" }, load)
       .subscribe();
 
     return () => {
@@ -141,7 +141,6 @@ function Products() {
                   <td className="px-5 py-3">Rs. {Number(p.price).toLocaleString()}</td>
                   <td className="px-5 py-3">
                     {p.wholesale_price != null &&
-                    p.wholesale_price !== "" &&
                     !isNaN(Number(p.wholesale_price))
                       ? `Rs. ${Number(p.wholesale_price).toLocaleString()}`
                       : "—"}
@@ -218,6 +217,25 @@ function ProductForm({
     product?.product_variants ?? [],
   );
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!product?.id || !supabase) return;
+    let active = true;
+    supabase
+      .from("product_wholesale_prices")
+      .select("wholesale_price")
+      .eq("product_id", product.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!active || error) return;
+        if (data?.wholesale_price != null) {
+          setWholesalePrice(String(data.wholesale_price));
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [product?.id]);
   const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
   const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
@@ -315,9 +333,9 @@ function ProductForm({
 
     const productId = result.data.id;
 
-    // Upsert or delete from admin-only product_wholesale table
+    // Upsert or delete from admin-only product_wholesale_prices table
     if (parsedWholesale !== null) {
-      const { error: wError } = await supabase!.from("product_wholesale").upsert(
+      const { error: wError } = await supabase!.from("product_wholesale_prices").upsert(
         {
           product_id: productId,
           wholesale_price: parsedWholesale,
@@ -330,7 +348,7 @@ function ProductForm({
       }
     } else {
       const { error: wDelError } = await supabase!
-        .from("product_wholesale")
+        .from("product_wholesale_prices")
         .delete()
         .eq("product_id", productId);
       if (wDelError) {
@@ -386,13 +404,23 @@ function ProductForm({
           <Field label="Name" value={name} set={setName} wide required />
           <Field label="Price (PKR)" value={price} set={setPrice} number required />
           <Field label="Compare-at price" value={compare} set={setCompare} number />
-          <Field
-            label="Wholesale price (PKR)"
-            value={wholesalePrice}
-            set={setWholesalePrice}
-            number
-            helperText="Visible only in admin. Not shown to customers."
-          />
+          <div>
+            <Field
+              label="Wholesale price (PKR) - admin only"
+              value={wholesalePrice}
+              set={setWholesalePrice}
+              number
+              helperText="Visible only in admin. Not shown to customers."
+            />
+            {Number(price) > 0 &&
+              wholesalePrice.trim() !== "" &&
+              !isNaN(Number(wholesalePrice)) &&
+              Number(wholesalePrice) > Number(price) && (
+                <span className="mt-1 block text-xs font-medium text-amber-600">
+                  ⚠️ Soft warning: Wholesale price (Rs. {Number(wholesalePrice).toLocaleString()}) is higher than the selling price (Rs. {Number(price).toLocaleString()}).
+                </span>
+              )}
+          </div>
 
           <label className="text-sm font-medium">
             Category

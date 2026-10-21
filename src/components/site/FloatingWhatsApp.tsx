@@ -8,7 +8,9 @@ export function FloatingWhatsApp() {
   const { pathname } = useLocation();
 
   // Hide WhatsApp button on all admin routes
-  if (pathname.startsWith("/admin")) {
+  const currentPath =
+    pathname || (typeof window !== "undefined" ? window.location.pathname : "");
+  if (currentPath.toLowerCase().startsWith("/admin")) {
     return null;
   }
 

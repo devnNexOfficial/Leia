@@ -170,7 +170,7 @@ function CheckoutContent() {
     try {
       const order = await submitStorefrontOrder({
         customerName: `${cleanFirstName} ${cleanLastName}`,
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         phone: standardPhone,
         address: `${address.trim()}, ${city}${postalCode ? ", " + postalCode.trim() : ""}`,
         city,

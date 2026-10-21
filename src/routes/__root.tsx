@@ -290,7 +290,9 @@ function MetaPageViewTrackerActive() {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { pathname } = useLocation();
-  const isAdmin = pathname.startsWith("/admin");
+  const currentPath =
+    pathname || (typeof window !== "undefined" ? window.location.pathname : "");
+  const isAdmin = currentPath.toLowerCase().startsWith("/admin");
 
   return (
     <QueryClientProvider client={queryClient}>
