@@ -16,6 +16,7 @@ import {
   isValidPakistaniPhone,
   normalizePakistaniPhone,
 } from "@/lib/utils";
+import { saveIdentity } from "@/lib/user-identity";
 
 import { siteUrl } from "@/lib/siteConfig";
 
@@ -231,6 +232,15 @@ function CheckoutContent() {
         });
       }
 
+      // Persist identified customer profile into identity store
+      saveIdentity({
+        email: email.trim().toLowerCase(),
+        phone: standardPhone,
+        first_name: cleanFirstName,
+        last_name: cleanLastName,
+        city: city.trim(),
+      });
+
       // Save or clear customer details based on checkbox
       if (typeof window !== "undefined") {
         if (saveInfo) {
@@ -330,6 +340,13 @@ function CheckoutContent() {
                     setEmail(e.target.value);
                     if (errors.email) setErrors((p) => ({ ...p, email: "" }));
                   }}
+                  onBlur={() => {
+                    const trimmed = email.trim().toLowerCase();
+                    const atIdx = trimmed.indexOf("@");
+                    if (atIdx > 0 && trimmed.indexOf(".", atIdx) > atIdx + 1 && trimmed.length > 5) {
+                      saveIdentity({ email: trimmed });
+                    }
+                  }}
                   className={
                     "w-full rounded-xl border bg-background px-4 py-3 pr-10 text-sm text-foreground focus:outline-none transition-all " +
                     (errors.email
@@ -398,6 +415,10 @@ function CheckoutContent() {
                     setFirstName(e.target.value);
                     if (errors.firstName) setErrors((p) => ({ ...p, firstName: "" }));
                   }}
+                  onBlur={() => {
+                    const trimmed = firstName.trim();
+                    if (trimmed) saveIdentity({ first_name: trimmed });
+                  }}
                   className={
                     "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground focus:outline-none transition-all " +
                     (errors.firstName
@@ -417,6 +438,10 @@ function CheckoutContent() {
                   onChange={(e) => {
                     setLastName(e.target.value);
                     if (errors.lastName) setErrors((p) => ({ ...p, lastName: "" }));
+                  }}
+                  onBlur={() => {
+                    const trimmed = lastName.trim();
+                    if (trimmed) saveIdentity({ last_name: trimmed });
                   }}
                   className={
                     "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground focus:outline-none transition-all " +
@@ -459,6 +484,10 @@ function CheckoutContent() {
                   onChange={(e) => {
                     setCity(e.target.value);
                     if (errors.city) setErrors((p) => ({ ...p, city: "" }));
+                  }}
+                  onBlur={() => {
+                    const trimmed = city.trim();
+                    if (trimmed) saveIdentity({ city: trimmed });
                   }}
                   className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground focus:border-accent focus:outline-none cursor-pointer"
                 >
@@ -509,6 +538,11 @@ function CheckoutContent() {
                     const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
                     setPhone(raw);
                     if (errors.phone) setErrors((p) => ({ ...p, phone: "" }));
+                  }}
+                  onBlur={() => {
+                    if (isValidPakistaniPhone(phone)) {
+                      saveIdentity({ phone: normalizePakistaniPhone(phone) });
+                    }
                   }}
                   className={
                     "w-full rounded-xl border bg-background py-3 pl-20 pr-10 text-sm text-foreground focus:outline-none transition-all " +

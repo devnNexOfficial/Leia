@@ -266,6 +266,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       pulse,
       isDrawerOpen,
       lastOrder,
+      isLoaded,
       openDrawer,
       closeDrawer,
       toggleDrawer,

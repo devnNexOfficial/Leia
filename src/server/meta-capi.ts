@@ -17,6 +17,7 @@ const userDataSchema = z
     last_name: z.string().optional(),
     city: z.string().optional(),
     country: z.string().optional(),
+    external_id: z.string().max(128).optional(),
   })
   .strict()
   .optional();
@@ -312,15 +313,15 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
     fbc: fbc || undefined,
   };
 
-  // Only hash and send personal identifiers (em, ph, fn, ln, ct, country) for checkout / purchase events
-  const isIdentifiedEvent =
-    payload.event_name === "InitiateCheckout" || payload.event_name === "Purchase";
+  // Hash customer identifiers across ALL events whenever provided
+  if (payload.user_data) {
+    let hasCustomerIdentifier = false;
 
-  if (isIdentifiedEvent && payload.user_data) {
     if (payload.user_data.email) {
       const trimmed = payload.user_data.email.trim().toLowerCase();
       if (trimmed) {
         metaUserData.em = [await sha256(trimmed)];
+        hasCustomerIdentifier = true;
       }
     }
 
@@ -328,6 +329,7 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
       const normalizedPhone = normalizePakistaniPhone(payload.user_data.phone);
       if (normalizedPhone) {
         metaUserData.ph = [await sha256(normalizedPhone)];
+        hasCustomerIdentifier = true;
       }
     }
 
@@ -335,6 +337,7 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
       const trimmed = payload.user_data.first_name.trim().toLowerCase();
       if (trimmed) {
         metaUserData.fn = [await sha256(trimmed)];
+        hasCustomerIdentifier = true;
       }
     }
 
@@ -342,6 +345,7 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
       const trimmed = payload.user_data.last_name.trim().toLowerCase();
       if (trimmed) {
         metaUserData.ln = [await sha256(trimmed)];
+        hasCustomerIdentifier = true;
       }
     }
 
@@ -349,17 +353,28 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
       const trimmed = payload.user_data.city.trim().toLowerCase();
       if (trimmed) {
         metaUserData.ct = [await sha256(trimmed)];
+        hasCustomerIdentifier = true;
       }
     }
 
-    // Default country to "pk" (Pakistan) per ISO standard, hashed with SHA-256
-    const countryCode = (payload.user_data.country || "pk").trim().toLowerCase();
-    metaUserData.country = [await sha256(countryCode)];
+    // external_id is allowed on every event (including anonymous)
+    if (payload.user_data.external_id) {
+      const trimmed = payload.user_data.external_id.trim();
+      if (trimmed) {
+        metaUserData.external_id = [await sha256(trimmed)];
+      }
+    }
+
+    // Only add hashed country ("pk") when at least one customer identifier (em/ph/fn/ln/ct) was added
+    if (hasCustomerIdentifier) {
+      const countryCode = (payload.user_data.country || "pk").trim().toLowerCase();
+      metaUserData.country = [await sha256(countryCode)];
+    }
   }
 
   // Non-sensitive diagnostic log: booleans only, zero personal data or hashes
   console.log(
-    `[Meta CAPI Dispatch] event=${payload.event_name} has_ip=${Boolean(metaUserData.client_ip_address)} has_ua=${Boolean(metaUserData.client_user_agent)} has_fbp=${Boolean(metaUserData.fbp)} has_fbc=${Boolean(metaUserData.fbc)} has_em=${Boolean(metaUserData.em)}`,
+    `[Meta CAPI Dispatch] event=${payload.event_name} has_ip=${Boolean(metaUserData.client_ip_address)} has_ua=${Boolean(metaUserData.client_user_agent)} has_fbp=${Boolean(metaUserData.fbp)} has_fbc=${Boolean(metaUserData.fbc)} has_em=${Boolean(metaUserData.em)} has_external_id=${Boolean(metaUserData.external_id)}`,
   );
 
   const accessToken = getServerEnv("META_CAPI_ACCESS_TOKEN", env);

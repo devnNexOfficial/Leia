@@ -24,7 +24,10 @@ export interface MetaUserData {
   last_name?: string;
   city?: string;
   country?: string;
+  external_id?: string;
 }
+
+import { getStoredIdentity, getExternalId } from "./user-identity";
 
 function getClientCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined;
@@ -68,6 +71,25 @@ export function sendMetaCapiEvent(
 
   // Server CAPI via /api/meta-capi with keepalive: true (never blocks UI or checkout)
   try {
+    // Automatically attach stored identity data (external_id, email, phone, name, city)
+    // Caller-provided userData fields take precedence; empty/undefined values are omitted.
+    const stored = getStoredIdentity();
+    const extId = getExternalId();
+    const rawUserData: MetaUserData = {
+      ...stored,
+      ...(extId ? { external_id: extId } : {}),
+      ...(userData || {}),
+    };
+
+    const mergedUserData: MetaUserData = {};
+    for (const [key, value] of Object.entries(rawUserData)) {
+      if (typeof value === "string" && value.trim()) {
+        (mergedUserData as Record<string, string>)[key] = value.trim();
+      }
+    }
+
+    const finalUserData = Object.keys(mergedUserData).length > 0 ? mergedUserData : undefined;
+
     fetch("/api/meta-capi", {
       method: "POST",
       headers: {
@@ -78,7 +100,7 @@ export function sendMetaCapiEvent(
         event_name: eventName,
         event_id: eventId,
         event_source_url: window.location.href,
-        user_data: userData,
+        user_data: finalUserData,
         custom_data: customData,
         fbp,
         fbc,

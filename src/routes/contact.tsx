@@ -17,6 +17,7 @@ import { sendContactNotification } from "@/lib/order-emails";
 import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
 import { sendMetaCapiEvent } from "@/lib/meta-pixel";
 import { pushToDataLayer } from "@/lib/gtm";
+import { saveIdentity } from "@/lib/user-identity";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -114,6 +115,17 @@ function ContactPage() {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       message: formattedMessage,
+    });
+
+    const rawName = form.name.trim();
+    const nameParts = rawName.split(/\s+/).filter(Boolean);
+    const firstName = nameParts[0] || undefined;
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : undefined;
+
+    saveIdentity({
+      email: form.email.trim().toLowerCase(),
+      first_name: firstName,
+      last_name: lastName,
     });
 
     setSent(true);

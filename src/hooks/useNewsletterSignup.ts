@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { sendNewsletterWelcomeEmail } from "@/lib/order-emails";
+import { saveIdentity } from "@/lib/user-identity";
 
 type SignupStatus = "idle" | "loading" | "success" | "duplicate" | "error";
 
@@ -40,6 +41,7 @@ export function useNewsletterSignup() {
     if (!error) {
       setStatus("success");
       setMessage("🎉 Subscribed! Use code: LEIA15 for 15% OFF at checkout.");
+      saveIdentity({ email: normalizedEmail });
       sendNewsletterWelcomeEmail(normalizedEmail, "LEIA15").catch(() => {});
       return;
     }
