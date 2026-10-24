@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Product, Shade } from "@/data/catalog";
 import { sendMetaCapiEvent } from "@/lib/meta-pixel";
 
@@ -36,6 +36,7 @@ type CartContextValue = {
   pulse: number;
   isDrawerOpen: boolean;
   lastOrder: OrderDetails | null;
+  isLoaded: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
   toggleDrawer: () => void;
@@ -58,40 +59,41 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("leia_cart") || localStorage.getItem("maisonrouge_cart");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore error
-        }
-      }
-    }
-    return [];
-  });
+  // Start with empty state on SSR & initial client mount (eliminates React error #418)
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [lastOrder, setLastOrder] = useState<OrderDetails | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isLoadedRef = useRef(false);
 
-  const [lastOrder, setLastOrder] = useState<OrderDetails | null>(() => {
-    if (typeof window !== "undefined") {
-      const saved =
-        localStorage.getItem("leia_last_order") || localStorage.getItem("maisonrouge_last_order");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore error
-        }
+  // Load saved state once mounted client-side
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const savedCart =
+        localStorage.getItem("leia_cart") || localStorage.getItem("maisonrouge_cart");
+      if (savedCart) {
+        setItems(JSON.parse(savedCart));
       }
+      const savedOrder =
+        localStorage.getItem("leia_last_order") || localStorage.getItem("maisonrouge_last_order");
+      if (savedOrder) {
+        setLastOrder(JSON.parse(savedOrder));
+      }
+    } catch {
+      // ignore error
+    } finally {
+      isLoadedRef.current = true;
+      setIsLoaded(true);
     }
-    return null;
-  });
+  }, []);
 
   const [pulse, setPulse] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const saveCartToStorage = (newItems: CartItem[]) => {
-    if (typeof window !== "undefined") {
+    // Guard against overwriting storage before client hydration finishes.
+    // Uses isLoadedRef so callbacks with empty dependency arrays never capture a stale closure.
+    if (typeof window !== "undefined" && isLoadedRef.current) {
       localStorage.setItem("leia_cart", JSON.stringify(newItems));
     }
   };
@@ -280,6 +282,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       pulse,
       isDrawerOpen,
       lastOrder,
+      isLoaded,
       openDrawer,
       closeDrawer,
       toggleDrawer,

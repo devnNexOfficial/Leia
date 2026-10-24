@@ -46,7 +46,7 @@ function CartPage() {
 }
 
 function CartPageContent() {
-  const { items, count, subtotal, updateQuantity, removeItem } = useCart();
+  const { items, count, subtotal, updateQuantity, removeItem, isLoaded } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
 
@@ -81,7 +81,7 @@ function CartPageContent() {
         </Link>
       </Reveal>
 
-      {items.length === 0 ? (
+      {!isLoaded ? null : items.length === 0 ? (
         /* Friendly Empty State */
         <Reveal className="my-16 text-center">
           <div className="mx-auto flex size-24 items-center justify-center rounded-full bg-soft">

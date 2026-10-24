@@ -37,18 +37,18 @@ function ConfirmationPage() {
 }
 
 function ConfirmationContent() {
-  const { lastOrder } = useCart();
+  const { lastOrder, isLoaded } = useCart();
   const navigate = useNavigate();
 
   // Redirect to shop if there's no real order — prevents showing fake data
   useEffect(() => {
-    if (!lastOrder) {
+    if (isLoaded && !lastOrder) {
       navigate({ to: "/shop" });
     }
-  }, [lastOrder, navigate]);
+  }, [lastOrder, isLoaded, navigate]);
 
-  if (!lastOrder) {
-    return null; // will redirect
+  if (!isLoaded || !lastOrder) {
+    return null; // will redirect or waiting for hydration
   }
 
   const order = lastOrder;

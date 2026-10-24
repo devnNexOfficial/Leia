@@ -43,7 +43,7 @@ function CheckoutPage() {
 
 function CheckoutContent() {
   const navigate = useNavigate();
-  const { items, count, subtotal, placeOrder } = useCart();
+  const { items, count, subtotal, placeOrder, isLoaded } = useCart();
 
   // Contact
   const [email, setEmail] = useState("");
@@ -268,6 +268,10 @@ function CheckoutContent() {
       setIsSubmitting(false);
     }
   };
+
+  if (!isLoaded) {
+    return null;
+  }
 
   if (items.length === 0) {
     return (

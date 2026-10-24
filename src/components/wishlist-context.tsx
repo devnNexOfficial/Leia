@@ -7,6 +7,7 @@ type WishlistContextValue = {
   wishlistIds: string[];
   wishlistCount: number;
   isWishlistOpen: boolean;
+  isLoaded: boolean;
   openWishlist: () => void;
   closeWishlist: () => void;
   toggleWishlist: (productId: string) => void;
@@ -20,29 +21,35 @@ const STORAGE_KEY = "leia_wishlist_ids";
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const { products } = useStorefrontCatalog();
-  const [wishlistIds, setWishlistIds] = useState<string[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
-      }
+  // Start with empty state on SSR & initial client mount (eliminates React error #418)
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load saved state once mounted client-side
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setWishlistIds(JSON.parse(saved));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoaded(true);
     }
-    return [];
-  });
+  }, []);
 
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
+  // Persist only after loading completes so initial empty state does not wipe storage
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && isLoaded) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlistIds));
       } catch (e) {
         console.error(e);
       }
     }
-  }, [wishlistIds]);
+  }, [wishlistIds, isLoaded]);
 
   const openWishlist = () => setIsWishlistOpen(true);
   const closeWishlist = () => setIsWishlistOpen(false);
@@ -63,6 +70,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         wishlistIds,
         wishlistCount: wishlistIds.length,
         isWishlistOpen,
+        isLoaded,
         openWishlist,
         closeWishlist,
         toggleWishlist,
