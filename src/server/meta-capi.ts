@@ -16,6 +16,7 @@ const userDataSchema = z
     first_name: z.string().optional(),
     last_name: z.string().optional(),
     city: z.string().optional(),
+    country: z.string().optional(),
   })
   .strict()
   .optional();
@@ -68,6 +69,8 @@ export const metaCapiSchema = z
       ),
     user_data: userDataSchema,
     custom_data: customDataSchema,
+    fbp: z.string().max(256).optional(),
+    fbc: z.string().max(256).optional(),
   })
   .strict();
 
@@ -114,13 +117,16 @@ function parseCookies(cookieHeader: string | null): Record<string, string> {
 }
 
 function getClientIp(request: Request): string | undefined {
+  // 1. Primary for Vercel & reverse proxies: first client IP in x-forwarded-for
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
     const first = forwarded.split(",")[0].trim();
     if (first) return first;
   }
+  // 2. Direct real IP fallback
   const realIp = request.headers.get("x-real-ip");
   if (realIp) return realIp.trim();
+  // 3. Cloudflare fallback
   const cfIp = request.headers.get("cf-connecting-ip");
   if (cfIp) return cfIp.trim();
   return undefined;
@@ -277,12 +283,12 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
     }
   }
 
-  // Extract cookies
+  // Extract cookies (from Cookie header with fallback to client-sent fbp/fbc)
   const cookies = parseCookies(request.headers.get("cookie"));
-  const fbp = cookies._fbp;
-  let fbc = cookies._fbc;
+  const fbp = cookies._fbp || payload.fbp;
+  let fbc = cookies._fbc || payload.fbc;
 
-  // Fallback: build fbc from fbclid if _fbc cookie was not found
+  // Fallback: build fbc from fbclid if _fbc was not found
   if (!fbc) {
     try {
       const sourceUrl = new URL(payload.event_source_url);
@@ -297,48 +303,64 @@ export async function handleMetaCapi(request: Request, env?: unknown): Promise<R
 
   const userAgent = request.headers.get("user-agent") || undefined;
 
-  // Build hashed user_data according to Meta CAPI specification
+  // Build user_data according to Meta CAPI specification
+  // Never hash client_ip_address, client_user_agent, fbp, or fbc
   const metaUserData: Record<string, unknown> = {
-    client_ip_address: clientIp,
-    client_user_agent: userAgent,
+    client_ip_address: clientIp || undefined,
+    client_user_agent: userAgent || undefined,
     fbp: fbp || undefined,
     fbc: fbc || undefined,
   };
 
-  if (payload.user_data?.email) {
-    const trimmed = payload.user_data.email.trim().toLowerCase();
-    if (trimmed) {
-      metaUserData.em = [await sha256(trimmed)];
+  // Only hash and send personal identifiers (em, ph, fn, ln, ct, country) for checkout / purchase events
+  const isIdentifiedEvent =
+    payload.event_name === "InitiateCheckout" || payload.event_name === "Purchase";
+
+  if (isIdentifiedEvent && payload.user_data) {
+    if (payload.user_data.email) {
+      const trimmed = payload.user_data.email.trim().toLowerCase();
+      if (trimmed) {
+        metaUserData.em = [await sha256(trimmed)];
+      }
     }
+
+    if (payload.user_data.phone) {
+      const normalizedPhone = normalizePakistaniPhone(payload.user_data.phone);
+      if (normalizedPhone) {
+        metaUserData.ph = [await sha256(normalizedPhone)];
+      }
+    }
+
+    if (payload.user_data.first_name) {
+      const trimmed = payload.user_data.first_name.trim().toLowerCase();
+      if (trimmed) {
+        metaUserData.fn = [await sha256(trimmed)];
+      }
+    }
+
+    if (payload.user_data.last_name) {
+      const trimmed = payload.user_data.last_name.trim().toLowerCase();
+      if (trimmed) {
+        metaUserData.ln = [await sha256(trimmed)];
+      }
+    }
+
+    if (payload.user_data.city) {
+      const trimmed = payload.user_data.city.trim().toLowerCase();
+      if (trimmed) {
+        metaUserData.ct = [await sha256(trimmed)];
+      }
+    }
+
+    // Default country to "pk" (Pakistan) per ISO standard, hashed with SHA-256
+    const countryCode = (payload.user_data.country || "pk").trim().toLowerCase();
+    metaUserData.country = [await sha256(countryCode)];
   }
 
-  if (payload.user_data?.phone) {
-    const normalizedPhone = normalizePakistaniPhone(payload.user_data.phone);
-    if (normalizedPhone) {
-      metaUserData.ph = [await sha256(normalizedPhone)];
-    }
-  }
-
-  if (payload.user_data?.first_name) {
-    const trimmed = payload.user_data.first_name.trim().toLowerCase();
-    if (trimmed) {
-      metaUserData.fn = [await sha256(trimmed)];
-    }
-  }
-
-  if (payload.user_data?.last_name) {
-    const trimmed = payload.user_data.last_name.trim().toLowerCase();
-    if (trimmed) {
-      metaUserData.ln = [await sha256(trimmed)];
-    }
-  }
-
-  if (payload.user_data?.city) {
-    const trimmed = payload.user_data.city.trim().toLowerCase();
-    if (trimmed) {
-      metaUserData.ct = [await sha256(trimmed)];
-    }
-  }
+  // Non-sensitive diagnostic log: booleans only, zero personal data or hashes
+  console.log(
+    `[Meta CAPI Dispatch] event=${payload.event_name} has_ip=${Boolean(metaUserData.client_ip_address)} has_ua=${Boolean(metaUserData.client_user_agent)} has_fbp=${Boolean(metaUserData.fbp)} has_fbc=${Boolean(metaUserData.fbc)} has_em=${Boolean(metaUserData.em)}`,
+  );
 
   const accessToken = getServerEnv("META_CAPI_ACCESS_TOKEN", env);
   const pixelId = getServerEnv("META_PIXEL_ID", env) || "2551859458621574";

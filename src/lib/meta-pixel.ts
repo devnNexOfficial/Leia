@@ -23,6 +23,13 @@ export interface MetaUserData {
   first_name?: string;
   last_name?: string;
   city?: string;
+  country?: string;
+}
+
+function getClientCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(new RegExp("(?:^|;\\s*)" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : undefined;
 }
 
 /**
@@ -44,6 +51,21 @@ export function sendMetaCapiEvent(
       ? crypto.randomUUID()
       : `ev_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
 
+  // Extract client-side Meta cookies as fallback for server CAPI
+  const fbp = getClientCookie("_fbp");
+  let fbc = getClientCookie("_fbc");
+  if (!fbc && typeof window !== "undefined" && window.location.search) {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fbclid = urlParams.get("fbclid");
+      if (fbclid) {
+        fbc = `fb.1.${Date.now()}.${fbclid}`;
+      }
+    } catch {
+      // Ignore URL parsing errors
+    }
+  }
+
   // Server CAPI via /api/meta-capi with keepalive: true (never blocks UI or checkout)
   try {
     fetch("/api/meta-capi", {
@@ -58,6 +80,8 @@ export function sendMetaCapiEvent(
         event_source_url: window.location.href,
         user_data: userData,
         custom_data: customData,
+        fbp,
+        fbc,
       }),
     }).catch(() => {
       // Swallowed silently
