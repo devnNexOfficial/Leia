@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { Product, Shade } from "@/data/catalog";
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { sendMetaCapiEvent } from "@/lib/meta-pixel";
 
 export type CartItem = {
   id: string; // unique cart line item id e.g. `${product.id}-${shadeName}`
@@ -113,7 +113,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const itemKey = `${product.id}-${targetShade?.id || targetShade?.name || "default"}`;
 
       const itemPrice = targetShade?.priceOverride ?? product.price;
-      trackMetaEvent("AddToCart", {
+      const eventId = sendMetaCapiEvent("AddToCart", {
         content_ids: [product.id],
         content_type: "product",
         value: itemPrice * quantity,
@@ -131,9 +131,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
           event: "add_to_cart",
+          event_id: eventId,
           content_ids: [product.id],
           content_name: product.name,
-          value: product.price * quantity,
+          value: itemPrice * quantity,
           currency: "PKR",
         });
       }

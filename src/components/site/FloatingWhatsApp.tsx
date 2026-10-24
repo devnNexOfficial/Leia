@@ -1,7 +1,8 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { sendMetaCapiEvent } from "@/lib/meta-pixel";
+import { pushToDataLayer } from "@/lib/gtm";
 
 export function FloatingWhatsApp() {
   const [isHovered, setIsHovered] = useState(false);
@@ -36,7 +37,10 @@ export function FloatingWhatsApp() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
-        onClick={() => trackMetaEvent("Contact")}
+        onClick={() => {
+          const eventId = sendMetaCapiEvent("Contact");
+          pushToDataLayer({ event: "contact", event_id: eventId });
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         whileHover={{ scale: 1.12, rotate: 5 }}

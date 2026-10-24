@@ -47,23 +47,6 @@ function ConfirmationContent() {
     }
   }, [lastOrder, navigate]);
 
-  // Safeguard: Ensure purchase event is tracked in dataLayer once and protected against page refresh
-  useEffect(() => {
-    if (!lastOrder?.orderId) return;
-    const gtmPurchaseKey = `gtm_purchase_tracked_${lastOrder.orderId}`;
-    if (typeof window !== "undefined" && !sessionStorage.getItem(gtmPurchaseKey)) {
-      sessionStorage.setItem(gtmPurchaseKey, "true");
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: "purchase",
-        transaction_id: lastOrder.orderId,
-        content_ids: (lastOrder.items || []).map((i) => i.productId),
-        value: Number(lastOrder.total) || 0,
-        currency: "PKR",
-      });
-    }
-  }, [lastOrder]);
-
   if (!lastOrder) {
     return null; // will redirect
   }

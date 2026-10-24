@@ -4,7 +4,7 @@ import { Banknote, Check, ChevronLeft, Truck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { sendMetaCapiEvent } from "@/lib/meta-pixel";
 import { BounceButton, Reveal } from "../components/motion";
 import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
@@ -96,7 +96,7 @@ function CheckoutContent() {
   useEffect(() => {
     if (items.length > 0 && !hasTrackedInitiateCheckout.current) {
       hasTrackedInitiateCheckout.current = true;
-      trackMetaEvent("InitiateCheckout", {
+      const eventId = sendMetaCapiEvent("InitiateCheckout", {
         value: total,
         currency: "PKR",
         num_items: count,
@@ -112,6 +112,7 @@ function CheckoutContent() {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
           event: "begin_checkout",
+          event_id: eventId,
           content_ids: items.map((i) => i.productId),
           value: subtotal,
           currency: "PKR",
@@ -187,15 +188,15 @@ function CheckoutContent() {
         shippingFee: Number(order.shipping_fee) || 0,
       });
 
-      // Track Purchase event with deduplication & protection against duplicate firing
-      const purchaseTrackKey = `meta_purchase_tracked_${order.order_number}`;
+      // Track Purchase exactly once per order (guarded against re-submit / refresh)
+      const purchaseTrackKey = `gtm_purchase_tracked_${order.order_number}`;
       if (typeof window !== "undefined" && !sessionStorage.getItem(purchaseTrackKey)) {
         sessionStorage.setItem(purchaseTrackKey, "true");
         const rawOrderTotal = Number(order.total);
         const safePurchaseValue =
           !isNaN(rawOrderTotal) && rawOrderTotal > 0 ? rawOrderTotal : Number(total) || 0;
 
-        trackMetaEvent(
+        const eventId = sendMetaCapiEvent(
           "Purchase",
           {
             value: safePurchaseValue,
@@ -219,18 +220,15 @@ function CheckoutContent() {
           `purchase_${order.order_number}`,
         );
 
-        const gtmPurchaseKey = `gtm_purchase_tracked_${order.order_number}`;
-        if (!sessionStorage.getItem(gtmPurchaseKey)) {
-          sessionStorage.setItem(gtmPurchaseKey, "true");
-          window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({
-            event: "purchase",
-            transaction_id: order.order_number,
-            content_ids: purchasedItems.map((i) => i.productId),
-            value: safePurchaseValue,
-            currency: "PKR",
-          });
-        }
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "purchase",
+          event_id: eventId,
+          transaction_id: order.order_number,
+          content_ids: purchasedItems.map((i) => i.productId),
+          value: safePurchaseValue,
+          currency: "PKR",
+        });
       }
 
       // Save or clear customer details based on checkbox

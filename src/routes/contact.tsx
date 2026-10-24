@@ -15,7 +15,8 @@ import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/lib/supabase";
 import { sendContactNotification } from "@/lib/order-emails";
 import { siteConfig, siteUrl, defaultOgImage } from "@/lib/siteConfig";
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { sendMetaCapiEvent } from "@/lib/meta-pixel";
+import { pushToDataLayer } from "@/lib/gtm";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -188,7 +189,8 @@ function ContactPage() {
                 href={href}
                 onClick={() => {
                   if (href.includes("wa.me")) {
-                    trackMetaEvent("Contact");
+                    const eventId = sendMetaCapiEvent("Contact");
+                    pushToDataLayer({ event: "contact", event_id: eventId });
                   }
                 }}
                 className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:border-[#D6336C]/30 hover:shadow-md transition-all group"

@@ -22,7 +22,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { formatPKR, type Review, type Shade, type Product } from "@/data/catalog";
 import { useStorefrontCatalog, fetchSingleProduct } from "@/components/storefront-catalog-context";
 import { siteConfig, siteUrl, defaultOgImage, getCanonicalUrl } from "@/lib/siteConfig";
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { sendMetaCapiEvent } from "@/lib/meta-pixel";
 
 export const Route = createFileRoute("/product/$productId")({
   head: () => ({
@@ -138,7 +138,7 @@ function ProductDetailContent() {
     if (product) {
       if (hasTrackedViewContent.current !== product.id) {
         hasTrackedViewContent.current = product.id;
-        trackMetaEvent("ViewContent", {
+        const eventId = sendMetaCapiEvent("ViewContent", {
           content_ids: [product.id],
           content_type: "product",
           value: product.price,
@@ -149,6 +149,7 @@ function ProductDetailContent() {
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
             event: "view_item",
+            event_id: eventId,
             content_ids: [product.id],
             content_name: product.name,
             value: product.price,

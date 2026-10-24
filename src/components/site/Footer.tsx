@@ -3,7 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useNewsletterSignup } from "@/hooks/useNewsletterSignup";
 
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { sendMetaCapiEvent } from "@/lib/meta-pixel";
+import { pushToDataLayer } from "@/lib/gtm";
 
 const columns = [
   {
@@ -60,7 +61,8 @@ export function Footer() {
                           rel="noopener noreferrer"
                           onClick={() => {
                             if (link.href.includes("wa.me")) {
-                              trackMetaEvent("Contact");
+                              const eventId = sendMetaCapiEvent("Contact");
+                              pushToDataLayer({ event: "contact", event_id: eventId });
                             }
                           }}
                           className="text-xs text-white/70 hover:text-white transition-colors"
